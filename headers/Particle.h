@@ -33,6 +33,8 @@ namespace NBodySim{
     class Particle;
 }
 class NBodySim::Particle {
+private:
+    virtual void particle(NBodySim::FloatingType xPos, NBodySim::FloatingType yPos, NBodySim::FloatingType zPos, NBodySim::FloatingType xVel, NBodySim::FloatingType yVel, NBodySim::FloatingType zVel, NBodySim::FloatingType massIn, std::string nameIn);
 protected:
     NBodySim::ThreeVector <NBodySim::FloatingType> position;
     NBodySim::ThreeVector <NBodySim::FloatingType> velocity;
