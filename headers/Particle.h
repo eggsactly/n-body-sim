@@ -25,13 +25,15 @@
 
 #include "NBodyTypes.h"
 
-/** A particle is an entity with a name, mass, instantaneous position and velocity in three dimensional space.
- *
- * @author: Garrett Weaver
- */
+
 namespace NBodySim{
     class Particle;
 }
+/**
+ * A particle is an entity with a name, mass, instantaneous position and velocity in three dimensional space.
+ *
+ * @author: Garrett Weaver
+ */
 class NBodySim::Particle {
 private:
     virtual void particle(NBodySim::FloatingType xPos, NBodySim::FloatingType yPos, NBodySim::FloatingType zPos, NBodySim::FloatingType xVel, NBodySim::FloatingType yVel, NBodySim::FloatingType zVel, NBodySim::FloatingType massIn, std::string nameIn);
