@@ -41,7 +41,7 @@ protected:
 public:
     Particle(void);
     Particle(NBodySim::FloatingType xPos, NBodySim::FloatingType yPos, NBodySim::FloatingType zPos, NBodySim::FloatingType xVel, NBodySim::FloatingType yVel, NBodySim::FloatingType zVel, NBodySim::FloatingType massIn, std::string nameIn);
-    Particle(NBodySim::ThreeVector <NBodySim::FloatingType> pos, NBodySim::ThreeVector <NBodySim::FloatingType> accel, NBodySim::FloatingType massIn, std::string nameIn);
+    Particle(NBodySim::ThreeVector <NBodySim::FloatingType> pos, NBodySim::ThreeVector <NBodySim::FloatingType> vel, NBodySim::FloatingType massIn, std::string nameIn);
     virtual ~Particle(void);
     NBodySim::ThreeVector <NBodySim::FloatingType> getPos(void);
     NBodySim::ThreeVector <NBodySim::FloatingType> getVel(void);
