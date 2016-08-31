@@ -7,6 +7,9 @@ Run _make_ to build the software. Run _./n-body-sim_ to run the simulation. Run 
 # Dependencies
 This program is a C++ program and it depends on the [SDL library](https://www.libsdl.org/), which must be downloaded separately, and the rapidxml library, which has been included in this project.
 
+# Support
+n-body-sim works only on Mac OS X and has been tested on version 10.11.6. All other operating systems are not expected to be able to compile this project without changes to the makefile.
+
 # License 
 n-body-sim is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,3 +27,10 @@ along with n-body-sim.  If not, see <http://www.gnu.org/licenses/>.
 ## rapidxml
 The rapidxml library included on this software and is licensed under both the Boost Software License and the MIT License, where users may choose which license to use in their project. n-body-sim shall use rapidxml under the MIT License. 
 
+# Structure
+- headers/ contains the specifications to the programs classes
+- inputs/ contains input xml files that the program can parse to bring in scenarios
+- LICENSE.txt contains a copy of the GPLv3 text
+- Makefile is the makefile for the project used to convert the source files into an executable
+- rapidxml/ contains the rapidxml library used to parse xml files and used under the MIT license
+- src/ contains the implementation of the programs classes
