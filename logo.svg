@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="256" height="256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+	<radialGradient id="grad1" cx="25%" cy="25%" r="75%" fx="25%" fy="25%">
+		<stop offset="0%" style="stop-color:rgb(255,255,255); stop-opacity:0" />
+		<stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+	</radialGradient>
+	<radialGradient id="grad2" cx="25%" cy="25%" r="75%" fx="25%" fy="25%">
+		<stop offset="0%" style="stop-color:rgb(255,255,255); stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+	</radialGradient>
+	<circle cx="128" cy="128" r="88" stroke="black" stroke-width="3" fill="url(#grad1)" />
+	<circle cx="188" cy="188" r="50" stroke="black" stroke-width="3" fill="url(#grad2)" />
+</svg>

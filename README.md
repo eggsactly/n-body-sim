@@ -32,6 +32,7 @@ The rapidxml library included on this software and is licensed under both the Bo
 - headers/ contains the specifications to the programs classes
 - inputs/ contains input xml files that the program can parse to bring in scenarios
 - LICENSE.txt contains a copy of the GPLv3 text
+- logo.svg logo for the project
 - Makefile is the makefile for the project used to convert the source files into an executable
 - rapidxml/ contains the rapidxml library used to parse xml files and used under the MIT license
 - src/ contains the implementation of the programs classes
