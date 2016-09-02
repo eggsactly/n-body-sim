@@ -1,3 +1,4 @@
 *.o
 n-body-sim
 .DS_Store
+docs/
