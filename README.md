@@ -28,6 +28,7 @@ along with n-body-sim.  If not, see <http://www.gnu.org/licenses/>.
 The rapidxml library included on this software and is licensed under both the Boost Software License and the MIT License, where users may choose which license to use in their project. n-body-sim shall use rapidxml under the MIT License. 
 
 # Structure
+- Doxyfile is a doxygen input file and is used to auto-generate documentation for this project
 - headers/ contains the specifications to the programs classes
 - inputs/ contains input xml files that the program can parse to bring in scenarios
 - LICENSE.txt contains a copy of the GPLv3 text
