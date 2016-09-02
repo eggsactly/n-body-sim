@@ -27,7 +27,7 @@
 
 
 namespace NBodySim{
-    class Particle;
+	class Particle;
 }
 /**
  * A particle is an entity with a name, mass, instantaneous position and velocity in three dimensional space.
@@ -36,30 +36,31 @@ namespace NBodySim{
  */
 class NBodySim::Particle {
 private:
+	
 protected:
-    virtual void particle(NBodySim::FloatingType xPos, NBodySim::FloatingType yPos, NBodySim::FloatingType zPos, NBodySim::FloatingType xVel, NBodySim::FloatingType yVel, NBodySim::FloatingType zVel, NBodySim::FloatingType massIn, std::string nameIn);
-    NBodySim::ThreeVector <NBodySim::FloatingType> position;
-    NBodySim::ThreeVector <NBodySim::FloatingType> velocity;
-    NBodySim::FloatingType mass;
-    std::string name;
+	virtual void particle(NBodySim::FloatingType xPos, NBodySim::FloatingType yPos, NBodySim::FloatingType zPos, NBodySim::FloatingType xVel, NBodySim::FloatingType yVel, NBodySim::FloatingType zVel, NBodySim::FloatingType massIn, std::string nameIn);
+	NBodySim::ThreeVector <NBodySim::FloatingType> position;
+	NBodySim::ThreeVector <NBodySim::FloatingType> velocity;
+	NBodySim::FloatingType mass;
+	std::string name;
 public:
-    Particle(void);
-    Particle(NBodySim::FloatingType xPos, NBodySim::FloatingType yPos, NBodySim::FloatingType zPos, NBodySim::FloatingType xVel, NBodySim::FloatingType yVel, NBodySim::FloatingType zVel, NBodySim::FloatingType massIn, std::string nameIn);
-    Particle(NBodySim::ThreeVector <NBodySim::FloatingType> pos, NBodySim::ThreeVector <NBodySim::FloatingType> vel, NBodySim::FloatingType massIn, std::string nameIn);
-    virtual ~Particle(void);
-    NBodySim::ThreeVector <NBodySim::FloatingType> getPos(void);
-    NBodySim::ThreeVector <NBodySim::FloatingType> getVel(void);
-    NBodySim::FloatingType getMass(void);
-    std::string getName(void);
-    void setPos(NBodySim::ThreeVector <NBodySim::FloatingType> newPosition);
-    void setVel(NBodySim::ThreeVector <NBodySim::FloatingType> newVelocity);
-    void setMass(NBodySim::FloatingType newMass);
-    void setPosX(NBodySim::FloatingType newPosition);
-    void setPosY(NBodySim::FloatingType newPosition);
-    void setPosZ(NBodySim::FloatingType newPosition);
-    void setVelX(NBodySim::FloatingType newPosition);
-    void setVelY(NBodySim::FloatingType newPosition);
-    void setVelZ(NBodySim::FloatingType newPosition);
+	Particle(void);
+	Particle(NBodySim::FloatingType xPos, NBodySim::FloatingType yPos, NBodySim::FloatingType zPos, NBodySim::FloatingType xVel, NBodySim::FloatingType yVel, NBodySim::FloatingType zVel, NBodySim::FloatingType massIn, std::string nameIn);
+	Particle(NBodySim::ThreeVector <NBodySim::FloatingType> pos, NBodySim::ThreeVector <NBodySim::FloatingType> vel, NBodySim::FloatingType massIn, std::string nameIn);
+	virtual ~Particle(void);
+	NBodySim::ThreeVector <NBodySim::FloatingType> getPos(void);
+	NBodySim::ThreeVector <NBodySim::FloatingType> getVel(void);
+	NBodySim::FloatingType getMass(void);
+	std::string getName(void);
+	void setPos(NBodySim::ThreeVector <NBodySim::FloatingType> newPosition);
+	void setVel(NBodySim::ThreeVector <NBodySim::FloatingType> newVelocity);
+	void setMass(NBodySim::FloatingType newMass);
+	void setPosX(NBodySim::FloatingType newPosition);
+	void setPosY(NBodySim::FloatingType newPosition);
+	void setPosZ(NBodySim::FloatingType newPosition);
+	void setVelX(NBodySim::FloatingType newPosition);
+	void setVelY(NBodySim::FloatingType newPosition);
+	void setVelZ(NBodySim::FloatingType newPosition);
 };
 
 #endif //PARTICLE_H

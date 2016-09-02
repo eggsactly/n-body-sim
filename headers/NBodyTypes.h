@@ -23,24 +23,24 @@
 #define N_BODY_TYPES_H
 
 namespace NBodySim{
-    /**
-     * ThreeVector is a templatized class containing three things labled 'x', 'y' and 'z'.
-     *
-     * @author Garrett Weaver
-     */
-    template <class T> class ThreeVector{
-    public:
-        T x;
-        T y;
-        T z;
-    };
-    
-    // Set up our types
-    typedef double FloatingType;
-    typedef unsigned long UnsignedType;
-    
-    // Universal Gravitation Constant in m^3kg^-1s^-2
-    static const FloatingType G = 6.67408e-11;
+	/**
+	 * ThreeVector is a templatized class containing three things labled 'x', 'y' and 'z'.
+	 *
+	 * @author Garrett Weaver
+	 */
+	template <class T> class ThreeVector{
+	public:
+		T x;
+		T y;
+		T z;
+	};
+	
+	// Set up our types
+	typedef double FloatingType;
+	typedef unsigned long UnsignedType;
+	
+	// Universal Gravitation Constant in m^3kg^-1s^-2
+	static const FloatingType G = 6.67408e-11;
 }
 
 #endif // N_BODY_TYPES_H

@@ -28,7 +28,7 @@
 #include "Particle.h"
 
 namespace NBodySim{
-    class NBodySystem;
+	class NBodySystem;
 }
 
 /**
@@ -39,17 +39,17 @@ namespace NBodySim{
 
 class NBodySim::NBodySystem {
 private:
-    
+	
 protected:
-    std::vector<NBodySim::Particle> system;
+	std::vector<NBodySim::Particle> system;
 public:
-    NBodySystem(void);
-    virtual ~NBodySystem(void);
-    void addParticle(NBodySim::Particle p);
-    NBodySim::Particle getParticle(NBodySim::UnsignedType index);
-    NBodySim::UnsignedType numParticles(void);
-    void removeParticle(NBodySim::UnsignedType index);
-    void step(NBodySim::FloatingType deltaT);
+	NBodySystem(void);
+	virtual ~NBodySystem(void);
+	void addParticle(NBodySim::Particle p);
+	NBodySim::Particle getParticle(NBodySim::UnsignedType index);
+	NBodySim::UnsignedType numParticles(void);
+	void removeParticle(NBodySim::UnsignedType index);
+	void step(NBodySim::FloatingType deltaT);
 };
 
 #endif // N_BODY_SYSTEM_H

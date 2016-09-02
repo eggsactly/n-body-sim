@@ -24,80 +24,80 @@
 #include "Particle.h"
 
 NBodySim::Particle::Particle(void){
-    particle(0, 0, 0, 0, 0, 0, 0, "");
+	particle(0, 0, 0, 0, 0, 0, 0, "");
 }
 
 NBodySim::Particle::Particle(NBodySim::FloatingType xPos, NBodySim::FloatingType yPos, NBodySim::FloatingType zPos, NBodySim::FloatingType xVel, NBodySim::FloatingType yVel, NBodySim::FloatingType zVel, NBodySim::FloatingType massIn, std::string nameIn){
-    particle(xPos, yPos, zPos, xVel, yVel, zVel, massIn, nameIn);
+	particle(xPos, yPos, zPos, xVel, yVel, zVel, massIn, nameIn);
 }
 
 NBodySim::Particle::Particle(NBodySim::ThreeVector <NBodySim::FloatingType> pos, NBodySim::ThreeVector <NBodySim::FloatingType> vel, NBodySim::FloatingType massIn, std::string nameIn){
-    particle(pos.x, pos.y, pos.z, vel.x, vel.y, vel.z, massIn, nameIn);
+	particle(pos.x, pos.y, pos.z, vel.x, vel.y, vel.z, massIn, nameIn);
 }
 
 void NBodySim::Particle::particle(NBodySim::FloatingType xPos, NBodySim::FloatingType yPos, NBodySim::FloatingType zPos, NBodySim::FloatingType xVel, NBodySim::FloatingType yVel, NBodySim::FloatingType zVel, NBodySim::FloatingType massIn, std::string nameIn){
-    position.x = xPos;
-    position.y = yPos;
-    position.z = zPos;
-    velocity.x = xVel;
-    velocity.y = yVel;
-    velocity.z = zVel;
-    mass = massIn;
-    name = nameIn;
+	position.x = xPos;
+	position.y = yPos;
+	position.z = zPos;
+	velocity.x = xVel;
+	velocity.y = yVel;
+	velocity.z = zVel;
+	mass = massIn;
+	name = nameIn;
 }
 
 NBodySim::Particle::~Particle(void){
-    // Do nothing
+	// Do nothing
 }
 
 NBodySim::ThreeVector <NBodySim::FloatingType> NBodySim::Particle::getPos(void){
-    return position;
+	return position;
 }
 
 NBodySim::ThreeVector <NBodySim::FloatingType> NBodySim::Particle::getVel(void){
-    return velocity;
+	return velocity;
 }
 
 NBodySim::FloatingType NBodySim::Particle::getMass(void){
-    return mass;
+	return mass;
 }
 
 std::string NBodySim::Particle::getName(void){
-    return name;
+	return name;
 }
 
 void NBodySim::Particle::setPos(NBodySim::ThreeVector <NBodySim::FloatingType> newPosition){
-    position = newPosition;
+	position = newPosition;
 }
 
 void NBodySim::Particle::setVel(NBodySim::ThreeVector <NBodySim::FloatingType> newVelocity){
-    velocity = newVelocity;
+	velocity = newVelocity;
 }
 
 void NBodySim::Particle::setMass(NBodySim::FloatingType newMass){
-    mass = newMass;
+	mass = newMass;
 }
 
 void NBodySim::Particle::setPosX(NBodySim::FloatingType newPosition){
-    position.x = newPosition;
+	position.x = newPosition;
 }
 
 void NBodySim::Particle::setPosY(NBodySim::FloatingType newPosition){
-    position.y = newPosition;
+	position.y = newPosition;
 }
 
 void NBodySim::Particle::setPosZ(NBodySim::FloatingType newPosition){
-    position.z = newPosition;
+	position.z = newPosition;
 }
 
 void NBodySim::Particle::setVelX(NBodySim::FloatingType newPosition){
-    velocity.x = newPosition;
+	velocity.x = newPosition;
 }
 
 void NBodySim::Particle::setVelY(NBodySim::FloatingType newPosition){
-    velocity.y = newPosition;
+	velocity.y = newPosition;
 }
 
 void NBodySim::Particle::setVelZ(NBodySim::FloatingType newPosition){
-    velocity.z = newPosition;
+	velocity.z = newPosition;
 }
