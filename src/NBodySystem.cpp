@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Garrett Weaver
+ * Copyright (c) 2016 W.A. Garrett Weaver
  *
  * This file is part of n-body-sim.
  *
@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with n-body-sim.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 

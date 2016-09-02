@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Garrett Weaver
+ * Copyright (c) 2016 W.A. Garrett Weaver
  *
  * This file is part of n-body-sim.
  *
@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with n-body-sim.  If not, see <http://www.gnu.org/licenses/>.
  *
  * NBodyTypes contains enumerations and typedefs used by n-body-sim.
  */
@@ -26,7 +26,7 @@ namespace NBodySim{
 	/**
 	 * ThreeVector is a templatized class containing three things labled 'x', 'y' and 'z'.
 	 *
-	 * @author Garrett Weaver
+	 * @author W.A. Garrett Weaver
 	 */
 	template <class T> class ThreeVector{
 	public:

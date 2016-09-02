@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Garrett Weaver
+ * Copyright (c) 2016 W.A. Garrett Weaver
  *
  * This file is part of n-body-sim.
  *
@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with n-body-sim.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -27,28 +27,69 @@
 #include "NBodyTypes.h"
 #include "Particle.h"
 
-namespace NBodySim{
+namespace NBodySim {
 	class NBodySystem;
 }
 
 /**
  * NBodySystem contains a vector of Particles and is used to calculate each new step of the simulation.
  *
- * @author Garrett Weaver
+ * @author W.A. Garrett Weaver
+ * @see Particle
  */
 
 class NBodySim::NBodySystem {
 private:
 	
 protected:
+	/**
+	 * system is set of all particles, where the order doesn't matter, but a vector was used anyways.
+	 */
 	std::vector<NBodySim::Particle> system;
 public:
+	/**
+	 * Default constructor
+	 */
 	NBodySystem(void);
+	/**
+	 * Destructor
+	 */
 	virtual ~NBodySystem(void);
+	
+	/**
+	 * addParticle adds a particle to the sim
+	 *
+	 * @param p is a particle to be added to the system vector
+	 */
 	void addParticle(NBodySim::Particle p);
+	
+	/**
+	 * getParticle returns a particle based on its index
+	 *
+	 * @param index the index of the particle to return
+	 * @return the particle specified by the index
+	 */
 	NBodySim::Particle getParticle(NBodySim::UnsignedType index);
+	
+	/**
+	 * numParticles returns the number of particles in the simulation
+	 *
+	 * @return an unsigned number representing the number of particles in the simulation
+	 */
 	NBodySim::UnsignedType numParticles(void);
+	
+	/**
+	 * removeParticle removes a particle from the simulation based on its index
+	 *
+	 * @param index is the index of the particle to be removed
+	 */
 	void removeParticle(NBodySim::UnsignedType index);
+	
+	/**
+	 * step calculates new positions and velocities of the particles in the system
+	 *
+	 * @param deltaT is a floating point number of the amount of time that passes till the next step
+	 */
 	void step(NBodySim::FloatingType deltaT);
 };
 
