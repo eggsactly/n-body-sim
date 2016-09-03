@@ -24,7 +24,7 @@
 
 namespace NBodySim{
 	/**
-	 * ThreeVector is a templatized class containing three things labled 'x', 'y' and 'z'.
+	 * @brief A templatized class containing three identical types labled 'x', 'y' and 'z'.
 	 *
 	 * @author W.A. Garrett Weaver
 	 */

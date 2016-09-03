@@ -30,7 +30,7 @@ namespace NBodySim{
 	class Particle;
 }
 /**
- * A particle is an entity with a name, mass, instantaneous position and velocity in three dimensional space.
+ * @brief An entity with a name, mass, instantaneous position and velocity in three dimensional space.
  *
  * @author: W.A. Garrett Weaver
  * @see ThreeVector

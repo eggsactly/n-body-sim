@@ -32,12 +32,11 @@ namespace NBodySim {
 }
 
 /**
- * NBodySystem contains a vector of Particles and is used to calculate each new step of the simulation.
+ * @brief Contains a vector of type Particle and is used to calculate each new step of the simulation.
  *
  * @author W.A. Garrett Weaver
  * @see Particle
  */
-
 class NBodySim::NBodySystem {
 private:
 	
