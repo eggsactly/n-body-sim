@@ -90,6 +90,13 @@ public:
 	 * @param deltaT is a floating point number of the amount of time that passes till the next step
 	 */
 	void step(NBodySim::FloatingType deltaT);
+	
+	/**
+	 * parse takes in a string containing xml text of a system scenario and creates particle instances in this class
+	 *
+	 * @param xmlText is a string containing valid xml
+	 */
+	void parse(std::string xmlText);
 };
 
 #endif // N_BODY_SYSTEM_H
