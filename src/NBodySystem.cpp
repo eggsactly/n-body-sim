@@ -18,9 +18,15 @@
  *
  */
 
+#include <cstdlib>
+#include <iostream>
 #include <string>
 #include <vector>
 #include <cmath>
+#include <fstream>
+#include <streambuf>
+
+#include "rapidxml.hpp"
 
 #include "NBodyTypes.h"
 #include "Particle.h"
@@ -83,4 +89,74 @@ void NBodySim::NBodySystem::step(NBodySim::FloatingType deltaT){
 		}
 		system[i].setVel(newVelocity);
 	}
+}
+
+void NBodySim::NBodySystem::parse(std::string xmlText){
+	char * buffer = NULL;
+	rapidxml::xml_node<> *node;
+	rapidxml::xml_node<> *secondNode;
+	rapidxml::xml_attribute<> *attr;
+	rapidxml::xml_document<> doc;
+	doc.parse<0>(buffer);
+	const unsigned attributeListLength = 8;
+	char attributeList [][attributeListLength] = {"posX", "posY", "posZ", "velX", "velY", "velZ", "mass", "name"};
+	
+	buffer = new char[xmlText.size() + 1];
+	if(buffer == NULL){
+		std::cout << "Failed to allocate memory for scenario text." << std::endl;
+		return;
+	}
+	
+	strcpy(buffer, xmlText.c_str());
+	
+	node = doc.first_node("system");
+	if(node != NULL){
+		if(node->next_sibling("system") != NULL){
+			std::cout << "More than one system specified in xml file." << std::endl;
+			delete [] buffer;
+			return;
+		}
+	}
+	else{
+		std::cout << "No system node found." << std::endl;
+		delete [] buffer;
+		return;
+	}
+	
+	secondNode = node->first_node("particle");
+	if(secondNode == NULL){
+		std::cout << "No particles in system." << std::endl;
+		delete [] buffer;
+		return;
+	}
+	
+	while(secondNode != NULL){
+		NBodySim::Particle p;
+		for(unsigned i = 0; i < attributeListLength; i++){
+			attr = secondNode->first_attribute(attributeList[i]);
+			if(attr == NULL){
+				std::cout << "No " << attributeList[i] << " attribute found for particle." << std::endl;
+				delete [] buffer;
+				return;
+			}
+			switch(i){
+				case 1: p.setPosX(atof(attr->value())); break;
+				case 2: p.setPosY(atof(attr->value())); break;
+				case 3: p.setPosZ(atof(attr->value())); break;
+				case 4: p.setVelX(atof(attr->value())); break;
+				case 5: p.setVelY(atof(attr->value())); break;
+				case 6: p.setVelZ(atof(attr->value())); break;
+				case 7: p.setMass(atof(attr->value())); break;
+				case 8: p.setName(std::string(attr->value())); break;
+				default: std::cout << "Index exceded somehow" << std::endl; return;
+			}
+		}
+		
+		secondNode = secondNode->next_sibling();
+		this->addParticle(p);
+	}
+	
+	delete [] buffer;
+	
+	return;
 }
