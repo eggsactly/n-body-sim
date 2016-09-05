@@ -198,6 +198,13 @@ public:
 	 * @param newVelocity is the new z position of the particle
 	 */
 	void setVelZ(NBodySim::FloatingType newVelocity);
+	
+	/**
+	 * Sets the name of the particle
+	 *
+	 * @param nameIn is the new name of the particle
+	 */
+	void setName(std::string nameIn);
 };
 
 #endif //PARTICLE_H

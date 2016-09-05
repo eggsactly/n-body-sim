@@ -101,3 +101,7 @@ void NBodySim::Particle::setVelY(NBodySim::FloatingType newVelocity){
 void NBodySim::Particle::setVelZ(NBodySim::FloatingType newVelocity){
 	velocity.z = newVelocity;
 }
+
+void NBodySim::Particle::setName(std::string nameIn){
+	name = nameIn;
+}
