@@ -21,10 +21,50 @@
 #include <cstdlib>
 #include <iostream>
 #include <string.h>
+#include <fstream>
+#include <streambuf>
 
 #include "NBodyTypes.h"
 #include "Particle.h"
 #include "NBodySystem.h"
+
+
+/**
+ * @brief main is the root function for the program
+ *
+ * @param argc the number of space separated words in the command
+ * @param argv an array of words in the input
+ * @return 0 on exit
+ */
+int main(int argc, char* argv[]);
+
+/**
+ * @brief readFile reads a file and outputs the contents of the file
+ *
+ * @param fileName is a std::string containing a path to a file to read
+ * @return the contents of the file specified by fileName
+ */
+std::string readFile(std::string fileName);
+
+
+std::string readFile(std::string fileName){
+	std::string scenarioText;
+	std::ifstream scenarioFile(fileName);
+	
+	if (scenarioFile.is_open())
+	{
+		scenarioFile.seekg(0, std::ios::end);
+		scenarioText.reserve(scenarioFile.tellg());
+		scenarioFile.seekg(0, std::ios::beg);
+		scenarioText.assign((std::istreambuf_iterator<char>(scenarioFile)), std::istreambuf_iterator<char>());
+		scenarioFile.close();
+		return scenarioText;
+	}
+	else {
+		std::cout << "Could not open file " << fileName << std::endl;
+		return "";
+	}
+}
 
 int main(int argc, char* argv[]){
 	NBodySim::ThreeVector <NBodySim::FloatingType> pos;
