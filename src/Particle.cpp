@@ -91,13 +91,13 @@ void NBodySim::Particle::setPosZ(NBodySim::FloatingType newPosition){
 }
 
 void NBodySim::Particle::setVelX(NBodySim::FloatingType newVelocity){
-	velocity.x = newPosition;
+	velocity.x = newVelocity;
 }
 
 void NBodySim::Particle::setVelY(NBodySim::FloatingType newVelocity){
-	velocity.y = newPosition;
+	velocity.y = newVelocity;
 }
 
 void NBodySim::Particle::setVelZ(NBodySim::FloatingType newVelocity){
-	velocity.z = newPosition;
+	velocity.z = newVelocity;
 }
