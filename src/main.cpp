@@ -67,44 +67,12 @@ std::string readFile(std::string fileName){
 }
 
 int main(int argc, char* argv[]){
-	NBodySim::ThreeVector <NBodySim::FloatingType> pos;
-	NBodySim::ThreeVector <NBodySim::FloatingType> vel;
-	NBodySim::FloatingType mass;
-	
-	pos.x = 0;
-	pos.y = 0;
-	pos.z = 0;
-	vel.x = 0;
-	vel.y = 0;
-	vel.z = 0;
-	mass = 1.988500e30;
-	NBodySim::Particle sun(pos, vel, mass, "Sun");
-	
-	pos.x = 0;
-	pos.y = 1.5210e11;
-	pos.z = 0;
-	vel.x = -2.929e4;
-	vel.y = 0;
-	vel.z = 0;
-	mass = 5.972e24;
-	NBodySim::Particle earth(pos, vel, mass, "Earth");
-	
-	pos.x = 4.054e8;
-	pos.y = 1.5210e11;
-	pos.z = 0;
-	vel.x = -2.929e4;
-	vel.y = -964.0f;
-	vel.z = 0;
-	mass = 7.34767309e22;
-	NBodySim::Particle::Particle moon(pos, vel, mass, "Moon");
+	std::string inputScenario = readFile("inputs/SolarSystem.xml");
 	
 	NBodySim::NBodySystem solarSystem;
-	
-	solarSystem.addParticle(sun);
-	solarSystem.addParticle(earth);
-	solarSystem.addParticle(moon);
-	
-	solarSystem.step(1.00f);
+	if(!solarSystem.parse(inputScenario)){
+		solarSystem.step(1.00f);
+	}
 	
 	return EXIT_SUCCESS;
 }
