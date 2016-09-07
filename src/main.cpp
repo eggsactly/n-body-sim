@@ -23,6 +23,7 @@
 #include <string.h>
 #include <fstream>
 #include <streambuf>
+#include <getopt.h>
 
 #include "NBodyTypes.h"
 #include "Particle.h"
@@ -46,6 +47,24 @@ int main(int argc, char* argv[]);
  */
 std::string readFile(std::string fileName);
 
+/**
+ * @brief This structure contains a list of options a user can control on the command line
+ */
+typedef struct {
+	bool help;            /**< Indicates whether to print the list of command line options to the user */
+	std::string fileName; /**< Indicates path to input file */
+} argsList;
+
+/**
+ * @brief parseArgs parses input arguments from the user
+ *
+ * @param argc the number of space separated words in the command
+ * @param argv an array of words in the input
+ * @return a list of arguments selected by the user
+ */
+
+argsList parseArgs(int argc, char* argv[]);
+
 
 std::string readFile(std::string fileName){
 	std::string scenarioText;
@@ -66,12 +85,57 @@ std::string readFile(std::string fileName){
 	}
 }
 
-int main(int argc, char* argv[]){
-	std::string inputScenario = readFile("inputs/SolarSystem.xml");
+argsList parseArgs(int argc, char* argv[]){
+	int c;
+	int option_index = 0;
+	static struct option long_options[] =
+	{
+		{"help",        no_argument,       0, 'h'},
+		{"input-file",  required_argument, 0, 'i'},
+		{0, 0, 0, 0}
+	};
+	argsList output;
 	
-	NBodySim::NBodySystem solarSystem;
-	if(!solarSystem.parse(inputScenario)){
-		solarSystem.step(1.00f);
+	output.help = false;
+	output.fileName = "";
+	
+	while ((c = getopt_long(argc, argv, "hi:", long_options, &option_index)) != -1){
+		switch (c)
+		{
+			case 'h':
+				output.help = true;
+				break;
+			case 'i':
+				output.fileName = optarg;
+				break;
+			default:
+				abort ();
+				break;
+		}
+	}
+	return output;
+}
+
+int main(int argc, char* argv[]){
+	argsList inputArgs = parseArgs(argc, argv);
+	std::string inputScenario;
+	
+	if(inputArgs.help){
+		std::cout << "Command line flags: " << std::endl;
+		std::cout << "\t-i, --input-file [Filename]: Input xml file with initial conditions" << std::endl;
+		std::cout << "\t-h, --help                 : Shows this help option" << std::endl;
+	}
+	else {
+		if(inputArgs.fileName.length() == 0){
+			inputScenario = readFile("inputs/SolarSystem.xml");
+		}
+		else {
+			inputScenario = readFile(inputArgs.fileName);
+		}
+		NBodySim::NBodySystem solarSystem;
+		if(!solarSystem.parse(inputScenario)){
+			solarSystem.step(1.00f);
+		}
 	}
 	
 	return EXIT_SUCCESS;
