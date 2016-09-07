@@ -95,8 +95,9 @@ public:
 	 * parse takes in a string containing xml text of a system scenario and creates particle instances in this class
 	 *
 	 * @param xmlText is a string containing valid xml
+	 * @return 0 on success, 1 on failure
 	 */
-	void parse(std::string xmlText);
+	unsigned char parse(std::string xmlText);
 };
 
 #endif // N_BODY_SYSTEM_H

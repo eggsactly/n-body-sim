@@ -91,7 +91,7 @@ void NBodySim::NBodySystem::step(NBodySim::FloatingType deltaT){
 	}
 }
 
-void NBodySim::NBodySystem::parse(std::string xmlText){
+unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
 	char * buffer = NULL;
 	rapidxml::xml_node<> *node;
 	rapidxml::xml_node<> *secondNode;
@@ -104,7 +104,7 @@ void NBodySim::NBodySystem::parse(std::string xmlText){
 	buffer = new char[xmlText.size() + 1];
 	if(buffer == NULL){
 		std::cout << "Failed to allocate memory for scenario text." << std::endl;
-		return;
+		return 1;
 	}
 	
 	strcpy(buffer, xmlText.c_str());
@@ -114,20 +114,20 @@ void NBodySim::NBodySystem::parse(std::string xmlText){
 		if(node->next_sibling("system") != NULL){
 			std::cout << "More than one system specified in xml file." << std::endl;
 			delete [] buffer;
-			return;
+			return 1;
 		}
 	}
 	else{
 		std::cout << "No system node found." << std::endl;
 		delete [] buffer;
-		return;
+		return 1;
 	}
 	
 	secondNode = node->first_node("particle");
 	if(secondNode == NULL){
 		std::cout << "No particles in system." << std::endl;
 		delete [] buffer;
-		return;
+		return 1;
 	}
 	
 	while(secondNode != NULL){
@@ -137,7 +137,7 @@ void NBodySim::NBodySystem::parse(std::string xmlText){
 			if(attr == NULL){
 				std::cout << "No " << attributeList[i] << " attribute found for particle." << std::endl;
 				delete [] buffer;
-				return;
+				return 1;
 			}
 			switch(i){
 				case 1: p.setPosX(atof(attr->value())); break;
@@ -148,7 +148,7 @@ void NBodySim::NBodySystem::parse(std::string xmlText){
 				case 6: p.setVelZ(atof(attr->value())); break;
 				case 7: p.setMass(atof(attr->value())); break;
 				case 8: p.setName(std::string(attr->value())); break;
-				default: std::cout << "Index exceded somehow" << std::endl; return;
+				default: std::cout << "Index exceded somehow" << std::endl; return 1;
 			}
 		}
 		
@@ -158,5 +158,5 @@ void NBodySim::NBodySystem::parse(std::string xmlText){
 	
 	delete [] buffer;
 	
-	return;
+	return 0;
 }
