@@ -97,7 +97,6 @@ unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
 	rapidxml::xml_node<> *secondNode;
 	rapidxml::xml_attribute<> *attr;
 	rapidxml::xml_document<> doc;
-	doc.parse<0>(buffer);
 	const unsigned attributeListLength = 8;
 	char attributeList [][attributeListLength] = {"posX", "posY", "posZ", "velX", "velY", "velZ", "mass", "name"};
 	
@@ -106,8 +105,10 @@ unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
 		std::cout << "Failed to allocate memory for scenario text." << std::endl;
 		return 1;
 	}
-	
 	strcpy(buffer, xmlText.c_str());
+	
+	// Parse the file
+	doc.parse<0>(buffer);
 	
 	node = doc.first_node("system");
 	if(node != NULL){
@@ -122,6 +123,7 @@ unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
 		delete [] buffer;
 		return 1;
 	}
+	
 	
 	secondNode = node->first_node("particle");
 	if(secondNode == NULL){
@@ -140,14 +142,14 @@ unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
 				return 1;
 			}
 			switch(i){
-				case 1: p.setPosX(atof(attr->value())); break;
-				case 2: p.setPosY(atof(attr->value())); break;
-				case 3: p.setPosZ(atof(attr->value())); break;
-				case 4: p.setVelX(atof(attr->value())); break;
-				case 5: p.setVelY(atof(attr->value())); break;
-				case 6: p.setVelZ(atof(attr->value())); break;
-				case 7: p.setMass(atof(attr->value())); break;
-				case 8: p.setName(std::string(attr->value())); break;
+				case 0: p.setPosX(atof(attr->value())); break;
+				case 1: p.setPosY(atof(attr->value())); break;
+				case 2: p.setPosZ(atof(attr->value())); break;
+				case 3: p.setVelX(atof(attr->value())); break;
+				case 4: p.setVelY(atof(attr->value())); break;
+				case 5: p.setVelZ(atof(attr->value())); break;
+				case 6: p.setMass(atof(attr->value())); break;
+				case 7: p.setName(std::string(attr->value())); break;
 				default: std::cout << "Index exceded somehow" << std::endl; return 1;
 			}
 		}
