@@ -36,6 +36,7 @@ The rapidxml library included on this software and is licensed under both the Bo
 - Makefile is the makefile for the project used to convert the source files into an executable
 - rapidxml/ contains the rapidxml library used to parse xml files and used under the MIT license
 - src/ contains the implementation of the programs classes
+- tests/ contains unit tests for the project
 
 # Coding Standards
 Consistancy helps build maintainable code, even if you don't agree with all the decisions. If you contribute to this project, please follow these guidelines:
