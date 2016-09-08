@@ -51,8 +51,9 @@ std::string readFile(std::string fileName);
  * @brief This structure contains a list of options a user can control on the command line
  */
 typedef struct {
-	bool help;            /**< Indicates whether to print the list of command line options to the user */
-	std::string fileName; /**< Indicates path to input file */
+	bool help;                       /**< Indicates whether to print the list of command line options to the user */
+	std::string fileName;            /**< Indicates path to input file */
+	NBodySim::FloatingType stepSize; /**< Size of simulation steps in seconds */
 } argsList;
 
 /**
@@ -92,14 +93,16 @@ argsList parseArgs(int argc, char* argv[]){
 	{
 		{"help",        no_argument,       0, 'h'},
 		{"input-file",  required_argument, 0, 'i'},
+		{"step-size",   required_argument, 0, 's'},
 		{0, 0, 0, 0}
 	};
 	argsList output;
 	
 	output.help = false;
 	output.fileName = "";
+	output.stepSize = 1.0f;
 	
-	while ((c = getopt_long(argc, argv, "hi:", long_options, &option_index)) != -1){
+	while ((c = getopt_long(argc, argv, "hi:s:", long_options, &option_index)) != -1){
 		switch (c)
 		{
 			case 'h':
@@ -107,6 +110,9 @@ argsList parseArgs(int argc, char* argv[]){
 				break;
 			case 'i':
 				output.fileName = optarg;
+				break;
+			case 's':
+				output.stepSize = atof(optarg);
 				break;
 			default:
 				abort ();
@@ -123,6 +129,7 @@ int main(int argc, char* argv[]){
 	if(inputArgs.help){
 		std::cout << "Command line flags: " << std::endl;
 		std::cout << "\t-i, --input-file [Filename]: Input xml file with initial conditions" << std::endl;
+		std::cout << "\t-s, --step-size  [float]   : Simulation step size in seconds" << std::endl;
 		std::cout << "\t-h, --help                 : Shows this help option" << std::endl;
 	}
 	else {
@@ -134,7 +141,7 @@ int main(int argc, char* argv[]){
 		}
 		NBodySim::NBodySystem solarSystem;
 		if(!solarSystem.parse(inputScenario)){
-			solarSystem.step(1.00f);
+			solarSystem.step(inputArgs.stepSize);
 		}
 	}
 	
