@@ -9,13 +9,22 @@ OBJ_DIR=obj/
 SRC_DIR=src/
 SOURCES=$(wildcard $(SRC_DIR)*.cpp)
 OBJECTS=$(patsubst $(SRC_DIR)%.cpp, $(OBJ_DIR)%.o, $(SOURCES))
+TEST_OBJECTS=$(patsubst $(OBJ_DIR)main.o, , $(OBJECTS))
 DEBUG=
+TESTDIR=tests
 
-all: $(EXE)
+all: $(EXE) $(TESTDIR)/test
+	./$(TESTDIR)/test
 
 debug: clean 
 debug: DEBUG+=-g 
 debug: $(EXE)	
+
+$(TESTDIR)/test : $(TESTDIR)/UnitTests.o $(OBJ_DIR) $(TEST_OBJECTS) 
+	$(CC) $(DEBUG) $(INC) $(LIB) $< $(TEST_OBJECTS) -o $@
+
+$(TESTDIR)/UnitTests.o : $(TESTDIR)/UnitTests.cpp
+	$(CC) $(DEBUG) $(INC) -c $^ -o $@
 
 $(EXE): $(OBJ_DIR) $(OBJECTS)
 	$(CC) $(DEBUG) $(LIB) $(OBJECTS) -o $@
@@ -28,5 +37,5 @@ $(OBJ_DIR):
 
 .PHONY: clean
 clean:
-	rm -rf $(EXE) $(OBJ_DIR)
+	rm -rf $(EXE) $(OBJ_DIR) $(TESTDIR)/UnitTests.o $(TESTDIR)/test
 

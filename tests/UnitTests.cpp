@@ -20,6 +20,7 @@
 
 
 #include <iostream>
+#include <cstdlib>
 
 #include "NBodyTypes.h"
 #include "Particle.h"
@@ -27,4 +28,24 @@
 
 int main(){
 	
+	NBodySim::ThreeVector <NBodySim::FloatingType> output;
+	NBodySim::Particle p;
+	p.setPosX(1);
+	p.setPosY(0);
+	p.setPosZ(0);
+	p.setVelX(0);
+	p.setVelY(0);
+	p.setVelZ(0);
+	p.setMass(1);
+	p.setName("1");
+	
+	output = p.getPos();
+	
+	if(output.x != 1){
+		std::cout << "Assertion 1 failed." << std::endl;
+		return EXIT_FAILURE;
+	}
+	
+	std::cout << "Tests passed." << std::endl;
+	return EXIT_SUCCESS;
 }
