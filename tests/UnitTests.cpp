@@ -27,6 +27,16 @@
 #include "Particle.h"
 #include "NBodySystem.h"
 
+template <typename T>
+unsigned char assert(T val1, T val2, T margin){
+	if(val1 > (val2 + margin) || val1 < (val2 - margin)){
+		return 1;
+	}
+	else{
+		return 0;
+	}
+}
+
 int main(){
 	
 	NBodySim::ThreeVector <NBodySim::FloatingType> output;
@@ -45,19 +55,19 @@ int main(){
 	
 	output = p.getPos();
 	
-	if(output.x != 1){
+	if(assert<NBodySim::FloatingType>(output.x, 1, 0)){
 		std::cout << "Assertion 1 failed, output.x is " << output.x << " not 1." << std::endl;
 		return EXIT_FAILURE;
 	}
 	
 	sys.addParticle(p);
 	
-	if(sys.numParticles() != 1){
+	if(assert<NBodySim::FloatingType>(sys.numParticles(), 1, 0)){
 		std::cout << "Assertion 2 failed, sys.numParticles() is " << sys.numParticles() << " not 1." << std::endl;
 		return EXIT_FAILURE;
 	}
 	
-	if(sys.getParticle(0).getPos().x != 1){
+	if(assert<NBodySim::FloatingType>(sys.getParticle(0).getPos().x, 1, 0)){
 		std::cout << "Assertion 3 failed, sys.getParticle(0).getPos().x is " << sys.getParticle(0).getPos().x << " not 1." << std::endl;
 		return EXIT_FAILURE;
 	}
@@ -67,38 +77,39 @@ int main(){
 	
 	sys.addParticle(p);
 	
-	if(sys.numParticles() != 2){
+	if(assert<NBodySim::FloatingType>(sys.numParticles(), 2, 0)){
 		std::cout << "Assertion 4 failed, sys.numParticles() is " << sys.numParticles() << " not 2." << std::endl;
 		return EXIT_FAILURE;
 	}
-	if(sys.getParticle(0).getPos().x != 1){
+	if(assert<NBodySim::FloatingType>(sys.getParticle(0).getPos().x, 1, 0)){
 		std::cout << "Assertion 5 failed, sys.getParticle(0).getPos().x is " << sys.getParticle(0).getPos().x << " not 1." << std::endl;
 		return EXIT_FAILURE;
 	}
-	if(sys.getParticle(1).getPos().x != -1){
+	if(assert<NBodySim::FloatingType>(sys.getParticle(1).getPos().x, -1, 0)){
 		std::cout << "Assertion 6 failed, sys.getParticle(1).getPos().x is " << sys.getParticle(1).getPos().x << " not -1." << std::endl;
 		return EXIT_FAILURE;
 	}
 	
 	sys.step(1);
 	
-	if(sys.getParticle(0).getPos().x != 1){
+	if(assert<NBodySim::FloatingType>(sys.getParticle(0).getPos().x, 1, 0)){
 		std::cout << "Assertion 7 failed, sys.getParticle(0).getPos().x is " << sys.getParticle(0).getPos().x << " not 1." << std::endl;
 		return EXIT_FAILURE;
 	}
-	if(sys.getParticle(1).getPos().x != -1){
+	if(assert<NBodySim::FloatingType>(sys.getParticle(1).getPos().x, -1, 0)){
 		std::cout << "Assertion 8 failed, sys.getParticle(1).getPos().x is " << sys.getParticle(1).getPos().x << " not -1." << std::endl;
 		return EXIT_FAILURE;
 	}
 	
+	/* Test the result of letting two bodies move towards each other for one second */
 	sys.step(1);
 	double newXPos = (1 - (NBodySim::G * partileMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)));
-	if(sys.getParticle(0).getPos().x > (newXPos + margin) || sys.getParticle(0).getPos().x < (newXPos - margin)){
+	if(assert<NBodySim::FloatingType>(sys.getParticle(0).getPos().x, newXPos, margin)){
 		std::cout << "Assertion 9 failed, sys.getParticle(0).getPos().x is " << sys.getParticle(0).getPos().x << " not " << newXPos << "." << std::endl;
 		return EXIT_FAILURE;
 	}
 	newXPos = (NBodySim::G * partileMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)) - 1;
-	if(sys.getParticle(1).getPos().x > (newXPos + margin) || sys.getParticle(0).getPos().x < (newXPos - margin)){
+	if(assert<NBodySim::FloatingType>(sys.getParticle(1).getPos().x, newXPos, margin)){
 		std::cout << "Assertion 10 failed, sys.getParticle(1).getPos().x is " << sys.getParticle(1).getPos().x << " not " << newXPos << "." << std::endl;
 		return EXIT_FAILURE;
 	}
