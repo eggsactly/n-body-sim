@@ -123,17 +123,20 @@ int main(){
 		std::cout << "Assertion 11 failed, sys2.parse(xmlString) is " << 1 << " not " << 0 << "." << std::endl;
 		return EXIT_FAILURE;
 	}
-	
+	if(assert<NBodySim::UnsignedType>(sys2.numParticles(), 3, 0)){
+		std::cout << "Assertion 12 failed, sys2.numParticles() " << sys2.numParticles() << " not " << 3 << "." << std::endl;
+		return EXIT_FAILURE;
+	}
 	if(sys2.getParticle(0).getName() != "Sun"){
-		std::cout << "Assertion 12 failed, sys2.getParticle(0).getName() " << sys2.getParticle(0).getName() << " not " << "Sun" << "." << std::endl;
+		std::cout << "Assertion 13 failed, sys2.getParticle(0).getName() " << sys2.getParticle(0).getName() << " not " << "Sun" << "." << std::endl;
 		return EXIT_FAILURE;
 	}
 	if(sys2.getParticle(1).getName() != "Earth"){
-		std::cout << "Assertion 13 failed, sys2.getParticle(1).getName() " << sys2.getParticle(1).getName() << " not " << "Earth" << "." << std::endl;
+		std::cout << "Assertion 14 failed, sys2.getParticle(1).getName() " << sys2.getParticle(1).getName() << " not " << "Earth" << "." << std::endl;
 		return EXIT_FAILURE;
 	}
 	if(sys2.getParticle(2).getName() != "Moon"){
-		std::cout << "Assertion 14 failed, sys2.getParticle(2).getName() " << sys2.getParticle(2).getName() << " not " << "Moon" << "." << std::endl;
+		std::cout << "Assertion 15 failed, sys2.getParticle(2).getName() " << sys2.getParticle(2).getName() << " not " << "Moon" << "." << std::endl;
 		return EXIT_FAILURE;
 	}
 	
