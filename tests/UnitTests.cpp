@@ -42,6 +42,8 @@ int main(){
 	NBodySim::ThreeVector <NBodySim::FloatingType> output;
 	NBodySim::Particle p;
 	NBodySim::NBodySystem sys;
+	NBodySim::NBodySystem sys2;
+	
 	double partileMass = 1000000;
 	p.setPosX(1);
 	p.setPosY(0);
@@ -52,6 +54,8 @@ int main(){
 	p.setMass(partileMass);
 	p.setName("1");
 	double margin = 0.001;
+	
+	std::string xmlString = "<?xml version=\"1.0\"?>\n<system>\n\t<particle posX=\"0\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"0\" velZ=\"0\" mass=\"1.988500e30\" name=\"Sun\"/>\n\t<particle posX=\"0\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"0\" velZ=\"0\" mass=\"5.972e24\" name=\"Earth\"/>\n\t<particle posX=\"4.054e8\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"-964.0f\" velZ=\"0\" mass=\"7.34767309e22\" name=\"Moon\"/>\t</system>";
 	
 	output = p.getPos();
 	
@@ -111,6 +115,25 @@ int main(){
 	newXPos = (NBodySim::G * partileMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)) - 1;
 	if(assert<NBodySim::FloatingType>(sys.getParticle(1).getPos().x, newXPos, margin)){
 		std::cout << "Assertion 10 failed, sys.getParticle(1).getPos().x is " << sys.getParticle(1).getPos().x << " not " << newXPos << "." << std::endl;
+		return EXIT_FAILURE;
+	}
+	
+	/* Test parsing of an xml file */
+	if(assert<unsigned char>(sys2.parse(xmlString), 0, 0)){
+		std::cout << "Assertion 11 failed, sys2.parse(xmlString) is " << 1 << " not " << 0 << "." << std::endl;
+		return EXIT_FAILURE;
+	}
+	
+	if(sys2.getParticle(0).getName() != "Sun"){
+		std::cout << "Assertion 12 failed, sys2.getParticle(0).getName() " << sys2.getParticle(0).getName() << " not " << "Sun" << "." << std::endl;
+		return EXIT_FAILURE;
+	}
+	if(sys2.getParticle(1).getName() != "Earth"){
+		std::cout << "Assertion 13 failed, sys2.getParticle(1).getName() " << sys2.getParticle(1).getName() << " not " << "Earth" << "." << std::endl;
+		return EXIT_FAILURE;
+	}
+	if(sys2.getParticle(2).getName() != "Moon"){
+		std::cout << "Assertion 14 failed, sys2.getParticle(2).getName() " << sys2.getParticle(2).getName() << " not " << "Moon" << "." << std::endl;
 		return EXIT_FAILURE;
 	}
 	
