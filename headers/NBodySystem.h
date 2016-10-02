@@ -156,7 +156,7 @@ public:
 	 * @param errorCode is the error code sent out by a method in this class
 	 * @return the human readable error code for the given error
 	 */
-	std::string errorToString(NBodySim::NBodySystemSpace::error errorCode);
+	static std::string errorToString(NBodySim::NBodySystemSpace::error errorCode);
 };
 
 #endif // N_BODY_SYSTEM_H

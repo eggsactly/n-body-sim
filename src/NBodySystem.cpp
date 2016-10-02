@@ -91,7 +91,7 @@ void NBodySim::NBodySystem::step(NBodySim::FloatingType deltaT){
 	}
 }
 
-std::string errorToString(NBodySim::NBodySystemSpace::error errorCode){
+std::string NBodySim::NBodySystem::errorToString(NBodySim::NBodySystemSpace::error errorCode){
 	switch(errorCode){
 		case NBodySim::NBodySystemSpace::SUCCESS: return "success"; break;
 		case NBodySim::NBodySystemSpace::FAILED_TO_ALLOCATE_MEMORY: return "failed to allocate memory"; break;
