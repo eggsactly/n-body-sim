@@ -124,7 +124,7 @@ int main(){
 		return EXIT_FAILURE;
 	}
 	
-	if(sys2.getGravitation() != 1.00f){
+	if(assert<NBodySim::FloatingType>(sys2.getGravitation(), 1.00f, 0.0)){
 		std::cout << "Assertion 12 failed, sys2.getGravitation() " << sys2.getGravitation() << " not " << 1.00 << "." << std::endl;
 		return EXIT_FAILURE;
 	}
