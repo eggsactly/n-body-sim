@@ -98,8 +98,6 @@ unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
 	rapidxml::xml_node<> *secondNode;
 	rapidxml::xml_attribute<> *attr;
 	rapidxml::xml_document<> doc;
-	const unsigned attributeListLength = 8;
-	char attributeList [][attributeListLength] = {"posX", "posY", "posZ", "velX", "velY", "velZ", "mass", "name"};
 	
 	buffer = new char[xmlText.size() + 1];
 	if(buffer == NULL){
@@ -138,22 +136,22 @@ unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
 	
 	while(secondNode != NULL){
 		NBodySim::Particle p;
-		for(unsigned i = 0; i < attributeListLength; i++){
-			attr = secondNode->first_attribute(attributeList[i]);
+		for(unsigned i = 0; i < NBodySim::particleAttributeListLength; i++){
+			attr = secondNode->first_attribute(NBodySim::particleAttributeList[i]);
 			if(attr == NULL){
-				std::cout << "No " << attributeList[i] << " attribute found for particle." << std::endl;
+				std::cout << "No " << NBodySim::particleAttributeList[i] << " attribute found for particle." << std::endl;
 				delete [] buffer;
 				return 1;
 			}
 			switch(i){
-				case 0: p.setPosX(atof(attr->value())); break;
-				case 1: p.setPosY(atof(attr->value())); break;
-				case 2: p.setPosZ(atof(attr->value())); break;
-				case 3: p.setVelX(atof(attr->value())); break;
-				case 4: p.setVelY(atof(attr->value())); break;
-				case 5: p.setVelZ(atof(attr->value())); break;
-				case 6: p.setMass(atof(attr->value())); break;
-				case 7: p.setName(std::string(attr->value())); break;
+				case NBodySim::POSX: p.setPosX(atof(attr->value())); break;
+				case NBodySim::POSY: p.setPosY(atof(attr->value())); break;
+				case NBodySim::POSZ: p.setPosZ(atof(attr->value())); break;
+				case NBodySim::VELX: p.setVelX(atof(attr->value())); break;
+				case NBodySim::VELY: p.setVelY(atof(attr->value())); break;
+				case NBodySim::VELZ: p.setVelZ(atof(attr->value())); break;
+				case NBodySim::MASS: p.setMass(atof(attr->value())); break;
+				case NBodySim::NAME: p.setName(std::string(attr->value())); break;
 				default: std::cout << "Index exceded somehow" << std::endl; return 1;
 			}
 		}

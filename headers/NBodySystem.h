@@ -29,6 +29,18 @@
 
 namespace NBodySim {
 	class NBodySystem;
+	const unsigned particleAttributeListLength = 8;
+	const char particleAttributeList [][NBodySim::particleAttributeListLength] = {"posX", "posY", "posZ", "velX", "velY", "velZ", "mass", "name"};
+	typedef enum {
+		POSX = 0,
+		POSY = 1,
+		POSZ = 2,
+		VELX = 3,
+		VELY = 4,
+		VELZ = 5,
+		MASS = 6,
+		NAME = 7
+	} particleAttributeIndexes;
 }
 
 /**
