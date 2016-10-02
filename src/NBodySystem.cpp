@@ -33,7 +33,8 @@
 #include "NBodySystem.h"
 
 NBodySim::NBodySystem::NBodySystem(void){
-	// Do literally nothing, this class is basically a wrapper for vector
+	// Initialize G to be our universe's gravitation constant.
+	G = 6.67408e-11;
 }
 
 NBodySim::NBodySystem::~NBodySystem(void){
@@ -81,7 +82,7 @@ void NBodySim::NBodySystem::step(NBodySim::FloatingType deltaT){
 			
 			distance = sqrt(pow(distanceComponent.x, 2) + pow(distanceComponent.y, 2) + pow(distanceComponent.z, 2));
 			
-			acceleration = (distance != 0.0f) ? (NBodySim::G * system.at(i).getMass()) / (pow(distanceComponent.x, 2) + pow(distanceComponent.y, 2) + pow(distanceComponent.z, 2)) : 0;
+			acceleration = (distance != 0.0f) ? (G * system.at(i).getMass()) / (pow(distanceComponent.x, 2) + pow(distanceComponent.y, 2) + pow(distanceComponent.z, 2)) : 0;
 			
 			newVelocity.x += (distance != 0.0f) ? ((acceleration) * deltaT) * (distanceComponent.x / distance) : 0;
 			newVelocity.y += (distance != 0.0f) ? ((acceleration) * deltaT) * (distanceComponent.y / distance) : 0;
@@ -123,7 +124,10 @@ unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
 		delete [] buffer;
 		return 1;
 	}
-	
+	// Get the gravitation constant of the system if it is given
+	if(node->first_attribute("G") != NULL){
+		this->setGravitation(atof(node->first_attribute("G")->value()));
+	}
 	
 	secondNode = node->first_node("particle");
 	if(secondNode == NULL){
@@ -161,4 +165,12 @@ unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
 	delete [] buffer;
 	
 	return 0;
+}
+
+void NBodySim::NBodySystem::setGravitation(NBodySim::FloatingType gravitationConstant){
+	G = gravitationConstant;
+}
+
+NBodySim::FloatingType NBodySim::NBodySystem::getGravitation(void){
+	return G;
 }

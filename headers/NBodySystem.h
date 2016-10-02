@@ -45,11 +45,16 @@ protected:
 	 * system is set of all particles, where the order doesn't matter, but a vector was used anyways.
 	 */
 	std::vector<NBodySim::Particle> system;
+	/**
+	 * G is the gravitation constant for the objects system
+	 */
+	FloatingType G;
 public:
 	/**
 	 * Default constructor
 	 */
 	NBodySystem(void);
+	
 	/**
 	 * Destructor
 	 */
@@ -98,6 +103,16 @@ public:
 	 * @return 0 on success, 1 on failure
 	 */
 	unsigned char parse(std::string xmlText);
+	
+	/**
+	 * setGravitation constant sets the systems gravitation constant
+	 */
+	void setGravitation(NBodySim::FloatingType gravitationConstant);
+	
+	/**
+	 * getGravitation returns the systems gravitation constant
+	 */
+	NBodySim::FloatingType getGravitation(void);
 };
 
 #endif // N_BODY_SYSTEM_H

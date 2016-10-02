@@ -38,9 +38,6 @@ namespace NBodySim{
 	// Set up our types
 	typedef double FloatingType;
 	typedef unsigned long UnsignedType;
-	
-	// Universal Gravitation Constant in m^3kg^-1s^-2
-	static const FloatingType G = 6.67408e-11;
 }
 
 #endif // N_BODY_TYPES_H
