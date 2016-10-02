@@ -29,19 +29,23 @@
 
 namespace NBodySim {
 	class NBodySystem;
-	const unsigned particleAttributeListLength = 8;
-	const char particleAttributeList [][NBodySim::particleAttributeListLength] = {"posX", "posY", "posZ", "velX", "velY", "velZ", "mass", "name"};
-	typedef enum {
-		POSX = 0,
-		POSY = 1,
-		POSZ = 2,
-		VELX = 3,
-		VELY = 4,
-		VELZ = 5,
-		MASS = 6,
-		NAME = 7
-	} particleAttributeIndexes;
+	namespace NBodySystemSpace {
+		const unsigned particleAttributeListLength = 8;
+		const char particleAttributeList [][NBodySim::NBodySystemSpace::particleAttributeListLength] = {"posX", "posY", "posZ", "velX", "velY", "velZ", "mass", "name"};
+		typedef enum {
+			POSX = 0,
+			POSY = 1,
+			POSZ = 2,
+			VELX = 3,
+			VELY = 4,
+			VELZ = 5,
+			MASS = 6,
+			NAME = 7
+		} particleAttributeIndexes;
+	}
 }
+
+
 
 /**
  * @brief Contains a vector of type Particle and is used to calculate each new step of the simulation.

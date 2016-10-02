@@ -136,22 +136,22 @@ unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
 	
 	while(secondNode != NULL){
 		NBodySim::Particle p;
-		for(unsigned i = 0; i < NBodySim::particleAttributeListLength; i++){
-			attr = secondNode->first_attribute(NBodySim::particleAttributeList[i]);
+		for(unsigned i = 0; i < NBodySim::NBodySystemSpace::particleAttributeListLength; i++){
+			attr = secondNode->first_attribute(NBodySim::NBodySystemSpace::particleAttributeList[i]);
 			if(attr == NULL){
-				std::cout << "No " << NBodySim::particleAttributeList[i] << " attribute found for particle." << std::endl;
+				std::cout << "No " << NBodySim::NBodySystemSpace::particleAttributeList[i] << " attribute found for particle." << std::endl;
 				delete [] buffer;
 				return 1;
 			}
 			switch(i){
-				case NBodySim::POSX: p.setPosX(atof(attr->value())); break;
-				case NBodySim::POSY: p.setPosY(atof(attr->value())); break;
-				case NBodySim::POSZ: p.setPosZ(atof(attr->value())); break;
-				case NBodySim::VELX: p.setVelX(atof(attr->value())); break;
-				case NBodySim::VELY: p.setVelY(atof(attr->value())); break;
-				case NBodySim::VELZ: p.setVelZ(atof(attr->value())); break;
-				case NBodySim::MASS: p.setMass(atof(attr->value())); break;
-				case NBodySim::NAME: p.setName(std::string(attr->value())); break;
+				case NBodySim::NBodySystemSpace::POSX: p.setPosX(atof(attr->value())); break;
+				case NBodySim::NBodySystemSpace::POSY: p.setPosY(atof(attr->value())); break;
+				case NBodySim::NBodySystemSpace::POSZ: p.setPosZ(atof(attr->value())); break;
+				case NBodySim::NBodySystemSpace::VELX: p.setVelX(atof(attr->value())); break;
+				case NBodySim::NBodySystemSpace::VELY: p.setVelY(atof(attr->value())); break;
+				case NBodySim::NBodySystemSpace::VELZ: p.setVelZ(atof(attr->value())); break;
+				case NBodySim::NBodySystemSpace::MASS: p.setMass(atof(attr->value())); break;
+				case NBodySim::NBodySystemSpace::NAME: p.setName(std::string(attr->value())); break;
 				default: std::cout << "Index exceded somehow" << std::endl; return 1;
 			}
 		}
