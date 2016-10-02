@@ -125,6 +125,8 @@ argsList parseArgs(int argc, char* argv[]){
 int main(int argc, char* argv[]){
 	argsList inputArgs = parseArgs(argc, argv);
 	std::string inputScenario;
+	NBodySim::NBodySystem solarSystem;
+	NBodySim::NBodySystemSpace::error solarSystemParseResult;
 	
 	if(inputArgs.help){
 		std::cout << "Command line flags: " << std::endl;
@@ -139,9 +141,13 @@ int main(int argc, char* argv[]){
 		else {
 			inputScenario = readFile(inputArgs.fileName);
 		}
-		NBodySim::NBodySystem solarSystem;
-		if(!solarSystem.parse(inputScenario)){
+		
+		solarSystemParseResult = solarSystem.parse(inputScenario);
+		if(solarSystemParseResult == NBodySim::NBodySystemSpace::SUCCESS){
 			solarSystem.step(inputArgs.stepSize);
+		}
+		else{
+			std::cout << "Error: " << NBodySim::NBodySystem::errorToString(solarSystemParseResult) << std::endl;
 		}
 	}
 	
