@@ -19,7 +19,6 @@
  */
 
 #include <cstdlib>
-#include <iostream>
 #include <string>
 #include <vector>
 #include <cmath>
@@ -92,7 +91,27 @@ void NBodySim::NBodySystem::step(NBodySim::FloatingType deltaT){
 	}
 }
 
-unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
+std::string errorToString(NBodySim::NBodySystemSpace::error errorCode){
+	switch(errorCode){
+		case NBodySim::NBodySystemSpace::SUCCESS: return "success"; break;
+		case NBodySim::NBodySystemSpace::FAILED_TO_ALLOCATE_MEMORY: return "failed to allocate memory"; break;
+		case NBodySim::NBodySystemSpace::MORE_THAN_ONE_SYSTEM: return "more than one system specified in xml file"; break;
+		case NBodySim::NBodySystemSpace::NO_SYSTEM: return "no system node found"; break;
+		case NBodySim::NBodySystemSpace::NO_PARTICLES: return "no particles found in system"; break;
+		case NBodySim::NBodySystemSpace::INDEX_EXCEEDED: return "index exceeded"; break;
+		case NBodySim::NBodySystemSpace::NO_POSX: return "no PosX attribute found for a particle"; break;
+		case NBodySim::NBodySystemSpace::NO_POSY: return "no PosY attribute found for a particle"; break;
+		case NBodySim::NBodySystemSpace::NO_POSZ: return "no PosZ attribute found for a particle"; break;
+		case NBodySim::NBodySystemSpace::NO_VELX: return "no VelX attribute found for a particle"; break;
+		case NBodySim::NBodySystemSpace::NO_VELY: return "no VelY attribute found for a particle"; break;
+		case NBodySim::NBodySystemSpace::NO_VELZ: return "no VelZ attribute found for a particle"; break;
+		case NBodySim::NBodySystemSpace::NO_MASS: return "no Mass attribute found for a particle"; break;
+		case NBodySim::NBodySystemSpace::NO_NAME: return "no Name attribute found for a particle"; break;
+		default: return "unknown error"; break;
+	}
+}
+
+NBodySim::NBodySystemSpace::error NBodySim::NBodySystem::parse(std::string xmlText){
 	char * buffer = NULL;
 	rapidxml::xml_node<> *node;
 	rapidxml::xml_node<> *secondNode;
@@ -101,8 +120,7 @@ unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
 	
 	buffer = new char[xmlText.size() + 1];
 	if(buffer == NULL){
-		std::cout << "Failed to allocate memory for scenario text." << std::endl;
-		return 1;
+		return NBodySim::NBodySystemSpace::FAILED_TO_ALLOCATE_MEMORY;
 	}
 	strcpy(buffer, xmlText.c_str());
 	
@@ -112,15 +130,13 @@ unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
 	node = doc.first_node("system");
 	if(node != NULL){
 		if(node->next_sibling("system") != NULL){
-			std::cout << "More than one system specified in xml file." << std::endl;
 			delete [] buffer;
-			return 1;
+			return NBodySim::NBodySystemSpace::MORE_THAN_ONE_SYSTEM;
 		}
 	}
 	else{
-		std::cout << "No system node found." << std::endl;
 		delete [] buffer;
-		return 1;
+		return NBodySim::NBodySystemSpace::NO_SYSTEM;
 	}
 	// Get the gravitation constant of the system if it is given
 	if(node->first_attribute("G") != NULL){
@@ -129,9 +145,8 @@ unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
 	
 	secondNode = node->first_node("particle");
 	if(secondNode == NULL){
-		std::cout << "No particles in system." << std::endl;
 		delete [] buffer;
-		return 1;
+		return NBodySim::NBodySystemSpace::NO_PARTICLES;
 	}
 	
 	while(secondNode != NULL){
@@ -139,9 +154,18 @@ unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
 		for(unsigned i = 0; i < NBodySim::NBodySystemSpace::particleAttributeListLength; i++){
 			attr = secondNode->first_attribute(NBodySim::NBodySystemSpace::particleAttributeList[i]);
 			if(attr == NULL){
-				std::cout << "No " << NBodySim::NBodySystemSpace::particleAttributeList[i] << " attribute found for particle." << std::endl;
 				delete [] buffer;
-				return 1;
+				switch(i){
+					case NBodySim::NBodySystemSpace::POSX: return NBodySim::NBodySystemSpace::NO_POSX; break;
+					case NBodySim::NBodySystemSpace::POSY: return NBodySim::NBodySystemSpace::NO_POSY; break;
+					case NBodySim::NBodySystemSpace::POSZ: return NBodySim::NBodySystemSpace::NO_POSZ; break;
+					case NBodySim::NBodySystemSpace::VELX: return NBodySim::NBodySystemSpace::NO_VELX; break;
+					case NBodySim::NBodySystemSpace::VELY: return NBodySim::NBodySystemSpace::NO_VELY; break;
+					case NBodySim::NBodySystemSpace::VELZ: return NBodySim::NBodySystemSpace::NO_VELZ; break;
+					case NBodySim::NBodySystemSpace::MASS: return NBodySim::NBodySystemSpace::NO_MASS; break;
+					case NBodySim::NBodySystemSpace::NAME: return NBodySim::NBodySystemSpace::NO_NAME; break;
+					default: return NBodySim::NBodySystemSpace::INDEX_EXCEEDED;
+				}
 			}
 			switch(i){
 				case NBodySim::NBodySystemSpace::POSX: p.setPosX(atof(attr->value())); break;
@@ -152,7 +176,7 @@ unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
 				case NBodySim::NBodySystemSpace::VELZ: p.setVelZ(atof(attr->value())); break;
 				case NBodySim::NBodySystemSpace::MASS: p.setMass(atof(attr->value())); break;
 				case NBodySim::NBodySystemSpace::NAME: p.setName(std::string(attr->value())); break;
-				default: std::cout << "Index exceded somehow" << std::endl; return 1;
+				default: return NBodySim::NBodySystemSpace::INDEX_EXCEEDED;
 			}
 		}
 		
@@ -162,7 +186,7 @@ unsigned char NBodySim::NBodySystem::parse(std::string xmlText){
 	
 	delete [] buffer;
 	
-	return 0;
+	return NBodySim::NBodySystemSpace::SUCCESS;
 }
 
 void NBodySim::NBodySystem::setGravitation(NBodySim::FloatingType gravitationConstant){

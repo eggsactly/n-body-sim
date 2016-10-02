@@ -42,6 +42,22 @@ namespace NBodySim {
 			MASS = 6,
 			NAME = 7
 		} particleAttributeIndexes;
+		typedef enum {
+			SUCCESS = 0,
+			FAILED_TO_ALLOCATE_MEMORY,
+			MORE_THAN_ONE_SYSTEM,
+			NO_SYSTEM,
+			NO_PARTICLES,
+			INDEX_EXCEEDED,
+			NO_POSX,
+			NO_POSY,
+			NO_POSZ,
+			NO_VELX,
+			NO_VELY,
+			NO_VELZ,
+			NO_MASS,
+			NO_NAME
+		} error;
 	}
 }
 
@@ -116,19 +132,31 @@ public:
 	 * parse takes in a string containing xml text of a system scenario and creates particle instances in this class
 	 *
 	 * @param xmlText is a string containing valid xml
-	 * @return 0 on success, 1 on failure
+	 * @return 0 on success
 	 */
-	unsigned char parse(std::string xmlText);
+	NBodySim::NBodySystemSpace::error parse(std::string xmlText);
 	
 	/**
 	 * setGravitation constant sets the systems gravitation constant
+	 *
+	 * @param gravitationConstant is the gravitation constant the system shall be set to
 	 */
 	void setGravitation(NBodySim::FloatingType gravitationConstant);
 	
 	/**
 	 * getGravitation returns the systems gravitation constant
+	 *
+	 * @return the systems gravitation constant
 	 */
 	NBodySim::FloatingType getGravitation(void);
+	
+	/**
+	 * errorToString takes an error code and returns it in human readable format
+	 *
+	 * @param errorCode is the error code sent out by a method in this class
+	 * @return the human readable error code for the given error
+	 */
+	std::string errorToString(NBodySim::NBodySystemSpace::error errorCode);
 };
 
 #endif // N_BODY_SYSTEM_H
