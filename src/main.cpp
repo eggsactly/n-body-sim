@@ -24,6 +24,7 @@
 #include <fstream>
 #include <streambuf>
 #include <getopt.h>
+#include <SDL2/SDL.h>
 
 #include "NBodyTypes.h"
 #include "Particle.h"
@@ -122,11 +123,70 @@ argsList parseArgs(int argc, char* argv[]){
 	return output;
 }
 
+typedef enum {
+	SUCCESS = 0,
+	COULD_NOT_INITIALIZE,
+	COULD_NOT_CREATE_WINDOW
+} guiInitErrors;
+
+std::string guiInitErrorsToString(guiInitErrors error){
+	switch(error){
+		case SUCCESS: return "success"; break;
+		case COULD_NOT_INITIALIZE: return "SDL could not initialize"; break;
+		case COULD_NOT_CREATE_WINDOW: return "window could not be created"; break;
+		default: return "unknown error"; break;
+	}
+}
+
+guiInitErrors guiInit(SDL_Window* gWindow, SDL_Surface* gScreenSurface, int height, int width)
+{
+	//Initialize SDL
+	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+	{
+		return COULD_NOT_INITIALIZE;
+	}
+	else
+	{
+		//Create window
+		gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN );
+		if( gWindow == NULL )
+		{
+			return COULD_NOT_CREATE_WINDOW;
+		}
+		else
+		{
+			//Get window surface
+			gScreenSurface = SDL_GetWindowSurface( gWindow );
+		}
+	}
+	
+	return SUCCESS;
+}
+
+void close(SDL_Window* gWindow)
+{
+	//Destroy window
+	SDL_DestroyWindow( gWindow );
+	gWindow = NULL;
+	
+	//Quit SDL subsystems
+	SDL_Quit();
+}
+
 int main(int argc, char* argv[]){
 	argsList inputArgs = parseArgs(argc, argv);
 	std::string inputScenario;
 	NBodySim::NBodySystem solarSystem;
 	NBodySim::NBodySystemSpace::error solarSystemParseResult;
+	// Scale holds the number of meters per pixel on the screen
+	float scale;
+	int height = 480;
+	int width = 640;
+	//The window we'll be rendering to
+	SDL_Window* gWindow = NULL;
+	//The surface contained by the window
+	SDL_Surface* gScreenSurface = NULL;
+	guiInitErrors guiErrorReturn;
 	
 	if(inputArgs.help){
 		std::cout << "Command line flags: " << std::endl;
@@ -144,10 +204,19 @@ int main(int argc, char* argv[]){
 		
 		solarSystemParseResult = solarSystem.parse(inputScenario);
 		if(solarSystemParseResult == NBodySim::NBodySystemSpace::SUCCESS){
-			solarSystem.step(inputArgs.stepSize);
+			guiErrorReturn = guiInit(gWindow, gScreenSurface, height, width);
+			if(guiErrorReturn == SUCCESS){
+				solarSystem.step(inputArgs.stepSize);
+				close(gWindow);
+			}
+			else{
+				std::cout << "Error: " << guiInitErrorsToString(guiErrorReturn) << std::endl;
+				return EXIT_FAILURE;
+			}
 		}
 		else{
 			std::cout << "Error: " << NBodySim::NBodySystem::errorToString(solarSystemParseResult) << std::endl;
+			
 		}
 	}
 	
