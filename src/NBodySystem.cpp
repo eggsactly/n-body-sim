@@ -79,9 +79,9 @@ void NBodySim::NBodySystem::step(NBodySim::FloatingType deltaT){
 			distanceComponent.y = systemCopy.at(j).getPos().y - systemCopy.at(i).getPos().y;
 			distanceComponent.z = systemCopy.at(j).getPos().z - systemCopy.at(i).getPos().z;
 			
-			distance = sqrt(pow(distanceComponent.x, 2) + pow(distanceComponent.y, 2) + pow(distanceComponent.z, 2));
+			distance = std::sqrt(std::pow(distanceComponent.x, 2) + std::pow(distanceComponent.y, 2) + std::pow(distanceComponent.z, 2));
 			
-			acceleration = (distance != 0.0f) ? (G * system.at(i).getMass()) / (pow(distanceComponent.x, 2) + pow(distanceComponent.y, 2) + pow(distanceComponent.z, 2)) : 0;
+			acceleration = (distance != 0.0f) ? (G * system.at(j).getMass()) / (std::pow(distanceComponent.x, 2) + std::pow(distanceComponent.y, 2) + std::pow(distanceComponent.z, 2)) : 0;
 			
 			newVelocity.x += (distance != 0.0f) ? ((acceleration) * deltaT) * (distanceComponent.x / distance) : 0;
 			newVelocity.y += (distance != 0.0f) ? ((acceleration) * deltaT) * (distanceComponent.y / distance) : 0;
