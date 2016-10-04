@@ -180,6 +180,8 @@ int main(int argc, char* argv[]){
 	NBodySim::NBodySystemSpace::error solarSystemParseResult;
 	// Scale holds the number of meters per pixel on the screen
 	float scale;
+	bool quit;
+	SDL_Event e;
 	int height = 480;
 	int width = 640;
 	//The window we'll be rendering to
@@ -207,7 +209,22 @@ int main(int argc, char* argv[]){
 			guiErrorReturn = guiInit(gWindow, gScreenSurface, height, width);
 			if(guiErrorReturn == SUCCESS){
 				solarSystem.step(inputArgs.stepSize);
-				close(gWindow);
+				quit = false;
+				//While application is running
+				while( !quit )
+				{
+					//Handle events on queue
+					while( SDL_PollEvent( &e ) != 0 )
+					{
+						//User requests quit
+						if( e.type == SDL_QUIT )
+						{
+							quit = true;
+							close(gWindow);
+						}
+					}
+				}
+				
 			}
 			else{
 				std::cout << "Error: " << guiInitErrorsToString(guiErrorReturn) << std::endl;
