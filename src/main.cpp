@@ -126,7 +126,8 @@ argsList parseArgs(int argc, char* argv[]){
 typedef enum {
 	SUCCESS = 0,
 	COULD_NOT_INITIALIZE,
-	COULD_NOT_CREATE_WINDOW
+	COULD_NOT_CREATE_WINDOW,
+	COULD_NOT_CREATE_RENDERER
 } guiInitErrors;
 
 std::string guiInitErrorsToString(guiInitErrors error){
@@ -134,11 +135,12 @@ std::string guiInitErrorsToString(guiInitErrors error){
 		case SUCCESS: return "success"; break;
 		case COULD_NOT_INITIALIZE: return "SDL could not initialize"; break;
 		case COULD_NOT_CREATE_WINDOW: return "window could not be created"; break;
+		case COULD_NOT_CREATE_RENDERER: return "could not create renderer"; break;
 		default: return "unknown error"; break;
 	}
 }
 
-guiInitErrors guiInit(SDL_Window* gWindow, SDL_Surface* gScreenSurface, int height, int width)
+guiInitErrors guiInit(SDL_Window ** gWindow, SDL_Renderer ** gRenderer, int height, int width)
 {
 	//Initialize SDL
 	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
@@ -148,26 +150,31 @@ guiInitErrors guiInit(SDL_Window* gWindow, SDL_Surface* gScreenSurface, int heig
 	else
 	{
 		//Create window
-		gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN );
-		if( gWindow == NULL )
+		*gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN );
+		if(*gWindow == NULL )
 		{
 			return COULD_NOT_CREATE_WINDOW;
 		}
 		else
 		{
 			//Get window surface
-			gScreenSurface = SDL_GetWindowSurface( gWindow );
+			*gRenderer = SDL_CreateRenderer( *gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
+			if(*gRenderer == NULL){
+				return COULD_NOT_CREATE_RENDERER;
+			}
 		}
 	}
 	
 	return SUCCESS;
 }
 
-void close(SDL_Window* gWindow)
+void close(SDL_Window * gWindow, SDL_Renderer * gRenderer)
 {
+	SDL_DestroyRenderer( gRenderer );
 	//Destroy window
 	SDL_DestroyWindow( gWindow );
 	gWindow = NULL;
+	gRenderer = NULL;
 	
 	//Quit SDL subsystems
 	SDL_Quit();
@@ -179,16 +186,15 @@ int main(int argc, char* argv[]){
 	NBodySim::NBodySystem solarSystem;
 	NBodySim::NBodySystemSpace::error solarSystemParseResult;
 	// Scale holds the number of meters per pixel on the screen
-	float scale;
+	NBodySim::FloatingType scale = 1e9;
 	bool quit;
 	SDL_Event e;
 	int height = 480;
 	int width = 640;
 	//The window we'll be rendering to
 	SDL_Window* gWindow = NULL;
-	//The surface contained by the window
-	SDL_Surface* gScreenSurface = NULL;
 	guiInitErrors guiErrorReturn;
+	SDL_Renderer* gRenderer = NULL;
 	
 	if(inputArgs.help){
 		std::cout << "Command line flags: " << std::endl;
@@ -206,9 +212,11 @@ int main(int argc, char* argv[]){
 		
 		solarSystemParseResult = solarSystem.parse(inputScenario);
 		if(solarSystemParseResult == NBodySim::NBodySystemSpace::SUCCESS){
-			guiErrorReturn = guiInit(gWindow, gScreenSurface, height, width);
+			guiErrorReturn = guiInit(&gWindow, &gRenderer, height, width);
+			if(gWindow == NULL || gRenderer == NULL){
+				return -1;
+			}
 			if(guiErrorReturn == SUCCESS){
-				solarSystem.step(inputArgs.stepSize);
 				quit = false;
 				//While application is running
 				while( !quit )
@@ -220,11 +228,20 @@ int main(int argc, char* argv[]){
 						if( e.type == SDL_QUIT )
 						{
 							quit = true;
-							close(gWindow);
 						}
 					}
+					
+					solarSystem.step(inputArgs.stepSize);
+					
+					// Clear Screen
+					SDL_RenderClear( gRenderer );
+					// Draw all the particles as points
+					for(unsigned i = 0; i < solarSystem.numParticles(); i++){
+						SDL_RenderDrawPoint(gRenderer, (solarSystem.getParticle(i).getPos().x/scale) + (width/2), (solarSystem.getParticle(i).getPos().y/scale) + (height/2));
+					}
+					
+					SDL_RenderPresent( gRenderer );
 				}
-				
 			}
 			else{
 				std::cout << "Error: " << guiInitErrorsToString(guiErrorReturn) << std::endl;
@@ -233,9 +250,10 @@ int main(int argc, char* argv[]){
 		}
 		else{
 			std::cout << "Error: " << NBodySim::NBodySystem::errorToString(solarSystemParseResult) << std::endl;
-			
+			return EXIT_FAILURE;
 		}
 	}
 	
+	close(gWindow, gRenderer);
 	return EXIT_SUCCESS;
 }
