@@ -65,9 +65,22 @@ typedef struct {
  * @param argv an array of words in the input
  * @return a list of arguments selected by the user
  */
-
 argsList parseArgs(int argc, char* argv[]);
 
+typedef enum {
+	SUCCESS = 0,
+	COULD_NOT_INITIALIZE,
+	COULD_NOT_CREATE_WINDOW,
+	COULD_NOT_CREATE_RENDERER
+} guiInitErrors;
+
+/**
+ * @brief guiInitErrorsToString converts the guiInitErrors to a std::string
+ *
+ * @param error error code
+ * @return string representation of error code
+ */
+std::string guiInitErrorsToString(guiInitErrors error);
 
 std::string readFile(std::string fileName){
 	std::string scenarioText;
@@ -128,13 +141,6 @@ argsList parseArgs(int argc, char* argv[]){
 	}
 	return output;
 }
-
-typedef enum {
-	SUCCESS = 0,
-	COULD_NOT_INITIALIZE,
-	COULD_NOT_CREATE_WINDOW,
-	COULD_NOT_CREATE_RENDERER
-} guiInitErrors;
 
 std::string guiInitErrorsToString(guiInitErrors error){
 	switch(error){
