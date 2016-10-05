@@ -164,7 +164,7 @@ guiInitErrors guiInit(SDL_Window ** gWindow, SDL_Renderer ** gRenderer, int heig
 	else
 	{
 		//Create window
-		*gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN );
+		*gWindow = SDL_CreateWindow( "N Body Sim", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN );
 		if(*gWindow == NULL )
 		{
 			return COULD_NOT_CREATE_WINDOW;
