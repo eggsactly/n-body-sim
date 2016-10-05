@@ -4,11 +4,22 @@ n-body-sim simulates how gravity affects bodies with mass in three dimensional s
 # Building
 Run _make_ to build the software. Run _./n-body-sim_ to run the simulation. Run _make clean_ to remove all binary and executable files generated in the build process.
 
+# Running
+A good first example is to run the following command:
+
+./n-body-sim -i inputs/SimpleExample.xml -s 0.033 -r 0.1 
+
+That command runs a small example, at 30 fps, which shows a planet clearing the region around its orbit.
+
 # Dependencies
 This program is a C++ program and it depends on the [SDL library](https://www.libsdl.org/), which must be downloaded separately, and the rapidxml library, which has been included in this project.
 
 # Support
-n-body-sim works only on Mac OS X and has been tested on version 10.11.6. All other operating systems are not expected to be able to compile this project without changes to the makefile.
+n-body-sim has been tested on the following operating systems:
+- Mac OS X 10.11.6
+- Debian 8.5
+
+Other Linux operating systems are expected to work but have not been tested. 
 
 # License 
 n-body-sim is free software: you can redistribute it and/or modify
