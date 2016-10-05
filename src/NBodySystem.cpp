@@ -18,6 +18,7 @@
  *
  */
 
+#include <cstring>
 #include <cstdlib>
 #include <string>
 #include <vector>
@@ -122,7 +123,7 @@ NBodySim::NBodySystemSpace::error NBodySim::NBodySystem::parse(std::string xmlTe
 	if(buffer == NULL){
 		return NBodySim::NBodySystemSpace::FAILED_TO_ALLOCATE_MEMORY;
 	}
-	strcpy(buffer, xmlText.c_str());
+	std::strcpy(buffer, xmlText.c_str());
 	
 	// Parse the file
 	doc.parse<0>(buffer);

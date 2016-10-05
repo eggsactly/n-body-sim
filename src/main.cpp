@@ -84,7 +84,7 @@ std::string guiInitErrorsToString(guiInitErrors error);
 
 std::string readFile(std::string fileName){
 	std::string scenarioText;
-	std::ifstream scenarioFile(fileName);
+	std::ifstream scenarioFile(fileName.c_str());
 	
 	if (scenarioFile.is_open())
 	{
