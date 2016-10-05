@@ -3,8 +3,15 @@ CC=g++
 mkfile_path=$(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir=$(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
 EXE=$(current_dir)
-INC=-I headers/ -I rapidxml/ -F/Library/Frameworks -framework SDL2
-LIB=-F/Library/Frameworks -framework SDL2
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	INC=-I headers/ -I rapidxml/ -F/Library/Frameworks -framework SDL2
+	LIB=-F/Library/Frameworks -framework SDL2
+endif
+ifeq ($(UNAME_S),Linux)
+	INC=-I headers/ -I rapidxml/ 
+	LIB=-lSDL2
+endif
 OBJ_DIR=obj/
 SRC_DIR=src/
 SOURCES=$(wildcard $(SRC_DIR)*.cpp)
