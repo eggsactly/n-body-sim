@@ -224,9 +224,6 @@ int main(int argc, char* argv[]){
 		solarSystemParseResult = solarSystem.parse(inputScenario);
 		if(solarSystemParseResult == NBodySim::NBodySystemSpace::SUCCESS){
 			guiErrorReturn = guiInit(&gWindow, &gRenderer, height, width);
-			if(gWindow == NULL || gRenderer == NULL){
-				return -1;
-			}
 			if(guiErrorReturn == SUCCESS){
 				quit = false;
 				//While application is running
