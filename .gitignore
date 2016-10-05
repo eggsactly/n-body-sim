@@ -3,7 +3,7 @@ n-body-sim
 .DS_Store
 docs/
 tests/test
-*.df
+*.pdf
 *.log
 *.out
 *.aux
