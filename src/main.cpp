@@ -125,9 +125,11 @@ argsList parseArgs(int argc, char* argv[]){
 			case 'h':
 				output.help = true;
 				break;
+			// Implements NF.UsersProvideFile
 			case 'i':
 				output.fileName = optarg;
 				break;
+			// Implements NF.UsersProvideTime
 			case 's':
 				output.stepSize = atof(optarg);
 				break;
@@ -220,7 +222,7 @@ int main(int argc, char* argv[]){
 		else {
 			inputScenario = readFile(inputArgs.fileName);
 		}
-		
+		// Implements Req FR.Initiate
 		solarSystemParseResult = solarSystem.parse(inputScenario);
 		if(solarSystemParseResult == NBodySim::NBodySystemSpace::SUCCESS){
 			guiErrorReturn = guiInit(&gWindow, &gRenderer, height, width);
@@ -239,6 +241,7 @@ int main(int argc, char* argv[]){
 						}
 					}
 					
+					// Implements Req FR.Calculate
 					solarSystem.step(inputArgs.stepSize);
 					
 					// Clear Screen

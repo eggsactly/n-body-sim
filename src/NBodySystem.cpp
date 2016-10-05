@@ -139,6 +139,7 @@ NBodySim::NBodySystemSpace::error NBodySim::NBodySystem::parse(std::string xmlTe
 		return NBodySim::NBodySystemSpace::NO_SYSTEM;
 	}
 	// Get the gravitation constant of the system if it is given
+	// Implements Req NF.SystemsProvideG
 	if(node->first_attribute("G") != NULL){
 		this->setGravitation(atof(node->first_attribute("G")->value()));
 	}

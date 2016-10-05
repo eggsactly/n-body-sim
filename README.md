@@ -35,6 +35,7 @@ The rapidxml library included on this software and is licensed under both the Bo
 - logo.svg logo for the project
 - Makefile is the makefile for the project used to convert the source files into an executable
 - rapidxml/ contains the rapidxml library used to parse xml files and used under the MIT license
+- reqs/ contains requirements for the program in LaTeX format
 - src/ contains the implementation of the programs classes
 - tests/ contains unit tests for the project
 

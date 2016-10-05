@@ -3,3 +3,11 @@ n-body-sim
 .DS_Store
 docs/
 tests/test
+*.df
+*.log
+*.out
+*.aux
+*.dvi
+*.blg
+*.bbl
+*~

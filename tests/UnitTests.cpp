@@ -94,6 +94,7 @@ int main(){
 		return EXIT_FAILURE;
 	}
 	
+	// Verifies Req NF.UsersProvideTime
 	sys.step(1);
 	
 	if(assert<NBodySim::FloatingType>(sys.getParticle(0).getPos().x, 1, 0)){
@@ -106,12 +107,18 @@ int main(){
 	}
 	
 	/* Test the result of letting two bodies move towards each other for one second */
+	// Verifies Req FR.Calculate
+	// Verifies Req NF.UsersProvideTime
 	sys.step(1);
+	// Verifies Req FR.Calculate
+	// Verifies Req NF.UsersProvideTime
 	double newXPos = (1 - (sys.getGravitation() * particleMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)));
 	if(assert<NBodySim::FloatingType>(sys.getParticle(0).getPos().x, newXPos, margin)){
 		std::cout << "Assertion 9 failed, sys.getParticle(0).getPos().x is " << sys.getParticle(0).getPos().x << " not " << newXPos << "." << std::endl;
 		return EXIT_FAILURE;
 	}
+	// Verifies Req FR.Calculate
+	// Verifies Req NF.UsersProvideTime
 	newXPos = (sys.getGravitation() * particleMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)) - 1;
 	if(assert<NBodySim::FloatingType>(sys.getParticle(1).getPos().x, newXPos, margin)){
 		std::cout << "Assertion 10 failed, sys.getParticle(1).getPos().x is " << sys.getParticle(1).getPos().x << " not " << newXPos << "." << std::endl;
@@ -119,28 +126,36 @@ int main(){
 	}
 	
 	/* Test parsing of an xml file */
+	// Verifies Req NF.UsersProvideFile
+	// Verifies Req FR.Initiate
 	if(assert<unsigned char>(sys2.parse(xmlString), 0, 0)){
 		std::cout << "Assertion 11 failed, sys2.parse(xmlString) is " << 1 << " not " << 0 << "." << std::endl;
 		return EXIT_FAILURE;
 	}
 	
+	// Verifies Req NF.SystemsProvideG
+	// Verifies Req FR.Initiate
 	if(assert<NBodySim::FloatingType>(sys2.getGravitation(), 1.00f, 0.0)){
 		std::cout << "Assertion 12 failed, sys2.getGravitation() " << sys2.getGravitation() << " not " << 1.00 << "." << std::endl;
 		return EXIT_FAILURE;
 	}
 	
+	// Verifies Req FR.Initiate
 	if(assert<NBodySim::UnsignedType>(sys2.numParticles(), 3, 0)){
 		std::cout << "Assertion 13 failed, sys2.numParticles() " << sys2.numParticles() << " not " << 3 << "." << std::endl;
 		return EXIT_FAILURE;
 	}
+	// Verifies Req FR.Initiate
 	if(sys2.getParticle(0).getName() != "Sun"){
 		std::cout << "Assertion 14 failed, sys2.getParticle(0).getName() " << sys2.getParticle(0).getName() << " not " << "Sun" << "." << std::endl;
 		return EXIT_FAILURE;
 	}
+	// Verifies Req FR.Initiate
 	if(sys2.getParticle(1).getName() != "Earth"){
 		std::cout << "Assertion 15 failed, sys2.getParticle(1).getName() " << sys2.getParticle(1).getName() << " not " << "Earth" << "." << std::endl;
 		return EXIT_FAILURE;
 	}
+	// Verifies Req FR.Initiate
 	if(sys2.getParticle(2).getName() != "Moon"){
 		std::cout << "Assertion 16 failed, sys2.getParticle(2).getName() " << sys2.getParticle(2).getName() << " not " << "Moon" << "." << std::endl;
 		return EXIT_FAILURE;
