@@ -55,7 +55,7 @@ typedef struct {
 	bool help;                       /**< Indicates whether to print the list of command line options to the user */
 	std::string fileName;            /**< Indicates path to input file */
 	NBodySim::FloatingType stepSize; /**< Size of simulation steps in seconds */
-	NBodySim::FloatingType scale; /**< Scale in meters per pixel */
+	NBodySim::FloatingType resolution; /**< resolution in meters per pixel */
 } argsList;
 
 /**
@@ -96,7 +96,7 @@ argsList parseArgs(int argc, char* argv[]){
 		{"help",        no_argument,       0, 'h'},
 		{"input-file",  required_argument, 0, 'i'},
 		{"step-size",   required_argument, 0, 's'},
-		{"scale",       required_argument, 0, 'b'},
+		{"resolution",  required_argument, 0, 'r'},
 		{0, 0, 0, 0}
 	};
 	argsList output;
@@ -104,9 +104,9 @@ argsList parseArgs(int argc, char* argv[]){
 	output.help = false;
 	output.fileName = "";
 	output.stepSize = 1.0f;
-	output.scale = 1e9;
+	output.resolution = 1e9;
 	
-	while ((c = getopt_long(argc, argv, "hi:s:b:", long_options, &option_index)) != -1){
+	while ((c = getopt_long(argc, argv, "hi:s:r:", long_options, &option_index)) != -1){
 		switch (c)
 		{
 			case 'h':
@@ -118,8 +118,8 @@ argsList parseArgs(int argc, char* argv[]){
 			case 's':
 				output.stepSize = atof(optarg);
 				break;
-			case 'b':
-				output.scale = atof(optarg);
+			case 'r':
+				output.resolution = atof(optarg);
 				break;
 			default:
 				abort ();
@@ -191,8 +191,6 @@ int main(int argc, char* argv[]){
 	std::string inputScenario;
 	NBodySim::NBodySystem solarSystem;
 	NBodySim::NBodySystemSpace::error solarSystemParseResult;
-	// Scale holds the number of meters per pixel on the screen
-	NBodySim::FloatingType scale = inputArgs.scale;
 	bool quit;
 	SDL_Event e;
 	int height = 480;
@@ -206,7 +204,7 @@ int main(int argc, char* argv[]){
 		std::cout << "Command line flags: " << std::endl;
 		std::cout << "\t-i, --input-file [Filename]: Input xml file with initial conditions" << std::endl;
 		std::cout << "\t-s, --step-size  [float]   : Simulation step size in seconds" << std::endl;
-		std::cout << "\t-b, --scale      [float]   : Scale in meters per pixel" << std::endl;
+		std::cout << "\t-r, --resolution [float]   : Scale in meters per pixel" << std::endl;
 		std::cout << "\t-h, --help                 : Shows this help option" << std::endl;
 	}
 	else {
@@ -244,7 +242,7 @@ int main(int argc, char* argv[]){
 					SDL_RenderClear( gRenderer );
 					// Draw all the particles as points
 					for(unsigned i = 0; i < solarSystem.numParticles(); i++){
-						SDL_RenderDrawPoint(gRenderer, (solarSystem.getParticle(i).getPos().x/scale) + (width/2), (solarSystem.getParticle(i).getPos().y/scale) + (height/2));
+						SDL_RenderDrawPoint(gRenderer, (solarSystem.getParticle(i).getPos().x/inputArgs.resolution) + (width/2), (solarSystem.getParticle(i).getPos().y/inputArgs.resolution) + (height/2));
 					}
 					
 					SDL_RenderPresent( gRenderer );
