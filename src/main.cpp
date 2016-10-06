@@ -56,6 +56,8 @@ typedef struct {
 	std::string fileName;            /**< Indicates path to input file */
 	NBodySim::FloatingType stepSize; /**< Size of simulation steps in seconds */
 	NBodySim::FloatingType resolution; /**< resolution in meters per pixel */
+	unsigned width; /**< width of window in pixels */
+	unsigned length; /**< length of window in pixels */
 } argsList;
 
 /**
@@ -110,6 +112,8 @@ argsList parseArgs(int argc, char* argv[]){
 		{"input-file",  required_argument, 0, 'i'},
 		{"step-size",   required_argument, 0, 's'},
 		{"resolution",  required_argument, 0, 'r'},
+		{"width",       required_argument, 0, 'w'},
+		{"length",      required_argument, 0, 'l'},
 		{0, 0, 0, 0}
 	};
 	argsList output;
@@ -118,8 +122,10 @@ argsList parseArgs(int argc, char* argv[]){
 	output.fileName = "";
 	output.stepSize = 1.0f;
 	output.resolution = 1e9;
+	output.length = 480;
+	output.width = 640;
 	
-	while ((c = getopt_long(argc, argv, "hi:s:r:", long_options, &option_index)) != -1){
+	while ((c = getopt_long(argc, argv, "hi:s:r:w:l:", long_options, &option_index)) != -1){
 		switch (c)
 		{
 			case 'h':
@@ -135,6 +141,12 @@ argsList parseArgs(int argc, char* argv[]){
 				break;
 			case 'r':
 				output.resolution = atof(optarg);
+				break;
+			case 'l':
+				output.length = atoi(optarg);
+				break;
+			case 'w':
+				output.width = atoi(optarg);
 				break;
 			default:
 				abort ();
@@ -201,8 +213,7 @@ int main(int argc, char* argv[]){
 	NBodySim::NBodySystemSpace::error solarSystemParseResult;
 	bool quit;
 	SDL_Event e;
-	int height = 480;
-	int width = 640;
+	
 	//The window we'll be rendering to
 	SDL_Window* gWindow = NULL;
 	guiInitErrors guiErrorReturn;
@@ -213,6 +224,8 @@ int main(int argc, char* argv[]){
 		std::cout << "\t-i, --input-file [Filename]: Input xml file with initial conditions" << std::endl;
 		std::cout << "\t-s, --step-size  [float]   : Simulation step size in seconds" << std::endl;
 		std::cout << "\t-r, --resolution [float]   : Scale in meters per pixel" << std::endl;
+		std::cout << "\t-l, --length     [int]     : Length of window in pixels" << std::endl;
+		std::cout << "\t-w, --width      [int]     : Width of window in pixels" << std::endl;
 		std::cout << "\t-h, --help                 : Shows this help option" << std::endl;
 	}
 	else {
@@ -225,7 +238,7 @@ int main(int argc, char* argv[]){
 		// Implements Req FR.Initiate
 		solarSystemParseResult = solarSystem.parse(inputScenario);
 		if(solarSystemParseResult == NBodySim::NBodySystemSpace::SUCCESS){
-			guiErrorReturn = guiInit(&gWindow, &gRenderer, height, width);
+			guiErrorReturn = guiInit(&gWindow, &gRenderer, inputArgs.length, inputArgs.width);
 			if(guiErrorReturn == SUCCESS){
 				quit = false;
 				//While application is running
@@ -248,7 +261,7 @@ int main(int argc, char* argv[]){
 					SDL_RenderClear( gRenderer );
 					// Draw all the particles as points
 					for(unsigned i = 0; i < solarSystem.numParticles(); i++){
-						SDL_RenderDrawPoint(gRenderer, (solarSystem.getParticle(i).getPos().x/inputArgs.resolution) + (width/2), (solarSystem.getParticle(i).getPos().y/inputArgs.resolution) + (height/2));
+						SDL_RenderDrawPoint(gRenderer, (solarSystem.getParticle(i).getPos().x/inputArgs.resolution) + (inputArgs.width/2), (solarSystem.getParticle(i).getPos().y/inputArgs.resolution) + (inputArgs.length/2));
 					}
 					
 					SDL_RenderPresent( gRenderer );
