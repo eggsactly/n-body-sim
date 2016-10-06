@@ -1,6 +1,8 @@
 # About
 n-body-sim simulates how gravity affects bodies with mass in three dimensional space. This program reads in an XML file of initial conditions of a system and displays on a screen, in real-time, the positions of bodies in the system.
 
+![Image of particles in N Body Sim](n-body-screen-shot.png)
+
 # Building
 Run _make_ to build the software. Run _./n-body-sim_ to run the simulation. Run _make clean_ to remove all binary and executable files generated in the build process.
 
