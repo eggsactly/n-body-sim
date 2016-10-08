@@ -32,30 +32,102 @@ namespace NBodySim {
 	namespace NBodySystemSpace {
 		const unsigned particleAttributeListLength = 8;
 		const char particleAttributeList [][NBodySim::NBodySystemSpace::particleAttributeListLength] = {"posX", "posY", "posZ", "velX", "velY", "velZ", "mass", "name"};
+		/**
+		 * Values for the particle attribute list
+		 */
 		typedef enum {
+			/**
+			 * Index of POSX
+			 */
 			POSX = 0,
+			/**
+			 * Index of POSY
+			 */
 			POSY = 1,
+			/**
+			 * Index of POSZ
+			 */
 			POSZ = 2,
+			/**
+			 * Index of VELX
+			 */
 			VELX = 3,
+			/**
+			 * Index of VELY
+			 */
 			VELY = 4,
+			/**
+			 * Index of VELZ
+			 */
 			VELZ = 5,
+			/**
+			 * Index of MASS
+			 */
 			MASS = 6,
+			/**
+			 * Index of NAME
+			 */
 			NAME = 7
 		} particleAttributeIndexes;
+		/**
+		 * List of errors the parse method can have
+		 */
 		typedef enum {
+			/**
+			 * Successful parse
+			 */
 			SUCCESS = 0,
+			/*
+			 * Failed to allocate memory
+			 */
 			FAILED_TO_ALLOCATE_MEMORY,
+			/*
+			 * More than one system in XML file
+			 */
 			MORE_THAN_ONE_SYSTEM,
+			/*
+			 * No system in XML file
+			 */
 			NO_SYSTEM,
+			/*
+			 * No particles in the system
+			 */
 			NO_PARTICLES,
+			/*
+			 * Index of particleAttributeListLength exceeded
+			 */
 			INDEX_EXCEEDED,
+			/**
+			 * No POSX attribute provided
+			 */
 			NO_POSX,
+			/**
+			 * No POSY attribute provided
+			 */
 			NO_POSY,
+			/**
+			 * No POSX attribute provided
+			 */
 			NO_POSZ,
+			/**
+			 * No VELX attribute provided
+			 */
 			NO_VELX,
+			/**
+			 * No VELY attribute provided
+			 */
 			NO_VELY,
+			/**
+			 * No VELZ attribute provided
+			 */
 			NO_VELZ,
+			/**
+			 * No MASS attribute provided
+			 */
 			NO_MASS,
+			/**
+			 * No NAME attribute provided
+			 */
 			NO_NAME
 		} error;
 	}

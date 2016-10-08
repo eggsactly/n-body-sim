@@ -69,10 +69,25 @@ typedef struct {
  */
 argsList parseArgs(int argc, char* argv[]);
 
+/**
+ * List of Gui initialization errors
+ */
 typedef enum {
+	/**
+	 * Successful Gui initialization
+	 */
 	SUCCESS = 0,
+	/**
+	 * SDL could not be initialized
+	 */
 	COULD_NOT_INITIALIZE,
+	/**
+	 * Failed to create a window
+	 */
 	COULD_NOT_CREATE_WINDOW,
+	/**
+	 * Failed to create a renderer
+	 */
 	COULD_NOT_CREATE_RENDERER
 } guiInitErrors;
 
