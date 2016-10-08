@@ -6,13 +6,13 @@
 \section*{n-body-system Requirements}
 	\subsection*{Functional Requirements}
 		\begin{enumerate}[label=FR-\arabic*]
-			\item \label{FR.Initiate} When the user initiates the program it {\em shall} parse an input file containing a collection of particles.
-			\item \label{FR.Calculate} When a system of particles has been loaded the program {\em shall} calculate the position and velocity of every particle for every time step.
+			\item \label{FR.Initiate} When the user initiates the program, the program {\em shall} parse an input system file containing a collection of particles.
+			\item \label{FR.Calculate} When a system of particles has been loaded the program {\em shall} calculate the position and velocity of every particle for every time step in accordance with Newton's law of universal gravitation.
 		\end{enumerate}
 	\subsection*{Non-functional Requirements}
 		\begin{enumerate}[label=NR-\arabic*]
-			\item \label{NF.UsersProvideFile} Users {\em shall} provide their own system files. 
-			\item \label{NF.SystemsProvideG} Systems {\em shall} provide their own gravitation constant. 
-			\item Users \label{NF.UsersProvideTime} {\em shall} provide simulation time step sizes. 
+			\item \label{NF.UsersProvideFile} The program {\em shall} allow users to provide their own system files. 
+			\item \label{NF.SystemsProvideG} The program {\em shall} allow system files provide their own gravitation constant. 
+			\item The program \label{NF.UsersProvideTime} {\em shall} allow users to provide simulation time step sizes. 
 		\end{enumerate}
 \end{document}
