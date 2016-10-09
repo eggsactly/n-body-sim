@@ -1,48 +1,67 @@
-# NOTE: This Makefile is only for computers running Mac OS X
-CC=g++
-mkfile_path=$(abspath $(lastword $(MAKEFILE_LIST)))
-current_dir=$(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
-EXE=$(current_dir)
-UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S),Darwin)
-	INC=-I headers/ -I rapidxml/ -F/Library/Frameworks -framework SDL2
-	LIB=-F/Library/Frameworks -framework SDL2
-endif
-ifeq ($(UNAME_S),Linux)
-	INC=-I headers/ -I rapidxml/ 
-	LIB=-lSDL2
-endif
-OBJ_DIR=obj/
-SRC_DIR=src/
-SOURCES=$(wildcard $(SRC_DIR)*.cpp)
-OBJECTS=$(patsubst $(SRC_DIR)%.cpp, $(OBJ_DIR)%.o, $(SOURCES))
-TEST_OBJECTS=$(patsubst $(OBJ_DIR)main.o, , $(OBJECTS))
-DEBUG=
-TESTDIR=tests
+# NOTE: This Makefile is only for computers running Mac OS X and Linux
+CXX?=g++
+mkfile_path:=$(abspath $(lastword $(MAKEFILE_LIST)))
+current_dir:=$(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
+EXE:=$(current_dir)
+UNAME_S:=$(shell uname -s)
+# These if statements check to see which of the supported operating systems are 
+# used and sets the correct include and library paths
 
-all: $(EXE) $(TESTDIR)/test
-	./$(TESTDIR)/test
+# For Mac OS X
+ifeq ($(UNAME_S),Darwin) 
+	INC:=-I headers/ -I rapidxml/ -F/Library/Frameworks -framework SDL2
+	LIB:=-F/Library/Frameworks -framework SDL2
+endif
+# For Linux
+ifeq ($(UNAME_S),Linux) 
+	INC:=-I headers/ -I rapidxml/ 
+	LIB:=-lSDL2
+endif
+OBJ_DIR:=obj/
+SRC_DIR:=src/
+SOURCES:=$(wildcard $(SRC_DIR)*.cpp)
+OBJECTS:=$(patsubst $(SRC_DIR)%.cpp, $(OBJ_DIR)%.o, $(SOURCES))
+TEST_OBJECTS:=$(patsubst $(OBJ_DIR)main.o, , $(OBJECTS))
+DEBUG:=
+TESTDIR:=tests
 
+PREFIX?=/usr/local/bin
+
+.PHONY: all
+all: $(EXE) test
+
+# The debug option cleans and builds the application with the -g compile flag
+.PHONY: debug
 debug: clean 
 debug: DEBUG+=-g 
-debug: $(EXE)	
-
-$(TESTDIR)/test : $(TESTDIR)/UnitTests.o $(OBJ_DIR) $(TEST_OBJECTS) 
-	$(CC) $(DEBUG) $(INC) $(LIB) $< $(TEST_OBJECTS) -o $@
-
-$(TESTDIR)/UnitTests.o : $(TESTDIR)/UnitTests.cpp
-	$(CC) $(DEBUG) $(INC) -c $^ -o $@
+debug: all
 
 $(EXE): $(OBJ_DIR) $(OBJECTS)
-	$(CC) $(DEBUG) $(LIB) $(OBJECTS) -o $@
+	$(CXX) $(DEBUG) $(LIB) $(OBJECTS) -o $@
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
-	$(CC) $(DEBUG) $(INC) -c $^ -o $@
+	$(CXX) $(DEBUG) $(INC) -c $^ -o $@
 
 $(OBJ_DIR):
 	mkdir $(OBJ_DIR)
 
+# test runs unit tests, which are used to verify the requirements 
+.PHONY: test
+test: $(TESTDIR)/test
+	./$(TESTDIR)/test
+
+$(TESTDIR)/test : $(TESTDIR)/UnitTests.o $(OBJ_DIR) $(TEST_OBJECTS) 
+	$(CXX) $(DEBUG) $(INC) $(LIB) $< $(TEST_OBJECTS) -o $@
+
+$(TESTDIR)/UnitTests.o : $(TESTDIR)/UnitTests.cpp
+	$(CXX) $(DEBUG) $(INC) -c $^ -o $@
+
 .PHONY: clean
 clean:
 	rm -rf $(EXE) $(OBJ_DIR) $(TESTDIR)/UnitTests.o $(TESTDIR)/test
+
+.PHONY: install
+install: all
+	install -t $(PREFIX) $(EXE)
+	
 
