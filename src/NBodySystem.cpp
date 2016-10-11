@@ -68,11 +68,6 @@ void NBodySim::NBodySystem::step(NBodySim::FloatingType deltaT){
 	for(NBodySim::UnsignedType i = 0; i < systemCopy.size(); i++){
 		// Calculate new position of particle first from current velocity
 		newPosition = system.at(i).getPos();
-		newPosition.x += systemCopy.at(i).getVel().x * deltaT;
-		newPosition.y += systemCopy.at(i).getVel().y * deltaT;
-		newPosition.z += systemCopy.at(i).getVel().z * deltaT;
-		system[i].setPos(newPosition);
-		
 		newVelocity = system.at(i).getVel();
 		// Sum forces on body from all bodys to obtain new velocity of paricle
 		for(NBodySim::UnsignedType j = 0; j < systemCopy.size(); j++){
@@ -89,6 +84,10 @@ void NBodySim::NBodySystem::step(NBodySim::FloatingType deltaT){
 			newVelocity.z += (distance != 0.0f) ? ((acceleration) * deltaT) * (distanceComponent.z / distance) : 0;
 		}
 		system[i].setVel(newVelocity);
+		newPosition.x += newVelocity.x * deltaT;
+		newPosition.y += newVelocity.y * deltaT;
+		newPosition.z += newVelocity.z * deltaT;
+		system[i].setPos(newPosition);
 	}
 }
 
