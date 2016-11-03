@@ -25,6 +25,8 @@
 #include <streambuf>
 #include <getopt.h>
 #include <SDL2/SDL.h>
+#include <pthread.h>
+#include <semaphore.h>
 
 #include "NBodyTypes.h"
 #include "Particle.h"
@@ -98,6 +100,20 @@ typedef enum {
  * @return string representation of error code
  */
 std::string guiInitErrorsToString(guiInitErrors error);
+
+typedef struct {
+	NBodySim::FloatingType interval;
+	sem_t * timingSem;
+	volatile unsigned char continueTiming;
+} timingFunctionStruct;
+
+/**
+ * @brief timingFunction pulls a semaphore high every interval for as long as continueTiming is non zero
+ *
+ * @param inputParams A pointer to the timingFunctionStruct
+ * @return A null pointer
+ */
+void * timingFunction(void * inputParams);
 
 std::string readFile(std::string fileName){
 	std::string scenarioText;
@@ -221,6 +237,32 @@ void close(SDL_Window * gWindow, SDL_Renderer * gRenderer)
 	SDL_Quit();
 }
 
+void * timingFunction(void * inputParams){
+
+	if(inputParams == NULL){
+		pthread_exit(NULL);
+	}
+	
+	timingFunctionStruct * inputParamStruct = reinterpret_cast<timingFunctionStruct *>(inputParams);
+	
+	NBodySim::FloatingType interval = timingFunctionStruct->interval;
+	sem_t * timingSem = timingFunctionStruct->timingSem;
+	volatile unsigned char * continueTiming = timingFunctionStruct->continueTiming;
+	
+	if(timingSem == NULL){
+		pthread_exit(NULL);
+	}
+	if(continueTiming == NULL){
+		pthread_exit(NULL);
+	}
+	
+	while((*continueTiming) != 0){
+		SDL_Delay(interval);
+		sem_post(timingSem);
+	}
+	pthread_exit(NULL);
+}
+
 int main(int argc, char* argv[]){
 	argsList inputArgs = parseArgs(argc, argv);
 	std::string inputScenario;
@@ -228,6 +270,10 @@ int main(int argc, char* argv[]){
 	NBodySim::NBodySystemSpace::error solarSystemParseResult;
 	bool quit;
 	SDL_Event e;
+	sem_t timingSemaphore;
+	pthread_t timingThread;
+	int pthreadResponse;
+	timingFunctionStruct timingStruct;
 	
 	//The window we'll be rendering to
 	SDL_Window* gWindow = NULL;
@@ -255,33 +301,41 @@ int main(int argc, char* argv[]){
 		if(solarSystemParseResult == NBodySim::NBodySystemSpace::SUCCESS){
 			guiErrorReturn = guiInit(&gWindow, &gRenderer, inputArgs.length, inputArgs.width);
 			if(guiErrorReturn == SUCCESS){
+				// Create a thread for the timer
+				pthreadResponse = pthread_create(&timingSemaphore, NULL, timingFunction, reinterpret_cast<void *>(&timingStruct));
 				quit = false;
-				//While application is running
-				while( !quit )
-				{
-					//Handle events on queue
-					while( SDL_PollEvent( &e ) != 0 )
+				if(!pthreadResponse){
+					//While application is running
+					while( !quit )
 					{
-						//User requests quit
-						if( e.type == SDL_QUIT )
+						//Handle events on queue
+						while( SDL_PollEvent( &e ) != 0 )
 						{
-							quit = true;
+							//User requests quit
+							if( e.type == SDL_QUIT )
+							{
+								quit = true;
+							}
 						}
+					
+						// Implements Req FR.Calculate
+						solarSystem.step(inputArgs.stepSize);
+					
+						// Clear Screen
+						SDL_RenderClear( gRenderer );
+						// Draw all the particles as points
+						for(unsigned i = 0; i < solarSystem.numParticles(); i++){
+							SDL_RenderDrawPoint(gRenderer, (solarSystem.getParticle(i).getPos().x/inputArgs.resolution) + (inputArgs.width/2), (solarSystem.getParticle(i).getPos().y/inputArgs.resolution) + (inputArgs.length/2));
+						}
+					
+						SDL_RenderPresent( gRenderer );
+					
+						SDL_Delay(1000 * inputArgs.stepSize);
 					}
-					
-					// Implements Req FR.Calculate
-					solarSystem.step(inputArgs.stepSize);
-					
-					// Clear Screen
-					SDL_RenderClear( gRenderer );
-					// Draw all the particles as points
-					for(unsigned i = 0; i < solarSystem.numParticles(); i++){
-						SDL_RenderDrawPoint(gRenderer, (solarSystem.getParticle(i).getPos().x/inputArgs.resolution) + (inputArgs.width/2), (solarSystem.getParticle(i).getPos().y/inputArgs.resolution) + (inputArgs.length/2));
-					}
-					
-					SDL_RenderPresent( gRenderer );
-					
-					SDL_Delay(1000 * inputArgs.stepSize);
+				}
+				else {
+					std::cout << "Error: return code from pthread: " << pthreadResponse << std::endl;
+					return EXIT_FAILURE;
 				}
 			}
 			else{
