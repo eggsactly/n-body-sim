@@ -103,12 +103,13 @@ std::string guiInitErrorsToString(guiInitErrors error);
 
 typedef struct {
 	NBodySim::FloatingType interval;
-	sem_t * timingSem;
-	volatile unsigned char continueTiming;
+	unsigned numSems;
+	sem_t ** timingSems;
+	volatile bool * quitTiming;
 } timingFunctionStruct;
 
 /**
- * @brief timingFunction pulls a semaphore high every interval for as long as continueTiming is non zero
+ * @brief timingFunction pulls a semaphore high every interval for as long as quitTiming is false
  *
  * @param inputParams A pointer to the timingFunctionStruct
  * @return A null pointer
@@ -245,20 +246,29 @@ void * timingFunction(void * inputParams){
 	
 	timingFunctionStruct * inputParamStruct = reinterpret_cast<timingFunctionStruct *>(inputParams);
 	
-	NBodySim::FloatingType interval = timingFunctionStruct->interval;
-	sem_t * timingSem = timingFunctionStruct->timingSem;
-	volatile unsigned char * continueTiming = timingFunctionStruct->continueTiming;
+	NBodySim::FloatingType interval = inputParamStruct->interval;
+	unsigned numSems = inputParamStruct->numSems;
+	sem_t ** timingSems = inputParamStruct->timingSems;
+	volatile bool * quitTiming = inputParamStruct->quitTiming;
 	
-	if(timingSem == NULL){
+	if(timingSems == NULL){
 		pthread_exit(NULL);
 	}
-	if(continueTiming == NULL){
+	for(unsigned i = 0; i < numSems; i++){
+		if(timingSems[i] == NULL){
+			pthread_exit(NULL);
+		}
+	}
+	if(quitTiming == NULL){
 		pthread_exit(NULL);
 	}
 	
-	while((*continueTiming) != 0){
+	// When each interval passes, raise up all the semaphores passed to this function.
+	while(!(*quitTiming)){
 		SDL_Delay(interval);
-		sem_post(timingSem);
+		for(unsigned i = 0; i < numSems; i++){
+			sem_post(timingSems[i]);
+		}
 	}
 	pthread_exit(NULL);
 }
@@ -268,12 +278,24 @@ int main(int argc, char* argv[]){
 	std::string inputScenario;
 	NBodySim::NBodySystem solarSystem;
 	NBodySim::NBodySystemSpace::error solarSystemParseResult;
-	bool quit;
+	volatile bool quit;
 	SDL_Event e;
-	sem_t timingSemaphore;
+	sem_t timingSemaphores[1];
 	pthread_t timingThread;
 	int pthreadResponse;
 	timingFunctionStruct timingStruct;
+	void * status;
+	
+	// Initialize the semaphores
+	for(unsigned i = 0; i < sizeof(timingSemaphores)/sizeof(sem_t); i++){
+		sem_init(&timingSemaphores[i], 0, 0);
+	}
+	
+	timingStruct.interval = 1000 * inputArgs.stepSize;
+	timingStruct.numSems = sizeof(timingSemaphores)/sizeof(sem_t);
+	timingStruct.timingSems = (sem_t **)&timingSemaphores;
+	timingStruct.quitTiming = &quit;
+
 	
 	//The window we'll be rendering to
 	SDL_Window* gWindow = NULL;
@@ -302,7 +324,11 @@ int main(int argc, char* argv[]){
 			guiErrorReturn = guiInit(&gWindow, &gRenderer, inputArgs.length, inputArgs.width);
 			if(guiErrorReturn == SUCCESS){
 				// Create a thread for the timer
-				pthreadResponse = pthread_create(&timingSemaphore, NULL, timingFunction, reinterpret_cast<void *>(&timingStruct));
+				// Initialize the semaphores
+				for(unsigned i = 0; i < sizeof(timingSemaphores)/sizeof(sem_t); i++){
+					
+				}
+				pthreadResponse = pthread_create(&timingThread, NULL, timingFunction, reinterpret_cast<void *>(&timingStruct));
 				quit = false;
 				if(!pthreadResponse){
 					//While application is running
@@ -330,8 +356,10 @@ int main(int argc, char* argv[]){
 					
 						SDL_RenderPresent( gRenderer );
 					
-						SDL_Delay(1000 * inputArgs.stepSize);
+						// Wait on a timing semaphore, if this wait function returns non zero keep waiting
+						while(sem_wait(&timingSemaphores[0]) != 0);
 					}
+					pthreadResponse = pthread_join(timingThread, &status);
 				}
 				else {
 					std::cout << "Error: return code from pthread: " << pthreadResponse << std::endl;
@@ -347,6 +375,11 @@ int main(int argc, char* argv[]){
 			std::cout << "Error: " << NBodySim::NBodySystem::errorToString(solarSystemParseResult) << std::endl;
 			return EXIT_FAILURE;
 		}
+	}
+	
+	// Uninitialize the semaphores
+	for(unsigned i = 0; i < sizeof(timingSemaphores)/sizeof(sem_t); i++){
+		 sem_destroy(&timingSemaphores[i]);
 	}
 	
 	close(gWindow, gRenderer);
