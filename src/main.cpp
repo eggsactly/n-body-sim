@@ -21,11 +21,14 @@
 #include <cstdlib>
 #include <iostream>
 #include <string.h>
+#include <sstream>
 #include <fstream>
 #include <streambuf>
 #include <getopt.h>
 #include <SDL2/SDL.h>
 #include <pthread.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 #include <semaphore.h>
 
 #include "NBodyTypes.h"
@@ -274,26 +277,39 @@ void * timingFunction(void * inputParams){
 }
 
 int main(int argc, char* argv[]){
+	const unsigned numTimingSems = 1;
 	argsList inputArgs = parseArgs(argc, argv);
 	std::string inputScenario;
 	NBodySim::NBodySystem solarSystem;
 	NBodySim::NBodySystemSpace::error solarSystemParseResult;
 	volatile bool quit;
 	SDL_Event e;
-	sem_t timingSemaphores[1];
+	sem_t ** timingSemaphores;
+	timingSemaphores = new (std::nothrow) sem_t*[numTimingSems];
+	if(timingSemaphores == NULL){
+		std::cout << "Error: Could not allocate semaphore array." << std::endl;
+		return EXIT_FAILURE;
+	}
+	
 	pthread_t timingThread;
 	int pthreadResponse;
 	timingFunctionStruct timingStruct;
 	void * status;
 	
 	// Initialize the semaphores
-	for(unsigned i = 0; i < sizeof(timingSemaphores)/sizeof(sem_t); i++){
-		sem_init(&timingSemaphores[i], 0, 0);
+	for(unsigned i = 0; i < numTimingSems; i++){
+		std::ostringstream semName;
+		semName << "timingSem" << i;
+		timingSemaphores[i] = sem_open(semName.str().c_str(), O_CREAT, S_IWRITE | S_IREAD, 0);
+		if(timingSemaphores[i] == SEM_FAILED){
+			std::cout << "Error initializing semaphore " << i << " error code: " << errno << std::endl;
+			return EXIT_FAILURE;
+		}
 	}
 	
 	timingStruct.interval = 1000 * inputArgs.stepSize;
-	timingStruct.numSems = sizeof(timingSemaphores)/sizeof(sem_t);
-	timingStruct.timingSems = (sem_t **)&timingSemaphores;
+	timingStruct.numSems = numTimingSems;
+	timingStruct.timingSems = timingSemaphores;
 	timingStruct.quitTiming = &quit;
 
 	
@@ -324,10 +340,6 @@ int main(int argc, char* argv[]){
 			guiErrorReturn = guiInit(&gWindow, &gRenderer, inputArgs.length, inputArgs.width);
 			if(guiErrorReturn == SUCCESS){
 				// Create a thread for the timer
-				// Initialize the semaphores
-				for(unsigned i = 0; i < sizeof(timingSemaphores)/sizeof(sem_t); i++){
-					
-				}
 				pthreadResponse = pthread_create(&timingThread, NULL, timingFunction, reinterpret_cast<void *>(&timingStruct));
 				quit = false;
 				if(!pthreadResponse){
@@ -357,7 +369,7 @@ int main(int argc, char* argv[]){
 						SDL_RenderPresent( gRenderer );
 					
 						// Wait on a timing semaphore, if this wait function returns non zero keep waiting
-						while(sem_wait(&timingSemaphores[0]) != 0);
+						while(sem_wait(timingSemaphores[0]) != 0);
 					}
 					pthreadResponse = pthread_join(timingThread, &status);
 				}
@@ -378,8 +390,11 @@ int main(int argc, char* argv[]){
 	}
 	
 	// Uninitialize the semaphores
-	for(unsigned i = 0; i < sizeof(timingSemaphores)/sizeof(sem_t); i++){
-		 sem_destroy(&timingSemaphores[i]);
+	for(unsigned i = 0; i < numTimingSems; i++){
+		if(sem_close(timingSemaphores[i]) < 0){
+			std::cout << "Error closing semaphore " << i << " error code: " << errno << std::endl;
+			return EXIT_FAILURE;
+		}
 	}
 	
 	close(gWindow, gRenderer);
