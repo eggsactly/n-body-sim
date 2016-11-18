@@ -62,6 +62,14 @@ clean:
 
 .PHONY: install
 install: all
+# For Mac OS X
+ifeq ($(UNAME_S),Darwin) 
+	install $(EXE) $(PREFIX) 
+endif
+# For Linux
+ifeq ($(UNAME_S),Linux) 
 	install -t $(PREFIX) $(EXE)
+endif
+	
 	
 
