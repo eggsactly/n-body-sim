@@ -119,6 +119,23 @@ typedef struct {
  */
 void * timingFunction(void * inputParams);
 
+typedef struct {
+	NBodySim::FloatingType stepSize;
+	sem_t * timingSem;
+	volatile bool * quitTiming;
+	NBodySim::NBodySystem * solarSystem;
+	volatile NBodySim::UnsignedType * stepsPerTime;
+} workThreadStruct;
+
+/**
+ * @brief workThread calculates new positions and velocities for the particle vector till program close
+ * The Proletariat will rise and overthrow the Bourgeoisie.
+ *
+ * @param inputParams A pointer to the workerThreadStruct
+ * @return A null pointer
+ */
+void * workThread(void * inputParams);
+
 std::string readFile(std::string fileName){
 	std::string scenarioText;
 	std::ifstream scenarioFile(fileName.c_str());
@@ -276,13 +293,49 @@ void * timingFunction(void * inputParams){
 	pthread_exit(NULL);
 }
 
+void * workThread(void * inputParams){
+	if(inputParams == NULL){
+		pthread_exit(NULL);
+	}
+	
+	workThreadStruct * inputParamStruct = reinterpret_cast<workThreadStruct *>(inputParams);
+	
+	NBodySim::FloatingType stepSize = inputParamStruct->stepSize;
+	sem_t * timingSem = inputParamStruct->timingSem;
+	volatile bool * quitTiming = inputParamStruct->quitTiming;
+	NBodySim::NBodySystem * solarSystem = inputParamStruct->solarSystem;
+	volatile NBodySim::UnsignedType * stepsPerTime = inputParamStruct->stepsPerTime;
+	
+	if(timingSem == NULL){
+		pthread_exit(NULL);
+	}
+	if(quitTiming == NULL){
+		pthread_exit(NULL);
+	}
+	if(solarSystem == NULL){
+		pthread_exit(NULL);
+	}
+	if(stepsPerTime == NULL){
+		pthread_exit(NULL);
+	}
+	
+	// For each iteration, wait on a semaphore
+	while(!(*quitTiming)){
+		while(sem_wait(timingSem) != 0);
+		// Implements Req FR.Calculate
+		solarSystem->step(stepSize);
+	}
+	pthread_exit(NULL);
+}
+
 int main(int argc, char* argv[]){
-	const unsigned numTimingSems = 1;
+	const unsigned numTimingSems = 2;
 	argsList inputArgs = parseArgs(argc, argv);
 	std::string inputScenario;
 	NBodySim::NBodySystem solarSystem;
 	NBodySim::NBodySystemSpace::error solarSystemParseResult;
 	volatile bool quit;
+	volatile NBodySim::UnsignedType stepsPerTime = 1;
 	SDL_Event e;
 	sem_t ** timingSemaphores;
 	timingSemaphores = new (std::nothrow) sem_t*[numTimingSems];
@@ -292,8 +345,12 @@ int main(int argc, char* argv[]){
 	}
 	
 	pthread_t timingThread;
-	int pthreadResponse;
 	timingFunctionStruct timingStruct;
+	
+	pthread_t workerThread;
+	workThreadStruct workerStruct;
+	
+	int pthreadResponse;
 	void * status;
 	
 	// Initialize the semaphores
@@ -312,6 +369,11 @@ int main(int argc, char* argv[]){
 	timingStruct.timingSems = timingSemaphores;
 	timingStruct.quitTiming = &quit;
 
+	workerStruct.stepSize = inputArgs.stepSize;
+	workerStruct.timingSem = timingSemaphores[1];
+	workerStruct.quitTiming = &quit;
+	workerStruct.solarSystem = &solarSystem;
+	workerStruct.stepsPerTime = &stepsPerTime;
 	
 	//The window we'll be rendering to
 	SDL_Window* gWindow = NULL;
@@ -339,42 +401,48 @@ int main(int argc, char* argv[]){
 		if(solarSystemParseResult == NBodySim::NBodySystemSpace::SUCCESS){
 			guiErrorReturn = guiInit(&gWindow, &gRenderer, inputArgs.length, inputArgs.width);
 			if(guiErrorReturn == SUCCESS){
+				quit = false;
 				// Create a thread for the timer
 				pthreadResponse = pthread_create(&timingThread, NULL, timingFunction, reinterpret_cast<void *>(&timingStruct));
-				quit = false;
 				if(!pthreadResponse){
-					//While application is running
-					while( !quit )
-					{
-						//Handle events on queue
-						while( SDL_PollEvent( &e ) != 0 )
+					// Create a thread for the worker
+					pthreadResponse = pthread_create(&workerThread, NULL, workThread, reinterpret_cast<void *>(&workerStruct));
+					if(!pthreadResponse){
+						//While application is running
+						while( !quit )
 						{
-							//User requests quit
-							if( e.type == SDL_QUIT )
+							//Handle events on queue
+							while( SDL_PollEvent( &e ) != 0 )
 							{
-								quit = true;
+								//User requests quit
+								if( e.type == SDL_QUIT )
+								{
+									quit = true;
+								}
 							}
+					
+							// Clear Screen
+							SDL_RenderClear( gRenderer );
+							// Draw all the particles as points
+							for(unsigned i = 0; i < solarSystem.numParticles(); i++){
+								SDL_RenderDrawPoint(gRenderer, (solarSystem.getParticle(i).getPos().x/inputArgs.resolution) + (inputArgs.width/2), (solarSystem.getParticle(i).getPos().y/inputArgs.resolution) + (inputArgs.length/2));
+							}
+					
+							SDL_RenderPresent( gRenderer );
+					
+							// Wait on a timing semaphore, if this wait function returns non zero keep waiting
+							while(sem_wait(timingSemaphores[0]) != 0);
 						}
-					
-						// Implements Req FR.Calculate
-						solarSystem.step(inputArgs.stepSize);
-					
-						// Clear Screen
-						SDL_RenderClear( gRenderer );
-						// Draw all the particles as points
-						for(unsigned i = 0; i < solarSystem.numParticles(); i++){
-							SDL_RenderDrawPoint(gRenderer, (solarSystem.getParticle(i).getPos().x/inputArgs.resolution) + (inputArgs.width/2), (solarSystem.getParticle(i).getPos().y/inputArgs.resolution) + (inputArgs.length/2));
-						}
-					
-						SDL_RenderPresent( gRenderer );
-					
-						// Wait on a timing semaphore, if this wait function returns non zero keep waiting
-						while(sem_wait(timingSemaphores[0]) != 0);
+						pthreadResponse = pthread_join(workerThread, &status);
+					}
+					else {
+						std::cout << "Error: return code from pthread for workerStruct: " << pthreadResponse << std::endl;
+						return EXIT_FAILURE;
 					}
 					pthreadResponse = pthread_join(timingThread, &status);
 				}
 				else {
-					std::cout << "Error: return code from pthread: " << pthreadResponse << std::endl;
+					std::cout << "Error: return code from pthread for timingStruct: " << pthreadResponse << std::endl;
 					return EXIT_FAILURE;
 				}
 			}
