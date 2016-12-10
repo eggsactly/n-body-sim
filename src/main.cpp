@@ -139,9 +139,10 @@ void * workThread(void * inputParams);
 /**
  * @breif determinant3x3 finds the determinent of a 3x3 matrix
  *
+ * @param a 3x3 matrix
+ * @return the determinent of the 3x3 matrix
  */
 NBodySim::FloatingType determinant3x3(NBodySim::FloatingType a[3][3]);
-
 
 
 std::string readFile(std::string fileName){
@@ -337,7 +338,24 @@ void * workThread(void * inputParams){
 }
 
 NBodySim::FloatingType determinant3x3(NBodySim::FloatingType a[3][3]){
-	return a[0][0] * a[1][1] * a[2][2] + a[1][0] * a[2][1] * a[0][2] + a[2][0] * a[0][1] * a[1][2] - a[0][0] * a[2][1] * a[1][2] - a[2][0] * a[1][1] * a[0][2] - a[1][0] * a[0][1] * a[2][2];
+	const unsigned matrixSize = sizeof(a[3]) / sizeof(NBodySim::FloatingType);
+	NBodySim::FloatingType determinant = 0;
+	NBodySim::FloatingType multiplyForward;
+	NBodySim::FloatingType multiplyBackwards;
+	
+	// Iterate down the left had side
+	for(unsigned i = 0; i < matrixSize; i++){
+		// Iterate along the diagonal
+		multiplyForward = 1;
+		multiplyBackwards = 1;
+		for(unsigned j = 0; j < matrixSize; j++){
+			multiplyForward *= a[(matrixSize + i + j) % matrixSize][j];
+			multiplyBackwards *= a[(matrixSize + i - j) % matrixSize][j];
+		}
+		determinant += multiplyForward - multiplyBackwards;
+	}
+	
+	return determinant;
 }
 
 int main(int argc, char* argv[]){
