@@ -136,6 +136,14 @@ typedef struct {
  */
 void * workThread(void * inputParams);
 
+/**
+ * @breif determinant3x3 finds the determinent of a 3x3 matrix
+ *
+ */
+NBodySim::FloatingType determinant3x3(NBodySim::FloatingType a[3][3]);
+
+
+
 std::string readFile(std::string fileName){
 	std::string scenarioText;
 	std::ifstream scenarioFile(fileName.c_str());
@@ -326,6 +334,10 @@ void * workThread(void * inputParams){
 		solarSystem->step(stepSize);
 	}
 	pthread_exit(NULL);
+}
+
+NBodySim::FloatingType determinant3x3(NBodySim::FloatingType a[3][3]){
+	return a[0][0] * a[1][1] * a[2][2] + a[1][0] * a[2][1] * a[0][2] + a[2][0] * a[0][1] * a[1][2] - a[0][0] * a[2][1] * a[1][2] - a[2][0] * a[1][1] * a[0][2] - a[1][0] * a[0][1] * a[2][2];
 }
 
 int main(int argc, char* argv[]){
