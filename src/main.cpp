@@ -504,6 +504,7 @@ int main(int argc, char* argv[]){
 	SDL_Renderer* gRenderer = NULL;
 	SDL_Surface* timeAccelSurf = NULL;
 	SDL_Texture * timeAccelTex = NULL;
+	SDL_Point triangle[] = {{10, 10}, {20, 15}, {10, 20}, {10, 10}};
 	
 	if(inputArgs.help){
 		std::cout << "Command line flags: " << std::endl;
@@ -551,6 +552,9 @@ int main(int argc, char* argv[]){
 							
 							//Render texture to screen
 							//SDL_RenderCopy( gRenderer, timeAccelTex, NULL, NULL );
+							
+							// Draw time acceleration arrows
+							SDL_RenderDrawLines(gRenderer, triangle, 4);
 							
 							// Draw all the particles as points
 							for(unsigned i = 0; i < solarSystem.numParticles(); i++){
