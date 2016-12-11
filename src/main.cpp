@@ -93,7 +93,15 @@ typedef enum {
 	/**
 	 * Failed to create a renderer
 	 */
-	COULD_NOT_CREATE_RENDERER
+	COULD_NOT_CREATE_RENDERER,
+	/**
+	 * Failed to create surface
+	 */
+	COULD_NOT_CREATE_SURFACE,
+	/**
+	 * Could not create texture
+	 */
+	COULD_NOT_CREATE_TEXTURE
 } guiInitErrors;
 
 /**
@@ -246,12 +254,26 @@ std::string guiInitErrorsToString(guiInitErrors error){
 		case COULD_NOT_INITIALIZE: return "SDL could not initialize"; break;
 		case COULD_NOT_CREATE_WINDOW: return "window could not be created"; break;
 		case COULD_NOT_CREATE_RENDERER: return "could not create renderer"; break;
+		case COULD_NOT_CREATE_SURFACE: return "could not create surface"; break;
+		case COULD_NOT_CREATE_TEXTURE: return "could not create texture"; break;
 		default: return "unknown error"; break;
 	}
 }
 
-guiInitErrors guiInit(SDL_Window ** gWindow, SDL_Renderer ** gRenderer, int height, int width)
+guiInitErrors guiInit(SDL_Window ** gWindow, SDL_Renderer ** gRenderer, SDL_Surface ** timeAccelSurf, SDL_Texture ** timeAccelTex, int height, int width)
 {
+	Uint32 rmask, gmask, bmask, amask;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	rmask = 0xff000000;
+	gmask = 0x00ff0000;
+	bmask = 0x0000ff00;
+	amask = 0x000000ff;
+#else
+	rmask = 0x000000ff;
+	gmask = 0x0000ff00;
+	bmask = 0x00ff0000;
+	amask = 0xff000000;
+#endif
 	//Initialize SDL
 	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
 	{
@@ -271,6 +293,18 @@ guiInitErrors guiInit(SDL_Window ** gWindow, SDL_Renderer ** gRenderer, int heig
 			*gRenderer = SDL_CreateRenderer( *gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
 			if(*gRenderer == NULL){
 				return COULD_NOT_CREATE_RENDERER;
+			}
+			else{
+				*timeAccelSurf = SDL_CreateRGBSurface(0, width, height, 32, rmask, gmask, bmask, amask);
+				if(*timeAccelSurf == NULL){
+					return COULD_NOT_CREATE_SURFACE;
+				}
+				else {
+					*timeAccelTex = SDL_CreateTextureFromSurface( *gRenderer, *timeAccelSurf );
+					if(*timeAccelTex == NULL){
+						return COULD_NOT_CREATE_TEXTURE;
+					}
+				}
 			}
 		}
 	}
@@ -468,6 +502,8 @@ int main(int argc, char* argv[]){
 	SDL_Window* gWindow = NULL;
 	guiInitErrors guiErrorReturn;
 	SDL_Renderer* gRenderer = NULL;
+	SDL_Surface* timeAccelSurf = NULL;
+	SDL_Texture * timeAccelTex = NULL;
 	
 	if(inputArgs.help){
 		std::cout << "Command line flags: " << std::endl;
@@ -488,7 +524,7 @@ int main(int argc, char* argv[]){
 		// Implements Req FR.Initiate
 		solarSystemParseResult = solarSystem.parse(inputScenario);
 		if(solarSystemParseResult == NBodySim::NBodySystemSpace::SUCCESS){
-			guiErrorReturn = guiInit(&gWindow, &gRenderer, inputArgs.length, inputArgs.width);
+			guiErrorReturn = guiInit(&gWindow, &gRenderer, &timeAccelSurf, &timeAccelTex, inputArgs.length, inputArgs.width);
 			if(guiErrorReturn == SUCCESS){
 				quit = false;
 				// Create a thread for the timer
@@ -512,11 +548,17 @@ int main(int argc, char* argv[]){
 					
 							// Clear Screen
 							SDL_RenderClear( gRenderer );
+							
+							//Render texture to screen
+							//SDL_RenderCopy( gRenderer, timeAccelTex, NULL, NULL );
+							
 							// Draw all the particles as points
 							for(unsigned i = 0; i < solarSystem.numParticles(); i++){
 								SDL_RenderDrawPoint(gRenderer, (solarSystem.getParticle(i).getPos().x/inputArgs.resolution) + (inputArgs.width/2), (solarSystem.getParticle(i).getPos().y/inputArgs.resolution) + (inputArgs.length/2));
 							}
 					
+							
+							
 							SDL_RenderPresent( gRenderer );
 					
 							// Wait on a timing semaphore, if this wait function returns non zero keep waiting
