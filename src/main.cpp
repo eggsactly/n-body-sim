@@ -560,13 +560,8 @@ int main(int argc, char* argv[]){
 							for(unsigned i = 0; i < solarSystem.numParticles(); i++){
 								SDL_RenderDrawPoint(gRenderer, (solarSystem.getParticle(i).getPos().x/inputArgs.resolution) + (inputArgs.width/2), (solarSystem.getParticle(i).getPos().y/inputArgs.resolution) + (inputArgs.length/2));
 							}
-					
-							
 							
 							SDL_RenderPresent( gRenderer );
-					
-							// Wait on a timing semaphore, if this wait function returns non zero keep waiting
-							while(sem_wait(timingSemaphores[0]) != 0);
 						}
 						pthreadResponse = pthread_join(workerThread, &status);
 					}
