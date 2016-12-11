@@ -137,12 +137,35 @@ typedef struct {
 void * workThread(void * inputParams);
 
 /**
+ * matrix3x3 contains a single parameter called 'a' which is a 3x3 matrix to get around functions not being able to return statically allocated arrays
+ */
+typedef struct {
+	NBodySim::FloatingType a[3][3];
+}matrix3x3;
+
+/**
  * @breif determinant3x3 finds the determinent of a 3x3 matrix
  *
  * @param a 3x3 matrix
  * @return the determinent of the 3x3 matrix
  */
 NBodySim::FloatingType determinant3x3(NBodySim::FloatingType a[3][3]);
+
+/**
+ * @breif calculates the transpose of a 3x3 matrix
+ *
+ * @param a 3x3 matrix
+ * @return the transposed 3x3 matrix
+ */
+matrix3x3 transpose3x3(NBodySim::FloatingType a[3][3]);
+
+/**
+ * @breif calculates the inverse of a 3x3 matrix
+ *
+ * @param a 3x3 matrix
+ * @return the inverted 3x3 matrix
+ */
+matrix3x3 inverse3x3(NBodySim::FloatingType a[3][3]);
 
 
 std::string readFile(std::string fileName){
@@ -338,12 +361,12 @@ void * workThread(void * inputParams){
 }
 
 NBodySim::FloatingType determinant3x3(NBodySim::FloatingType a[3][3]){
-	const unsigned matrixSize = sizeof(a[3]) / sizeof(NBodySim::FloatingType);
+	const unsigned matrixSize = sizeof(a[0]) / sizeof(NBodySim::FloatingType);
 	NBodySim::FloatingType determinant = 0;
 	NBodySim::FloatingType multiplyForward;
 	NBodySim::FloatingType multiplyBackwards;
 	
-	// Iterate down the left had side
+	// Iterate down the left hand side
 	for(unsigned i = 0; i < matrixSize; i++){
 		// Iterate along the diagonal
 		multiplyForward = 1;
@@ -356,6 +379,42 @@ NBodySim::FloatingType determinant3x3(NBodySim::FloatingType a[3][3]){
 	}
 	
 	return determinant;
+}
+
+matrix3x3 transpose3x3(NBodySim::FloatingType a[3][3]){
+	const unsigned matrixSize = sizeof(a[0]) / sizeof(NBodySim::FloatingType);
+	matrix3x3 trans;
+	NBodySim::FloatingType temp;
+	for(unsigned i = 0; i < matrixSize; i++){
+		for(unsigned j = 0; j < matrixSize; j++){
+			trans.a[i][j] = a[j][i];
+		}
+	}
+	return trans;
+}
+
+matrix3x3 inverse3x3(NBodySim::FloatingType a[3][3]){
+	const unsigned matrixSize = sizeof(a[0]) / sizeof(NBodySim::FloatingType);
+	static NBodySim::FloatingType invA[matrixSize][matrixSize];
+	NBodySim::FloatingType multiplyForward;
+	NBodySim::FloatingType multiplyBackwards;
+	NBodySim::FloatingType determinant = determinant3x3(a);
+
+	// Go to every cell
+	for(unsigned i = 0; i < matrixSize; i++){
+		for(unsigned j = 0; j < matrixSize; j++){
+			// Calculate the determinent of each sub matrix opposite to the current cell
+			multiplyForward = 1;
+			multiplyBackwards = 1;
+			for(unsigned k = 1; k < matrixSize; k++){
+				multiplyForward *= a[(matrixSize + i + k) % matrixSize][(matrixSize + j + k) % matrixSize];
+				multiplyBackwards *= a[(matrixSize + i - k) % matrixSize][(matrixSize + j + k) % matrixSize];
+			}
+			invA[i][j] = (multiplyForward - multiplyBackwards) / determinant;
+		}
+	}
+	
+	return transpose3x3(invA);
 }
 
 int main(int argc, char* argv[]){
