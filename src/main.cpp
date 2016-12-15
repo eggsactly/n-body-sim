@@ -30,6 +30,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <semaphore.h>
+#include <cmath>
 
 #include "NBodyTypes.h"
 #include "Particle.h"
@@ -175,6 +176,16 @@ matrix3x3 transpose3x3(NBodySim::FloatingType a[3][3]);
  */
 matrix3x3 inverse3x3(NBodySim::FloatingType a[3][3]);
 
+/**
+ * @brief drawTrianle draws a triangle at position x, y with heigh and width, users can fill in the triangle too
+ * @param gRenderer place to draw the trianlge
+ * @param x location in the x plane
+ * @param y location in the y plane
+ * @param height of triangle
+ * @param width of triangle
+ * @param whether the triangle should be filled in
+ */
+void drawTriangle(SDL_Renderer * gRenderer, int x, int y, int height, int width, unsigned char fillIn);
 
 std::string readFile(std::string fileName){
 	std::string scenarioText;
@@ -451,6 +462,29 @@ matrix3x3 inverse3x3(NBodySim::FloatingType a[3][3]){
 	return transpose3x3(invA);
 }
 
+void drawTriangle(SDL_Renderer * gRenderer, int x, int y, int height, int width, unsigned char fillIn){
+	int calculatedWidth = static_cast<int>(static_cast<double>(width) * sqrt(3.00f)/2.00f);
+	int slope = height / width;
+	SDL_Point triangle[4] = {{x, y}, {x + calculatedWidth, y + height/2}, {x, y + height}, {x, y}};
+	
+	SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+	
+	for(int i = 0; fillIn && i < height/2; i++){
+		for(int j = 0; j < slope * i + 1; j++){
+			SDL_RenderDrawPoint(gRenderer, j + x, i + y);
+		}
+	}
+	for(int i = 0; fillIn && i < height/2; i++){
+		for(int j = (slope * (height/2 - i)) + 1; j >= 0; j--){
+			SDL_RenderDrawPoint(gRenderer, j + x, i + y + height/2);
+		}
+	}
+	// Set color for fill in
+	SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+	// Draw time acceleration arrows
+	SDL_RenderDrawLines(gRenderer, triangle, 4);
+}
+
 int main(int argc, char* argv[]){
 	const unsigned numTimingSems = 2;
 	argsList inputArgs = parseArgs(argc, argv);
@@ -504,7 +538,7 @@ int main(int argc, char* argv[]){
 	SDL_Renderer* gRenderer = NULL;
 	SDL_Surface* timeAccelSurf = NULL;
 	SDL_Texture * timeAccelTex = NULL;
-	SDL_Point triangle[] = {{10, 10}, {20, 15}, {10, 20}, {10, 10}};
+	
 	
 	if(inputArgs.help){
 		std::cout << "Command line flags: " << std::endl;
@@ -551,15 +585,24 @@ int main(int argc, char* argv[]){
 							SDL_RenderClear( gRenderer );
 							
 							//Render texture to screen
-							//SDL_RenderCopy( gRenderer, timeAccelTex, NULL, NULL );
+							SDL_RenderCopy( gRenderer, timeAccelTex, NULL, NULL );
+							
+							SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 							
 							// Draw time acceleration arrows
-							SDL_RenderDrawLines(gRenderer, triangle, 4);
+							for(int i = 0; i < 11; i++){
+								int triangleWidth = 10;
+								int triangleHeight = 10;
+								int margin = 5;
+								drawTriangle(gRenderer, margin + (triangleWidth + margin) * i, margin, triangleHeight, triangleWidth, true);
+							}
 							
+							SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 							// Draw all the particles as points
 							for(unsigned i = 0; i < solarSystem.numParticles(); i++){
 								SDL_RenderDrawPoint(gRenderer, (solarSystem.getParticle(i).getPos().x/inputArgs.resolution) + (inputArgs.width/2), (solarSystem.getParticle(i).getPos().y/inputArgs.resolution) + (inputArgs.length/2));
 							}
+							SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0x00 );
 							
 							SDL_RenderPresent( gRenderer );
 						}
