@@ -102,8 +102,132 @@ typedef enum {
 	/**
 	 * Could not create texture
 	 */
-	COULD_NOT_CREATE_TEXTURE
+	COULD_NOT_CREATE_TEXTURE,
+	/**
+	 * Time warp buttons null
+	 */
+	TIME_WARP_BUTTONS_NULL
 } guiInitErrors;
+
+// Copied and pasted from Lazyfoo.net's SDL mouse events tutorial
+enum LButtonSprite
+{
+	BUTTON_SPRITE_MOUSE_OUT = 0,
+	BUTTON_SPRITE_MOUSE_OVER_MOTION = 1,
+	BUTTON_SPRITE_MOUSE_DOWN = 2,
+	BUTTON_SPRITE_MOUSE_UP = 3,
+	BUTTON_SPRITE_TOTAL = 4
+};
+//The mouse button
+class LButton
+{
+public:
+	//Initializes internal variables
+	LButton();
+	
+	//Sets top left position
+	void setPosition( int x, int y );
+	
+	void setHeightWidth(int x, int y);
+	
+	//Handles mouse event
+	bool handleEvent( SDL_Event* e );
+	
+private:
+	//Top left position
+	SDL_Point mPosition;
+	SDL_Point heightWidth;
+	
+	//Currently used global sprite
+	LButtonSprite mCurrentSprite;
+};
+
+LButton::LButton()
+{
+	mPosition.x = 0;
+	mPosition.y = 0;
+	heightWidth.x = 0;
+	heightWidth.y = 0;
+	
+	mCurrentSprite = BUTTON_SPRITE_MOUSE_OUT;
+}
+
+void LButton::setPosition( int x, int y )
+{
+	mPosition.x = x;
+	mPosition.y = y;
+}
+
+void LButton::setHeightWidth( int x, int y )
+{
+	heightWidth.x = x;
+	heightWidth.y = y;
+}
+
+bool LButton::handleEvent( SDL_Event* e)
+{
+	//If mouse event happened
+	if( (e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEBUTTONUP) )
+	{
+		//Get mouse position
+		int x, y;
+		SDL_GetMouseState( &x, &y );
+		
+		//Check if mouse is in button
+		bool inside = true;
+		
+		//Mouse is left of the button
+		if( x < mPosition.x )
+		{
+			inside = false;
+		}
+		//Mouse is right of the button
+		else if( x > mPosition.x + heightWidth.x )
+		{
+			inside = false;
+		}
+		//Mouse above the button
+		else if( y < mPosition.y )
+		{
+			inside = false;
+		}
+		//Mouse below the button
+		else if( y > mPosition.y + heightWidth.y )
+		{
+			inside = false;
+		}
+		
+		//Mouse is outside button
+		if( !inside )
+		{
+			return false;
+		}
+		//Mouse is inside button
+		else
+		{
+			//Set mouse over sprite
+			switch( e->type )
+			{
+				case SDL_MOUSEMOTION:
+					return false;
+					break;
+					
+				case SDL_MOUSEBUTTONDOWN:
+					return false;
+					break;
+					
+				case SDL_MOUSEBUTTONUP:
+					return true;
+					break;
+					
+				default:
+					return false;
+					break;
+			}
+		}
+	}
+	return false;
+}
 
 /**
  * @brief guiInitErrorsToString converts the guiInitErrors to a std::string
@@ -267,11 +391,12 @@ std::string guiInitErrorsToString(guiInitErrors error){
 		case COULD_NOT_CREATE_RENDERER: return "could not create renderer"; break;
 		case COULD_NOT_CREATE_SURFACE: return "could not create surface"; break;
 		case COULD_NOT_CREATE_TEXTURE: return "could not create texture"; break;
+		case TIME_WARP_BUTTONS_NULL: return "timw warp buttons null"; break;
 		default: return "unknown error"; break;
 	}
 }
 
-guiInitErrors guiInit(SDL_Window ** gWindow, SDL_Renderer ** gRenderer, SDL_Surface ** timeAccelSurf, SDL_Texture ** timeAccelTex, int height, int width)
+guiInitErrors guiInit(SDL_Window ** gWindow, SDL_Renderer ** gRenderer, SDL_Surface ** timeAccelSurf, SDL_Texture ** timeAccelTex, LButton ** timeAccelButtons, int height, int width, unsigned numTimeWarpFactors, unsigned triangleMargin, unsigned triangleWidth, unsigned triangleHeight)
 {
 	Uint32 rmask, gmask, bmask, amask;
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
@@ -314,6 +439,18 @@ guiInitErrors guiInit(SDL_Window ** gWindow, SDL_Renderer ** gRenderer, SDL_Surf
 					*timeAccelTex = SDL_CreateTextureFromSurface( *gRenderer, *timeAccelSurf );
 					if(*timeAccelTex == NULL){
 						return COULD_NOT_CREATE_TEXTURE;
+					}
+					else {
+						if(timeAccelButtons == NULL){
+							return TIME_WARP_BUTTONS_NULL;
+						}
+						else{
+							// Create the time acceleration buttons
+							for(int i = 0; i < numTimeWarpFactors; i++){
+								timeAccelButtons[i]->setPosition(triangleMargin + (triangleWidth + triangleMargin) * i, triangleMargin);
+								timeAccelButtons[i]->setHeightWidth(triangleWidth, triangleHeight);
+							}
+						}
 					}
 				}
 			}
@@ -486,13 +623,25 @@ void drawTriangle(SDL_Renderer * gRenderer, int x, int y, int height, int width,
 }
 
 int main(int argc, char* argv[]){
+	// KSP style time warp factors
+	const NBodySim::UnsignedType timeWarpFactors[] = {1, 2, 3, 4, 5, 10, 50, 1000, 10000, 100000};
+	const int triangleWidth = 10;
+	const int triangleHeight = 10;
+	const int triangleMargin = 5;
+	unsigned timeWarpLevel = 0;
+	//Buttons objects
+	LButton * gButtons = new LButton[ sizeof(timeWarpFactors) / sizeof(const NBodySim::UnsignedType) ];
+	if(gButtons == NULL){
+		std::cout << "Failed to allocate gButtons." << std::endl;
+		return EXIT_FAILURE;
+	}
 	const unsigned numTimingSems = 2;
 	argsList inputArgs = parseArgs(argc, argv);
 	std::string inputScenario;
 	NBodySim::NBodySystem solarSystem;
 	NBodySim::NBodySystemSpace::error solarSystemParseResult;
 	volatile bool quit;
-	volatile NBodySim::UnsignedType stepsPerTime = 1;
+	volatile NBodySim::UnsignedType stepsPerTime = timeWarpFactors[timeWarpLevel];
 	SDL_Event e;
 	sem_t ** timingSemaphores;
 	timingSemaphores = new (std::nothrow) sem_t*[numTimingSems];
@@ -559,7 +708,7 @@ int main(int argc, char* argv[]){
 		// Implements Req FR.Initiate
 		solarSystemParseResult = solarSystem.parse(inputScenario);
 		if(solarSystemParseResult == NBodySim::NBodySystemSpace::SUCCESS){
-			guiErrorReturn = guiInit(&gWindow, &gRenderer, &timeAccelSurf, &timeAccelTex, inputArgs.length, inputArgs.width);
+			guiErrorReturn = guiInit(&gWindow, &gRenderer, &timeAccelSurf, &timeAccelTex, &gButtons, inputArgs.length, inputArgs.width, sizeof(timeWarpFactors) / sizeof(const NBodySim::UnsignedType),  triangleMargin, triangleWidth, triangleHeight);
 			if(guiErrorReturn == SUCCESS){
 				quit = false;
 				// Create a thread for the timer
@@ -579,22 +728,27 @@ int main(int argc, char* argv[]){
 								{
 									quit = true;
 								}
+								//Handle button events
+								for( unsigned i = 0; i < sizeof(timeWarpFactors)/sizeof(const NBodySim::UnsignedType); i++ )
+								{
+									if(gButtons[i].handleEvent(&e)){
+										timeWarpLevel = i;
+									}
+								}
 							}
-					
+							
 							// Clear Screen
 							SDL_RenderClear( gRenderer );
 							
 							//Render texture to screen
 							SDL_RenderCopy( gRenderer, timeAccelTex, NULL, NULL );
 							
+							// Set the color of all the arrows to white
 							SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 							
 							// Draw time acceleration arrows
-							for(int i = 0; i < 11; i++){
-								int triangleWidth = 10;
-								int triangleHeight = 10;
-								int margin = 5;
-								drawTriangle(gRenderer, margin + (triangleWidth + margin) * i, margin, triangleHeight, triangleWidth, true);
+							for(int i = 0; i < sizeof(timeWarpFactors)/sizeof(const NBodySim::UnsignedType); i++){
+								drawTriangle(gRenderer, triangleMargin + (triangleWidth + triangleMargin) * i, triangleMargin, triangleHeight, triangleWidth, timeWarpLevel >= i);
 							}
 							
 							SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
@@ -605,6 +759,8 @@ int main(int argc, char* argv[]){
 							SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0x00 );
 							
 							SDL_RenderPresent( gRenderer );
+							
+							stepsPerTime = timeWarpFactors[timeWarpLevel];
 						}
 						pthreadResponse = pthread_join(workerThread, &status);
 					}
@@ -639,5 +795,6 @@ int main(int argc, char* argv[]){
 	}
 	
 	close(gWindow, gRenderer);
+	delete [] gButtons;
 	return EXIT_SUCCESS;
 }
