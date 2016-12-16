@@ -444,12 +444,12 @@ guiInitErrors guiInit(SDL_Window ** gWindow, SDL_Renderer ** gRenderer, SDL_Surf
 						if(timeAccelButtons == NULL){
 							return TIME_WARP_BUTTONS_NULL;
 						}
-						else{
+						else{/*
 							// Create the time acceleration buttons
 							for(int i = 0; i < numTimeWarpFactors; i++){
 								timeAccelButtons[i]->setPosition(triangleMargin + (triangleWidth + triangleMargin) * i, triangleMargin);
 								timeAccelButtons[i]->setHeightWidth(triangleWidth, triangleHeight);
-							}
+							}*/
 						}
 					}
 				}
@@ -630,10 +630,17 @@ int main(int argc, char* argv[]){
 	const int triangleMargin = 5;
 	unsigned timeWarpLevel = 0;
 	//Buttons objects
-	LButton * gButtons = new LButton[ sizeof(timeWarpFactors) / sizeof(const NBodySim::UnsignedType) ];
+	LButton * gButtons;
+	gButtons = new LButton[ sizeof(timeWarpFactors) / sizeof(const NBodySim::UnsignedType) ];
 	if(gButtons == NULL){
 		std::cout << "Failed to allocate gButtons." << std::endl;
 		return EXIT_FAILURE;
+	}
+	else {
+		for(int i = 0; i < sizeof(timeWarpFactors) / sizeof(const NBodySim::UnsignedType); i++){
+			gButtons[i].setPosition(triangleMargin + (triangleWidth + triangleMargin) * i, triangleMargin);
+			gButtons[i].setHeightWidth(triangleWidth, triangleHeight);
+		}
 	}
 	const unsigned numTimingSems = 2;
 	argsList inputArgs = parseArgs(argc, argv);
