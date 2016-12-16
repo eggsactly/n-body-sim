@@ -301,7 +301,7 @@ matrix3x3 transpose3x3(NBodySim::FloatingType a[3][3]);
 matrix3x3 inverse3x3(NBodySim::FloatingType a[3][3]);
 
 /**
- * @brief drawTrianle draws a triangle at position x, y with heigh and width, users can fill in the triangle too
+ * @brief drawTrianle draws a triangle at position x, y with height and width, users can fill in the triangle too
  * @param gRenderer place to draw the trianlge
  * @param x location in the x plane
  * @param y location in the y plane
@@ -537,7 +537,9 @@ void * workThread(void * inputParams){
 	while(!(*quitTiming)){
 		while(sem_wait(timingSem) != 0);
 		// Implements Req FR.Calculate
-		solarSystem->step(stepSize);
+		for(NBodySim::UnsignedType i = 0; i < *stepsPerTime; i++){
+			solarSystem->step(stepSize);
+		}
 	}
 	pthread_exit(NULL);
 }
