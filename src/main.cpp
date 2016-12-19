@@ -301,6 +301,16 @@ matrix3x3 transpose3x3(NBodySim::FloatingType a[3][3]);
 matrix3x3 inverse3x3(NBodySim::FloatingType a[3][3]);
 
 /**
+ * @breif calculates dot product between 3x3 matix and a 3 vector.
+ * 
+ * @param a matrix 
+ * @param x vector
+ *
+ * @return vector result of the dot product
+ */
+NBodySim::ThreeVector<NBodySim::FloatingType> matrix3x3VectorDotProduct(NBodySim::FloatingType a[3][3], NBodySim::FloatingType x[3])
+
+/**
  * @brief drawTrianle draws a triangle at position x, y with height and width, users can fill in the triangle too
  * @param gRenderer place to draw the trianlge
  * @param x location in the x plane
@@ -310,6 +320,8 @@ matrix3x3 inverse3x3(NBodySim::FloatingType a[3][3]);
  * @param whether the triangle should be filled in
  */
 void drawTriangle(SDL_Renderer * gRenderer, int x, int y, int height, int width, unsigned char fillIn);
+
+
 
 std::string readFile(std::string fileName){
 	std::string scenarioText;
@@ -599,6 +611,21 @@ matrix3x3 inverse3x3(NBodySim::FloatingType a[3][3]){
 	}
 	
 	return transpose3x3(invA);
+}
+
+NBodySim::ThreeVector<NBodySim::FloatingType> matrix3x3VectorDotProduct(NBodySim::FloatingType a[3][3], NBodySim::FloatingType x[3]){
+	NBodySim::ThreeVector<NBodySim::FloatingType> retVal;
+	NBodySim::FloatingType b [] = {0.0, 0.0, 0.0};
+	for(unsigned i = 0; i < 3; i++){
+		for(unsigned j = 0; j < 3; j++){
+			b[i] += a[i][j] * x[j];
+		}
+	}
+	retVal.x = b[0];
+	retVal.y = b[1];
+	retVal.z = b[2];
+	
+	return retVal;
 }
 
 void drawTriangle(SDL_Renderer * gRenderer, int x, int y, int height, int width, unsigned char fillIn){
