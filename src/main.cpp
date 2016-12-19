@@ -308,7 +308,7 @@ matrix3x3 inverse3x3(NBodySim::FloatingType a[3][3]);
  *
  * @return vector result of the dot product
  */
-NBodySim::ThreeVector<NBodySim::FloatingType> matrix3x3VectorDotProduct(NBodySim::FloatingType a[3][3], NBodySim::FloatingType x[3])
+NBodySim::ThreeVector<NBodySim::FloatingType> matrix3x3VectorDotProduct(NBodySim::FloatingType a[3][3], NBodySim::FloatingType x[3]);
 
 /**
  * @brief drawTrianle draws a triangle at position x, y with height and width, users can fill in the triangle too
@@ -657,6 +657,8 @@ int main(int argc, char* argv[]){
 	const int triangleWidth = 10;
 	const int triangleHeight = 10;
 	const int triangleMargin = 5;
+	const NBodySim::FloatingType thetaChangePerSecond = M_PI; // In radians
+	const NBodySim::FloatingType phiChangePerSecond = M_PI; // In radians
 	unsigned timeWarpLevel = 0;
 	//Buttons objects
 	LButton * gButtons;
@@ -685,6 +687,19 @@ int main(int argc, char* argv[]){
 		std::cout << "Error: Could not allocate semaphore array." << std::endl;
 		return EXIT_FAILURE;
 	}
+	// Range: 0 <= Theta < 2 * PI
+	NBodySim::FloatingType theta = 0;
+	// Range: 0 <= Phi <= PI
+	NBodySim::FloatingType phi = 0;
+	matrix3x3 a;
+	NBodySim::ThreeVector<NBodySim::FloatingType> projectedPoints;
+	NBodySim::FloatingType particlePoints [3];
+	
+	Uint32 startTime = SDL_GetTicks();
+	Uint32 stopTime = SDL_GetTicks();
+	Uint32 ticksPerFrame;
+	
+	
 	
 	pthread_t timingThread;
 	timingFunctionStruct timingStruct;
@@ -756,6 +771,12 @@ int main(int argc, char* argv[]){
 						//While application is running
 						while( !quit )
 						{
+							stopTime = SDL_GetTicks();
+							ticksPerFrame = stopTime - startTime;
+							startTime = stopTime;
+							if(ticksPerFrame <= 0){
+								ticksPerFrame = 1;
+							}
 							//Handle events on queue
 							while( SDL_PollEvent( &e ) != 0 )
 							{
@@ -763,6 +784,50 @@ int main(int argc, char* argv[]){
 								if( e.type == SDL_QUIT )
 								{
 									quit = true;
+								}
+								//User presses a key
+								else if( e.type == SDL_KEYDOWN )
+								{
+									switch( e.key.keysym.sym )
+									{
+										case SDLK_UP:
+											phi -= (phiChangePerSecond * ticksPerFrame) / 1000.0f;
+											if(phi < 0){
+												phi = 0.0f;
+											}
+											break;
+											
+										case SDLK_DOWN:
+											phi += (phiChangePerSecond * ticksPerFrame) / 1000.0f;
+											if(phi > M_PI){
+												phi = M_PI;
+											}
+											break;
+											
+										default:
+											// Do nothing
+											break;
+									}
+									switch( e.key.keysym.sym )
+									{
+										case SDLK_LEFT:
+											theta += (thetaChangePerSecond * ticksPerFrame) / 1000.0f;
+											if(theta >= (2.0f * M_PI)){
+												theta = theta - (2.0f * M_PI);
+											}
+											break;
+											
+										case SDLK_RIGHT:
+											theta -= (thetaChangePerSecond * ticksPerFrame) / 1000.0f;
+											if(theta < 0.0f){
+												theta = (2 * M_PI) + theta;
+											}
+											break;
+											
+										default:
+											// Do nothing
+											break;
+									}
 								}
 								//Handle button events
 								for( unsigned i = 0; i < sizeof(timeWarpFactors)/sizeof(const NBodySim::UnsignedType); i++ )
@@ -772,6 +837,20 @@ int main(int argc, char* argv[]){
 									}
 								}
 							}
+							
+							// Calculate the graphics matrix
+							a.a[0][0] = cos(theta);
+							a.a[0][1] = -1.0f * sin(theta) * cos(phi);
+							a.a[0][2] = -1.0f * sin(theta) * sin(phi);
+							a.a[1][0] = sin(theta);
+							a.a[1][1] = cos(theta) * cos(phi);
+							a.a[1][2] = cos(theta) * sin(phi);
+							a.a[2][0] = 0.0f;
+							a.a[2][1] = sin(phi);
+							a.a[2][2] = -1.0f * cos(phi);
+							
+							// Invert the graphics matrix
+							a = inverse3x3(a.a);
 							
 							// Clear Screen
 							SDL_RenderClear( gRenderer );
@@ -790,7 +869,14 @@ int main(int argc, char* argv[]){
 							SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 							// Draw all the particles as points
 							for(unsigned i = 0; i < solarSystem.numParticles(); i++){
-								SDL_RenderDrawPoint(gRenderer, (solarSystem.getParticle(i).getPos().x/inputArgs.resolution) + (inputArgs.width/2), (solarSystem.getParticle(i).getPos().y/inputArgs.resolution) + (inputArgs.length/2));
+								particlePoints[0] = solarSystem.getParticle(i).getPos().x;
+								particlePoints[1] = solarSystem.getParticle(i).getPos().y;
+								particlePoints[2] = solarSystem.getParticle(i).getPos().z;
+								
+								// Calculate the projected points of the particles onto the plane
+								projectedPoints = matrix3x3VectorDotProduct(a.a, particlePoints);
+								
+								SDL_RenderDrawPoint(gRenderer, (projectedPoints.x/inputArgs.resolution) + (inputArgs.width/2), (projectedPoints.y/inputArgs.resolution) + (inputArgs.length/2));
 							}
 							SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0x00 );
 							
