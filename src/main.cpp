@@ -31,6 +31,7 @@
 #include <sys/stat.h>
 #include <semaphore.h>
 #include <cmath>
+#include <errno.h>
 
 #include "NBodyTypes.h"
 #include "Particle.h"

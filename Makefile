@@ -15,7 +15,7 @@ endif
 # For Linux
 ifeq ($(UNAME_S),Linux) 
 	INC:=-I headers/ -I rapidxml/ 
-	LIB:=-lSDL2
+	LIB:=-lSDL2 -pthread
 endif
 OBJ_DIR:=obj/
 SRC_DIR:=src/
