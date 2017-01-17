@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 W.A. Garrett Weaver
+ * Copyright (c) 2016-2017 W.A. Garrett Weaver
  *
  * This file is part of n-body-sim.
  *
@@ -25,7 +25,14 @@
 #include <fstream>
 #include <streambuf>
 #include <getopt.h>
-#include <SDL2/SDL.h>
+#ifdef _WIN32
+	#include <SDL.h>
+	// Keep redeclaration of timespec
+	#define HAVE_STRUCT_TIMESPEC
+#else
+	// Mac OS X and Linux
+	#include <SDL2/SDL.h>
+#endif
 #include <pthread.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -518,6 +525,9 @@ void * timingFunction(void * inputParams){
 		}
 	}
 	pthread_exit(NULL);
+#ifdef _WIN32
+	return NULL;
+#endif
 }
 
 void * workThread(void * inputParams){
@@ -555,6 +565,9 @@ void * workThread(void * inputParams){
 		}
 	}
 	pthread_exit(NULL);
+#ifdef _WIN32
+	return NULL;
+#endif
 }
 
 NBodySim::FloatingType determinant3x3(NBodySim::FloatingType a[3][3]){
@@ -715,8 +728,12 @@ int main(int argc, char* argv[]){
 	for(unsigned i = 0; i < numTimingSems; i++){
 		std::ostringstream semName;
 		semName << "timingSem" << i;
-		timingSemaphores[i] = sem_open(semName.str().c_str(), O_CREAT, S_IWRITE | S_IREAD, 0);
-		if(timingSemaphores[i] == SEM_FAILED){
+		timingSemaphores[i] = reinterpret_cast<sem_t*>(sem_open(semName.str().c_str(), O_CREAT, S_IWRITE | S_IREAD, 0));
+#ifdef _WIN32
+		if(timingSemaphores[i] == NULL){
+#else
+		if (timingSemaphores[i] == SEM_FAILED) {
+#endif
 			std::cout << "Error initializing semaphore " << i << " error code: " << errno << std::endl;
 			return EXIT_FAILURE;
 		}
@@ -863,7 +880,7 @@ int main(int argc, char* argv[]){
 							SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 							
 							// Draw time acceleration arrows
-							for(int i = 0; i < sizeof(timeWarpFactors)/sizeof(const NBodySim::UnsignedType); i++){
+							for(unsigned i = 0; i < sizeof(timeWarpFactors)/sizeof(const NBodySim::UnsignedType); i++){
 								drawTriangle(gRenderer, triangleMargin + (triangleWidth + triangleMargin) * i, triangleMargin, triangleHeight, triangleWidth, timeWarpLevel >= i);
 							}
 							
