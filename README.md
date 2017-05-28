@@ -54,7 +54,7 @@ The rapidxml library included on this software and is licensed under both the Bo
 
 # Coding Standards
 Consistancy helps build maintainable code, even if you don't agree with all the decisions. If you contribute to this project, please follow these guidelines:
-- Always use tabs for indentation, never use spaces. If your editor does not render them the way you want, consider different editors.
+- Always use tabs for indentation.
 - Never use global variables outside of classes. Pass pointers to functions and methods instead.
 - Never use macros or _\#define_, these are global and their scope cannot be controled with namespaces. Use functions and const variables instead.
 - Always call out namespaces explicitly. Never use _using namespace_. _using namespace_ can cause name collisions when libraries are updated.
