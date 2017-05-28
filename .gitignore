@@ -11,3 +11,4 @@ tests/test
 *.blg
 *.bbl
 *~
+*.kate-swp
