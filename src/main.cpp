@@ -497,7 +497,7 @@ void close(SDL_Window * gWindow, SDL_Renderer * gRenderer)
 void * timingFunction(void * inputParams){
 
 	if(inputParams == NULL){
-		pthread_exit(NULL);
+		return NULL;
 	}
 	
 	timingFunctionStruct * inputParamStruct = reinterpret_cast<timingFunctionStruct *>(inputParams);
@@ -508,15 +508,15 @@ void * timingFunction(void * inputParams){
 	volatile bool * quitTiming = inputParamStruct->quitTiming;
 	
 	if(timingSems == NULL){
-		pthread_exit(NULL);
+		return NULL;
 	}
 	for(unsigned i = 0; i < numSems; i++){
 		if(timingSems[i] == NULL){
-			pthread_exit(NULL);
+			return NULL;
 		}
 	}
 	if(quitTiming == NULL){
-		pthread_exit(NULL);
+		return NULL;
 	}
 	
 	// When each interval passes, raise up all the semaphores passed to this function.
@@ -526,15 +526,13 @@ void * timingFunction(void * inputParams){
 			timingSems[i]->post();
 		}
 	}
-	pthread_exit(NULL);
-#ifdef _WIN32
+
 	return NULL;
-#endif
 }
 
 void * workThread(void * inputParams){
 	if(inputParams == NULL){
-		pthread_exit(NULL);
+		return NULL;
 	}
 	
 	workThreadStruct * inputParamStruct = reinterpret_cast<workThreadStruct *>(inputParams);
@@ -546,16 +544,16 @@ void * workThread(void * inputParams){
 	volatile size_t * stepsPerTime = inputParamStruct->stepsPerTime;
 	
 	if(timingSem == NULL){
-		pthread_exit(NULL);
+		return NULL;
 	}
 	if(quitTiming == NULL){
-		pthread_exit(NULL);
+		return NULL;
 	}
 	if(solarSystem == NULL){
-		pthread_exit(NULL);
+		return NULL;
 	}
 	if(stepsPerTime == NULL){
-		pthread_exit(NULL);
+		return NULL;
 	}
 	
 	// For each iteration, wait on a semaphore
@@ -566,10 +564,9 @@ void * workThread(void * inputParams){
 			solarSystem->step(stepSize);
 		}
 	}
-	pthread_exit(NULL);
-#ifdef _WIN32
+
 	return NULL;
-#endif
+
 }
 
 NBodySim::FloatingType determinant3x3(NBodySim::FloatingType a[3][3]){
@@ -715,15 +712,9 @@ int main(int argc, char* argv[]){
 	Uint32 stopTime = SDL_GetTicks();
 	Uint32 ticksPerFrame;
 	
-	
-	
-	pthread_t timingThread;
 	timingFunctionStruct timingStruct;
-	
-	pthread_t workerThread;
 	workThreadStruct workerStruct;
 	
-	int pthreadResponse;
 	void * status;
 	
 	// Initialize the semaphores
@@ -776,139 +767,131 @@ int main(int argc, char* argv[]){
 			if(guiErrorReturn == SUCCESS){
 				quit = false;
 				// Create a thread for the timer
-				pthreadResponse = pthread_create(&timingThread, NULL, timingFunction, reinterpret_cast<void *>(&timingStruct));
-				if(!pthreadResponse){
-					// Create a thread for the worker
-					pthreadResponse = pthread_create(&workerThread, NULL, workThread, reinterpret_cast<void *>(&workerStruct));
-					if(!pthreadResponse){
-						//While application is running
-						while( !quit )
+				boost::thread timingThread(timingFunction, reinterpret_cast<void *>(&timingStruct));
+				// Create a thread for the worker
+				boost::thread workerThread(workThread, reinterpret_cast<void *>(&workerStruct));
+				
+					
+				//While application is running
+				while( !quit )
+				{
+					stopTime = SDL_GetTicks();
+					ticksPerFrame = stopTime - startTime;
+					startTime = stopTime;
+					if(ticksPerFrame <= 0){
+						ticksPerFrame = 1;
+					}
+					//Handle events on queue
+					while( SDL_PollEvent( &e ) != 0 )
+					{
+						//User requests quit
+						if( e.type == SDL_QUIT )
 						{
-							stopTime = SDL_GetTicks();
-							ticksPerFrame = stopTime - startTime;
-							startTime = stopTime;
-							if(ticksPerFrame <= 0){
-								ticksPerFrame = 1;
-							}
-							//Handle events on queue
-							while( SDL_PollEvent( &e ) != 0 )
-							{
-								//User requests quit
-								if( e.type == SDL_QUIT )
-								{
-									quit = true;
-								}
-								//User presses a key
-								else if( e.type == SDL_KEYDOWN )
-								{
-									switch( e.key.keysym.sym )
-									{
-										case SDLK_UP:
-											phi -= (phiChangePerSecond * ticksPerFrame) / 1000.0f;
-											if(phi < 0){
-												phi = 0.0f;
-											}
-											break;
-											
-										case SDLK_DOWN:
-											phi += (phiChangePerSecond * ticksPerFrame) / 1000.0f;
-											if(phi > M_PI){
-												phi = M_PI;
-											}
-											break;
-											
-										default:
-											// Do nothing
-											break;
-									}
-									switch( e.key.keysym.sym )
-									{
-										case SDLK_LEFT:
-											theta += (thetaChangePerSecond * ticksPerFrame) / 1000.0f;
-											if(theta >= (2.0f * M_PI)){
-												theta = theta - (2.0f * M_PI);
-											}
-											break;
-											
-										case SDLK_RIGHT:
-											theta -= (thetaChangePerSecond * ticksPerFrame) / 1000.0f;
-											if(theta < 0.0f){
-												theta = (2 * M_PI) + theta;
-											}
-											break;
-											
-										default:
-											// Do nothing
-											break;
-									}
-								}
-								//Handle button events
-								for( unsigned i = 0; i < sizeof(timeWarpFactors)/sizeof(const size_t); i++ )
-								{
-									if(gButtons[i].handleEvent(&e)){
-										timeWarpLevel = i;
-									}
-								}
-							}
-							
-							// Calculate the graphics matrix
-							a.a[0][0] = cos(theta);
-							a.a[0][1] = -1.0f * sin(theta) * cos(phi);
-							a.a[0][2] = -1.0f * sin(theta) * sin(phi);
-							a.a[1][0] = sin(theta);
-							a.a[1][1] = cos(theta) * cos(phi);
-							a.a[1][2] = cos(theta) * sin(phi);
-							a.a[2][0] = 0.0f;
-							a.a[2][1] = sin(phi);
-							a.a[2][2] = -1.0f * cos(phi);
-							
-							// Invert the graphics matrix
-							a = inverse3x3(a.a);
-							
-							// Clear Screen
-							SDL_RenderClear( gRenderer );
-							
-							//Render texture to screen
-							SDL_RenderCopy( gRenderer, timeAccelTex, NULL, NULL );
-							
-							// Set the color of all the arrows to white
-							SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-							
-							// Draw time acceleration arrows
-							for(unsigned i = 0; i < sizeof(timeWarpFactors)/sizeof(const size_t); i++){
-								drawTriangle(gRenderer, triangleMargin + (triangleWidth + triangleMargin) * i, triangleMargin, triangleHeight, triangleWidth, timeWarpLevel >= i);
-							}
-							
-							SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-							// Draw all the particles as points
-							for(unsigned i = 0; i < solarSystem.numParticles(); i++){
-								particlePoints[0] = solarSystem.getParticle(i).getPos().x;
-								particlePoints[1] = solarSystem.getParticle(i).getPos().y;
-								particlePoints[2] = solarSystem.getParticle(i).getPos().z;
-								
-								// Calculate the projected points of the particles onto the plane
-								projectedPoints = matrix3x3VectorDotProduct(a.a, particlePoints);
-								
-								SDL_RenderDrawPoint(gRenderer, (projectedPoints.x/inputArgs.resolution) + (inputArgs.width/2), (projectedPoints.y/inputArgs.resolution) + (inputArgs.length/2));
-							}
-							SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0x00 );
-							
-							SDL_RenderPresent( gRenderer );
-							
-							stepsPerTime = timeWarpFactors[timeWarpLevel];
+							quit = true;
 						}
-						pthreadResponse = pthread_join(workerThread, &status);
+						//User presses a key
+						else if( e.type == SDL_KEYDOWN )
+						{
+							switch( e.key.keysym.sym )
+							{
+								case SDLK_UP:
+									phi -= (phiChangePerSecond * ticksPerFrame) / 1000.0f;
+									if(phi < 0){
+										phi = 0.0f;
+									}
+									break;
+								
+								case SDLK_DOWN:
+									phi += (phiChangePerSecond * ticksPerFrame) / 1000.0f;
+									if(phi > M_PI){
+										phi = M_PI;
+									}
+									break;
+									
+								default:
+									// Do nothing
+									break;
+							}
+							switch( e.key.keysym.sym )
+							{
+								case SDLK_LEFT:
+									theta += (thetaChangePerSecond * ticksPerFrame) / 1000.0f;
+									if(theta >= (2.0f * M_PI)){
+										theta = theta - (2.0f * M_PI);
+									}
+									break;
+									
+								case SDLK_RIGHT:
+									theta -= (thetaChangePerSecond * ticksPerFrame) / 1000.0f;
+									if(theta < 0.0f){
+										theta = (2 * M_PI) + theta;
+									}
+									break;
+									
+									default:
+									// Do nothing
+									break;
+							}
+						}
+						//Handle button events
+						for( unsigned i = 0; i < sizeof(timeWarpFactors)/sizeof(const size_t); i++ )
+						{
+							if(gButtons[i].handleEvent(&e)){
+								timeWarpLevel = i;
+							}
+						}
 					}
-					else {
-						std::cout << "Error: return code from pthread for workerStruct: " << pthreadResponse << std::endl;
-						return EXIT_FAILURE;
+					
+					// Calculate the graphics matrix
+					a.a[0][0] = cos(theta);
+					a.a[0][1] = -1.0f * sin(theta) * cos(phi);
+					a.a[0][2] = -1.0f * sin(theta) * sin(phi);
+					a.a[1][0] = sin(theta);
+					a.a[1][1] = cos(theta) * cos(phi);
+					a.a[1][2] = cos(theta) * sin(phi);
+					a.a[2][0] = 0.0f;
+					a.a[2][1] = sin(phi);
+					a.a[2][2] = -1.0f * cos(phi);
+					
+					// Invert the graphics matrix
+					a = inverse3x3(a.a);
+					
+					// Clear Screen
+					SDL_RenderClear( gRenderer );
+					
+					//Render texture to screen
+					SDL_RenderCopy( gRenderer, timeAccelTex, NULL, NULL );
+					
+					// Set the color of all the arrows to white
+					SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+					
+					// Draw time acceleration arrows
+					for(unsigned i = 0; i < sizeof(timeWarpFactors)/sizeof(const size_t); i++){
+						drawTriangle(gRenderer, triangleMargin + (triangleWidth + triangleMargin) * i, triangleMargin, triangleHeight, triangleWidth, timeWarpLevel >= i);
 					}
-					pthreadResponse = pthread_join(timingThread, &status);
+					
+					SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+					// Draw all the particles as points
+					for(unsigned i = 0; i < solarSystem.numParticles(); i++){
+						particlePoints[0] = solarSystem.getParticle(i).getPos().x;
+						particlePoints[1] = solarSystem.getParticle(i).getPos().y;
+						particlePoints[2] = solarSystem.getParticle(i).getPos().z;
+						
+						// Calculate the projected points of the particles onto the plane
+						projectedPoints = matrix3x3VectorDotProduct(a.a, particlePoints);
+						
+						SDL_RenderDrawPoint(gRenderer, (projectedPoints.x/inputArgs.resolution) + (inputArgs.width/2), (projectedPoints.y/inputArgs.resolution) + (inputArgs.length/2));
+					}
+					SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0x00 );
+					
+					SDL_RenderPresent( gRenderer );
+					
+					stepsPerTime = timeWarpFactors[timeWarpLevel];
 				}
-				else {
-					std::cout << "Error: return code from pthread for timingStruct: " << pthreadResponse << std::endl;
-					return EXIT_FAILURE;
-				}
+				
+				workerThread.join();
+				timingThread.join();
+				
 			}
 			else{
 				std::cout << "Error: " << guiInitErrorsToString(guiErrorReturn) << std::endl;
