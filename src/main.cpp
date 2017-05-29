@@ -41,6 +41,12 @@
 #include <boost/thread.hpp>
 #include <boost/functional.hpp>
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/vector_proxy.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/triangular.hpp>
+#include <boost/numeric/ublas/lu.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 #include "NBodyTypes.h"
 #include "Particle.h"
@@ -281,47 +287,6 @@ typedef struct {
 void * workThread(void * inputParams);
 
 /**
- * matrix3x3 contains a single parameter called 'a' which is a 3x3 matrix to get around functions not being able to return statically allocated arrays
- */
-typedef struct {
-	NBodySim::FloatingType a[3][3];
-}matrix3x3;
-
-/**
- * @breif determinant3x3 finds the determinent of a 3x3 matrix
- *
- * @param a 3x3 matrix
- * @return the determinent of the 3x3 matrix
- */
-NBodySim::FloatingType determinant3x3(NBodySim::FloatingType a[3][3]);
-
-/**
- * @breif calculates the transpose of a 3x3 matrix
- *
- * @param a 3x3 matrix
- * @return the transposed 3x3 matrix
- */
-matrix3x3 transpose3x3(NBodySim::FloatingType a[3][3]);
-
-/**
- * @breif calculates the inverse of a 3x3 matrix
- *
- * @param a 3x3 matrix
- * @return the inverted 3x3 matrix
- */
-matrix3x3 inverse3x3(NBodySim::FloatingType a[3][3]);
-
-/**
- * @breif calculates dot product between 3x3 matix and a 3 vector.
- * 
- * @param a matrix 
- * @param x vector
- *
- * @return vector result of the dot product
- */
-NBodySim::ThreeVector<NBodySim::FloatingType> matrix3x3VectorDotProduct(NBodySim::FloatingType a[3][3], NBodySim::FloatingType x[3]);
-
-/**
  * @brief drawTrianle draws a triangle at position x, y with height and width, users can fill in the triangle too
  * @param gRenderer place to draw the trianlge
  * @param x location in the x plane
@@ -331,7 +296,6 @@ NBodySim::ThreeVector<NBodySim::FloatingType> matrix3x3VectorDotProduct(NBodySim
  * @param whether the triangle should be filled in
  */
 void drawTriangle(SDL_Renderer * gRenderer, int x, int y, int height, int width, unsigned char fillIn);
-
 
 
 std::string readFile(std::string fileName){
@@ -570,76 +534,23 @@ void * workThread(void * inputParams){
 
 }
 
-NBodySim::FloatingType determinant3x3(NBodySim::FloatingType a[3][3]){
-	const unsigned matrixSize = sizeof(a[0]) / sizeof(NBodySim::FloatingType);
-	NBodySim::FloatingType determinant = 0;
-	NBodySim::FloatingType multiplyForward;
-	NBodySim::FloatingType multiplyBackwards;
-	
-	// Iterate down the left hand side
-	for(unsigned i = 0; i < matrixSize; i++){
-		// Iterate along the diagonal
-		multiplyForward = 1;
-		multiplyBackwards = 1;
-		for(unsigned j = 0; j < matrixSize; j++){
-			multiplyForward *= a[(matrixSize + i + j) % matrixSize][j];
-			multiplyBackwards *= a[(matrixSize + i - j) % matrixSize][j];
-		}
-		determinant += multiplyForward - multiplyBackwards;
-	}
-	
-	return determinant;
-}
-
-matrix3x3 transpose3x3(NBodySim::FloatingType a[3][3]){
-	const unsigned matrixSize = sizeof(a[0]) / sizeof(NBodySim::FloatingType);
-	matrix3x3 trans;
-	NBodySim::FloatingType temp;
-	for(unsigned i = 0; i < matrixSize; i++){
-		for(unsigned j = 0; j < matrixSize; j++){
-			trans.a[i][j] = a[j][i];
-		}
-	}
-	return trans;
-}
-
-matrix3x3 inverse3x3(NBodySim::FloatingType a[3][3]){
-	const unsigned matrixSize = sizeof(a[0]) / sizeof(NBodySim::FloatingType);
-	static NBodySim::FloatingType invA[matrixSize][matrixSize];
-	NBodySim::FloatingType multiplyForward;
-	NBodySim::FloatingType multiplyBackwards;
-	NBodySim::FloatingType determinant = determinant3x3(a);
-
-	// Go to every cell
-	for(unsigned i = 0; i < matrixSize; i++){
-		for(unsigned j = 0; j < matrixSize; j++){
-			// Calculate the determinent of each sub matrix opposite to the current cell
-			multiplyForward = 1;
-			multiplyBackwards = 1;
-			for(unsigned k = 1; k < matrixSize; k++){
-				multiplyForward *= a[(matrixSize + i + k) % matrixSize][(matrixSize + j + k) % matrixSize];
-				multiplyBackwards *= a[(matrixSize + i - k) % matrixSize][(matrixSize + j + k) % matrixSize];
-			}
-			invA[i][j] = (multiplyForward - multiplyBackwards) / determinant;
-		}
-	}
-	
-	return transpose3x3(invA);
-}
-
-NBodySim::ThreeVector<NBodySim::FloatingType> matrix3x3VectorDotProduct(NBodySim::FloatingType a[3][3], NBodySim::FloatingType x[3]){
-	NBodySim::ThreeVector<NBodySim::FloatingType> retVal;
-	NBodySim::FloatingType b [] = {0.0, 0.0, 0.0};
-	for(unsigned i = 0; i < 3; i++){
-		for(unsigned j = 0; j < 3; j++){
-			b[i] += a[i][j] * x[j];
-		}
-	}
-	retVal.x = b[0];
-	retVal.y = b[1];
-	retVal.z = b[2];
-	
-	return retVal;
+// Source: http://www.crystalclearsoftware.com/cgi-bin/boost_wiki/wiki.pl?LU_Matrix_Inversion
+template<class T> 
+bool InvertMatrix (const boost::numeric::ublas::matrix<T>& input, boost::numeric::ublas::matrix<T>& inverse) { 
+    typedef  boost::numeric::ublas::permutation_matrix<std::size_t> pmatrix; 
+    // create a working copy of the input 
+    boost::numeric::ublas::matrix<T> A(input); 
+    // create a permutation matrix for the LU-factorization 
+    pmatrix pm(A.size1()); 
+    // perform LU-factorization 
+    int res = lu_factorize(A,pm); 
+    if( res != 0 )
+        return false; 
+    // create identity matrix of "inverse" 
+    inverse.assign(boost::numeric::ublas::identity_matrix<T>(A.size1())); 
+    // backsubstitute to get the inverse 
+    boost::numeric::ublas::lu_substitute(A, pm, inverse); 
+    return true; 
 }
 
 void drawTriangle(SDL_Renderer * gRenderer, int x, int y, int height, int width, unsigned char fillIn){
@@ -705,9 +616,10 @@ int main(int argc, char* argv[]){
 	NBodySim::FloatingType theta = 0;
 	// Range: 0 <= Phi <= PI
 	NBodySim::FloatingType phi = 0;
-	matrix3x3 a;
-	NBodySim::ThreeVector<NBodySim::FloatingType> projectedPoints;
-	NBodySim::FloatingType particlePoints [3];
+	boost::numeric::ublas::matrix<NBodySim::FloatingType> a (3, 3);
+	boost::numeric::ublas::matrix<NBodySim::FloatingType> A (3, 3);
+	boost::numeric::ublas::vector<NBodySim::FloatingType> projectedPoints(3);
+	boost::numeric::ublas::vector<NBodySim::FloatingType> particlePoints(3);
 	
 	Uint32 startTime = SDL_GetTicks();
 	Uint32 stopTime = SDL_GetTicks();
@@ -742,7 +654,6 @@ int main(int argc, char* argv[]){
 	SDL_Renderer* gRenderer = NULL;
 	SDL_Surface* timeAccelSurf = NULL;
 	SDL_Texture * timeAccelTex = NULL;
-	
 	
 	if(inputArgs.help){
 		std::cout << "Command line flags: " << std::endl;
@@ -853,18 +764,18 @@ int main(int argc, char* argv[]){
 		}
 		
 		// Calculate the graphics matrix
-		a.a[0][0] = cos(theta);
-		a.a[0][1] = -1.0f * sin(theta) * cos(phi);
-		a.a[0][2] = -1.0f * sin(theta) * sin(phi);
-		a.a[1][0] = sin(theta);
-		a.a[1][1] = cos(theta) * cos(phi);
-		a.a[1][2] = cos(theta) * sin(phi);
-		a.a[2][0] = 0.0f;
-		a.a[2][1] = sin(phi);
-		a.a[2][2] = -1.0f * cos(phi);
+		a(0, 0) = cos(theta);
+		a(0, 1) = -1.0f * sin(theta) * cos(phi);
+		a(0, 2) = -1.0f * sin(theta) * sin(phi);
+		a(1, 0) = sin(theta);
+		a(1, 1) = cos(theta) * cos(phi);
+		a(1, 2) = cos(theta) * sin(phi);
+		a(2, 0) = 0.0f;
+		a(2, 1) = sin(phi);
+		a(2, 2) = -1.0f * cos(phi);
 		
 		// Invert the graphics matrix
-		a = inverse3x3(a.a);
+		InvertMatrix (a, A);
 		
 		// Clear Screen
 		SDL_RenderClear( gRenderer );
@@ -883,14 +794,14 @@ int main(int argc, char* argv[]){
 		SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 		// Draw all the particles as points
 		for(unsigned i = 0; i < solarSystem.numParticles(); i++){
-			particlePoints[0] = solarSystem.getParticle(i).getPos().x;
-			particlePoints[1] = solarSystem.getParticle(i).getPos().y;
-			particlePoints[2] = solarSystem.getParticle(i).getPos().z;
+			particlePoints(0) = solarSystem.getParticle(i).getPos().x;
+			particlePoints(1) = solarSystem.getParticle(i).getPos().y;
+			particlePoints(2) = solarSystem.getParticle(i).getPos().z;
 			
 			// Calculate the projected points of the particles onto the plane
-			projectedPoints = matrix3x3VectorDotProduct(a.a, particlePoints);
+			boost::numeric::ublas::axpy_prod(A, particlePoints, projectedPoints, true);
 			
-			SDL_RenderDrawPoint(gRenderer, (projectedPoints.x/inputArgs.resolution) + (inputArgs.width/2), (projectedPoints.y/inputArgs.resolution) + (inputArgs.length/2));
+			SDL_RenderDrawPoint(gRenderer, (projectedPoints(0)/inputArgs.resolution) + (inputArgs.width/2), (projectedPoints(1)/inputArgs.resolution) + (inputArgs.length/2));
 		}
 		SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0x00 );
 		
