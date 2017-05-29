@@ -18,7 +18,6 @@
  *
  */
 
-
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
@@ -29,13 +28,25 @@
 #include "Particle.h"
 #include "NBodySystem.h"
 
-TEST(Basic, Initialize) {	
-	NBodySim::ThreeVector <NBodySim::FloatingType> output;
+
+TEST(FR, Initiate) {
+	std::string xmlString = "<?xml version=\"1.0\"?>\n<system G=\"1.00\">\n\t<particle posX=\"0\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"0\" velZ=\"0\" mass=\"1.988500e30\" name=\"Sun\"/>\n\t<particle posX=\"0\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"0\" velZ=\"0\" mass=\"5.972e24\" name=\"Earth\"/>\n\t<particle posX=\"4.054e8\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"-964.0f\" velZ=\"0\" mass=\"7.34767309e22\" name=\"Moon\"/>\t</system>";
+	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
+	
+	EXPECT_EQ(sys.parse(xmlString), 0);
+	EXPECT_EQ(sys.numParticles(), 3);
+	EXPECT_EQ(sys.getParticle(0).getName(), "Sun");
+	EXPECT_EQ(sys.getParticle(1).getName(), "Earth");
+	EXPECT_EQ(sys.getParticle(2).getName(), "Moon");
+}
+
+TEST(FR, Calculate){
 	NBodySim::Particle <NBodySim::FloatingType> p;
 	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
-	NBodySim::NBodySystem <NBodySim::FloatingType> sys2;
+	NBodySim::FloatingType newXPos;
+	NBodySim::FloatingType particleMass = 1000000;
+	NBodySim::FloatingType margin = 0.00001;
 	
-	double particleMass = 1000000;
 	p.setPosX(1);
 	p.setPosY(0);
 	p.setPosZ(0);
@@ -44,19 +55,8 @@ TEST(Basic, Initialize) {
 	p.setVelZ(0);
 	p.setMass(particleMass);
 	p.setName("1");
-	double margin = 0.00001;
-	
-	std::string xmlString = "<?xml version=\"1.0\"?>\n<system G=\"1.00\">\n\t<particle posX=\"0\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"0\" velZ=\"0\" mass=\"1.988500e30\" name=\"Sun\"/>\n\t<particle posX=\"0\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"0\" velZ=\"0\" mass=\"5.972e24\" name=\"Earth\"/>\n\t<particle posX=\"4.054e8\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"-964.0f\" velZ=\"0\" mass=\"7.34767309e22\" name=\"Moon\"/>\t</system>";
-	
-	output = p.getPos();
-	
-	
-	EXPECT_DOUBLE_EQ(output.x, 1.00f);
 	
 	sys.addParticle(p);
-	
-	EXPECT_EQ(sys.numParticles(), 1);
-	EXPECT_DOUBLE_EQ(sys.getParticle(0).getPos().x, 1.00f);
 	
 	p.setPosX(-1);
 	p.setName("2");
@@ -67,40 +67,56 @@ TEST(Basic, Initialize) {
 	EXPECT_DOUBLE_EQ(sys.getParticle(0).getPos().x, 1.00f);
 	EXPECT_DOUBLE_EQ(sys.getParticle(1).getPos().x, -1.00f);
 	
-	/* Test the result of letting two bodies move towards each other for one second */
-	// Verifies Req FR.Calculate
-	// Verifies Req NF.UsersProvideTime
 	sys.step(1);
-	// Verifies Req FR.Calculate
-	// Verifies Req NF.UsersProvideTime
-	double newXPos = (1 - (sys.getGravitation() * particleMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)));
+	newXPos = (1 - (sys.getGravitation() * particleMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)));
 	EXPECT_NEAR(sys.getParticle(0).getPos().x, newXPos, margin);
 	
-	// Verifies Req FR.Calculate
-	// Verifies Req NF.UsersProvideTime
 	newXPos = (sys.getGravitation() * particleMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)) - 1;
 	EXPECT_NEAR(sys.getParticle(1).getPos().x, newXPos, margin);
-	
-	/* Test parsing of an xml file */
-	// Verifies Req NF.UsersProvideFile
-	// Verifies Req FR.Initiate
-	EXPECT_EQ(sys2.parse(xmlString), 0);
-	
-	// Verifies Req NF.SystemsProvideG
-	// Verifies Req FR.Initiate
-	EXPECT_DOUBLE_EQ(sys2.getGravitation(), 1.00f);
-	
-	// Verifies Req FR.Initiate
-	EXPECT_EQ(sys2.numParticles(), 3);
-	
-	// Verifies Req FR.Initiate
-	EXPECT_EQ(sys2.getParticle(0).getName(), "Sun");
+}
 
-	// Verifies Req FR.Initiate
-	EXPECT_EQ(sys2.getParticle(1).getName(), "Earth");
+TEST(NF, SystemsProvideG){
+	std::string xmlString = "<?xml version=\"1.0\"?>\n<system G=\"1.00\">\n\t<particle posX=\"0\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"0\" velZ=\"0\" mass=\"1.988500e30\" name=\"Sun\"/>\n\t<particle posX=\"0\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"0\" velZ=\"0\" mass=\"5.972e24\" name=\"Earth\"/>\n\t<particle posX=\"4.054e8\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"-964.0f\" velZ=\"0\" mass=\"7.34767309e22\" name=\"Moon\"/>\t</system>";
+	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
+	
+	EXPECT_EQ(sys.parse(xmlString), 0);
+	EXPECT_EQ(sys.getGravitation(), 1.0f);
+}
 
-	// Verifies Req FR.Initiate
-	EXPECT_EQ(sys2.getParticle(2).getName(), "Moon");
+TEST(NF, UsersProvideTime){
+	NBodySim::Particle <NBodySim::FloatingType> p;
+	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
+	NBodySim::FloatingType newXPos;
+	NBodySim::FloatingType particleMass = 1000000;
+	NBodySim::FloatingType margin = 0.00001;
+	NBodySim::FloatingType stepSize = 0.5;
+	
+	p.setPosX(1);
+	p.setPosY(0);
+	p.setPosZ(0);
+	p.setVelX(0);
+	p.setVelY(0);
+	p.setVelZ(0);
+	p.setMass(particleMass);
+	p.setName("1");
+	
+	sys.addParticle(p);
+	
+	p.setPosX(-1);
+	p.setName("2");
+	
+	sys.addParticle(p);
+	
+	EXPECT_EQ(sys.numParticles(), 2);
+	EXPECT_DOUBLE_EQ(sys.getParticle(0).getPos().x, 1.00f);
+	EXPECT_DOUBLE_EQ(sys.getParticle(1).getPos().x, -1.00f);
+	
+	sys.step(stepSize);
+	newXPos = (1 - (stepSize * sys.getGravitation() * particleMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)));
+	EXPECT_NEAR(sys.getParticle(0).getPos().x, newXPos, margin);
+	
+	newXPos = (stepSize * sys.getGravitation() * particleMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)) - 1;
+	EXPECT_NEAR(sys.getParticle(1).getPos().x, newXPos, margin);
 }
 
 int main(int argc, char* argv[]){
