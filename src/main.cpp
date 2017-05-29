@@ -722,7 +722,6 @@ int main(int argc, char* argv[]){
 		std::ostringstream semName;
 		semName << "timingSem" << i;
 		timingSemaphores[i] = new boost::interprocess::interprocess_semaphore(0);
-
 	}
 	
 	timingStruct.interval = 1000 * inputArgs.stepSize;
@@ -752,157 +751,155 @@ int main(int argc, char* argv[]){
 		std::cout << "\t-l, --length     [int]     : Length of window in pixels" << std::endl;
 		std::cout << "\t-w, --width      [int]     : Width of window in pixels" << std::endl;
 		std::cout << "\t-h, --help                 : Shows this help option" << std::endl;
+		return EXIT_SUCCESS;
+	}
+
+	if(inputArgs.fileName.length() == 0){
+		inputScenario = "<?xml version=\"1.0\"?><system G=\"5.483e-10\"><particle posX=\"0\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"0\" velZ=\"0\" mass=\"1e10\" name=\"Sun\"/><particle posX=\"0\" posY=\"-10\" posZ=\"0\" velX=\"-0.5\" velY=\"0\" velZ=\"0\" mass=\"100\" name=\"Comet1\"/><particle posX=\"7\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"-0.55\" velZ=\"0\" mass=\"100\" name=\"Comet2\"/><particle posX=\"-6\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"0.6\" velZ=\"0\" mass=\"400\" name=\"Comet3\"/><particle posX=\"-3.5\" posY=\"3.6\" posZ=\"0\" velX=\"0.7\" velY=\"0.7\" velZ=\"0\" mass=\"900\" name=\"Comet4\"/><particle posX=\"0\" posY=\"-5\" posZ=\"0\" velX=\"-1\" velY=\"0\" velZ=\"0\" mass=\"300\" name=\"Commet5\"/><particle posX=\"-5.2\" posY=\"3\" posZ=\"0\" velX=\"0.6\" velY=\"0.9\" velZ=\"0\" mass=\"700\" name=\"Commet6\"/><particle posX=\"5.2\" posY=\"3\" posZ=\"0\" velX=\"0.3\" velY=\"-0.7\" velZ=\"0\" mass=\"500\" name=\"Commet7\"/><particle posX=\"0\" posY=\"8\" posZ=\"0\" velX=\"0.4\" velY=\"0\" velZ=\"0\" mass=\"300\" name=\"Commet8\"/><particle posX=\"7\" posY=\"-7\" posZ=\"0\" velX=\"-0.4\" velY=\"-0.5\" velZ=\"0\" mass=\"200\" name=\"Commet9\"/><particle posX=\"-1\" posY=\"-1\" posZ=\"0\" velX=\"-1.6\" velY=\"1.8\" velZ=\"0\" mass=\"200\" name=\"Commet10\"/><particle posX=\"-8.5\" posY=\"-8.5\" posZ=\"0\" velX=\"-0.3\" velY=\"0.3\" velZ=\"0\" mass=\"700\" name=\"Commet11\"/><particle posX=\"0.7\" posY=\"0.7\" posZ=\"0\" velX=\"2\" velY=\"-2\" velZ=\"0\" mass=\"100\" name=\"Commet12\"/><particle posX=\"1.1\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"-2.2\" velZ=\"0\" mass=\"100\" name=\"Commet13\"/><particle posX=\"2.7\" posY=\"2.7\" posZ=\"0\" velX=\"0.9\" velY=\"-0.8\" velZ=\"0\" mass=\"100\" name=\"Commet14\"/><particle posX=\"8\" posY=\"8\" posZ=\"0\" velX=\"0.4\" velY=\"-0.4\" velZ=\"0\" mass=\"150\" name=\"Commet15\"/><particle posX=\"20\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"-0.3\" velZ=\"0\" mass=\"750\" name=\"Commet16\"/><particle posX=\"1\" posY=\"-1\" posZ=\"0\" velX=\"-1.7\" velY=\"-1.9\" velZ=\"0\" mass=\"450\" name=\"Commet17\"/><particle posX=\"-18\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"0.35\" velZ=\"0\" mass=\"750\" name=\"Commet18\"/><particle posX=\"14\" posY=\"-14\" posZ=\"0\" velX=\"-0.13\" velY=\"-0.11\" velZ=\"0\" mass=\"150\" name=\"Commet19\"/><particle posX=\"0\" posY=\"25\" posZ=\"0\" velX=\"0.22\" velY=\"-0\" velZ=\"0\" mass=\"1000\" name=\"Commet20\"/></system>";
 	}
 	else {
-		if(inputArgs.fileName.length() == 0){
-			inputScenario = "<?xml version=\"1.0\"?><system G=\"5.483e-10\"><particle posX=\"0\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"0\" velZ=\"0\" mass=\"1e10\" name=\"Sun\"/><particle posX=\"0\" posY=\"-10\" posZ=\"0\" velX=\"-0.5\" velY=\"0\" velZ=\"0\" mass=\"100\" name=\"Comet1\"/><particle posX=\"7\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"-0.55\" velZ=\"0\" mass=\"100\" name=\"Comet2\"/><particle posX=\"-6\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"0.6\" velZ=\"0\" mass=\"400\" name=\"Comet3\"/><particle posX=\"-3.5\" posY=\"3.6\" posZ=\"0\" velX=\"0.7\" velY=\"0.7\" velZ=\"0\" mass=\"900\" name=\"Comet4\"/><particle posX=\"0\" posY=\"-5\" posZ=\"0\" velX=\"-1\" velY=\"0\" velZ=\"0\" mass=\"300\" name=\"Commet5\"/><particle posX=\"-5.2\" posY=\"3\" posZ=\"0\" velX=\"0.6\" velY=\"0.9\" velZ=\"0\" mass=\"700\" name=\"Commet6\"/><particle posX=\"5.2\" posY=\"3\" posZ=\"0\" velX=\"0.3\" velY=\"-0.7\" velZ=\"0\" mass=\"500\" name=\"Commet7\"/><particle posX=\"0\" posY=\"8\" posZ=\"0\" velX=\"0.4\" velY=\"0\" velZ=\"0\" mass=\"300\" name=\"Commet8\"/><particle posX=\"7\" posY=\"-7\" posZ=\"0\" velX=\"-0.4\" velY=\"-0.5\" velZ=\"0\" mass=\"200\" name=\"Commet9\"/><particle posX=\"-1\" posY=\"-1\" posZ=\"0\" velX=\"-1.6\" velY=\"1.8\" velZ=\"0\" mass=\"200\" name=\"Commet10\"/><particle posX=\"-8.5\" posY=\"-8.5\" posZ=\"0\" velX=\"-0.3\" velY=\"0.3\" velZ=\"0\" mass=\"700\" name=\"Commet11\"/><particle posX=\"0.7\" posY=\"0.7\" posZ=\"0\" velX=\"2\" velY=\"-2\" velZ=\"0\" mass=\"100\" name=\"Commet12\"/><particle posX=\"1.1\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"-2.2\" velZ=\"0\" mass=\"100\" name=\"Commet13\"/><particle posX=\"2.7\" posY=\"2.7\" posZ=\"0\" velX=\"0.9\" velY=\"-0.8\" velZ=\"0\" mass=\"100\" name=\"Commet14\"/><particle posX=\"8\" posY=\"8\" posZ=\"0\" velX=\"0.4\" velY=\"-0.4\" velZ=\"0\" mass=\"150\" name=\"Commet15\"/><particle posX=\"20\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"-0.3\" velZ=\"0\" mass=\"750\" name=\"Commet16\"/><particle posX=\"1\" posY=\"-1\" posZ=\"0\" velX=\"-1.7\" velY=\"-1.9\" velZ=\"0\" mass=\"450\" name=\"Commet17\"/><particle posX=\"-18\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"0.35\" velZ=\"0\" mass=\"750\" name=\"Commet18\"/><particle posX=\"14\" posY=\"-14\" posZ=\"0\" velX=\"-0.13\" velY=\"-0.11\" velZ=\"0\" mass=\"150\" name=\"Commet19\"/><particle posX=\"0\" posY=\"25\" posZ=\"0\" velX=\"0.22\" velY=\"-0\" velZ=\"0\" mass=\"1000\" name=\"Commet20\"/></system>";
-		}
-		else {
-			inputScenario = readFile(inputArgs.fileName);
-		}
-		// Implements Req FR.Initiate
-		solarSystemParseResult = solarSystem.parse(inputScenario);
-		if(solarSystemParseResult == NBodySim::NBodySystemSpace::SUCCESS){
-			guiErrorReturn = guiInit(&gWindow, &gRenderer, &timeAccelSurf, &timeAccelTex, &gButtons, inputArgs.length, inputArgs.width, sizeof(timeWarpFactors) / sizeof(const size_t),  triangleMargin, triangleWidth, triangleHeight);
-			if(guiErrorReturn == SUCCESS){
-				quit = false;
-				// Create a thread for the timer
-				boost::thread timingThread(timingFunction, reinterpret_cast<void *>(&timingStruct));
-				// Create a thread for the worker
-				boost::thread workerThread(workThread, reinterpret_cast<void *>(&workerStruct));
-				
-					
-				//While application is running
-				while( !quit )
-				{
-					stopTime = SDL_GetTicks();
-					ticksPerFrame = stopTime - startTime;
-					startTime = stopTime;
-					if(ticksPerFrame <= 0){
-						ticksPerFrame = 1;
-					}
-					//Handle events on queue
-					while( SDL_PollEvent( &e ) != 0 )
-					{
-						//User requests quit
-						if( e.type == SDL_QUIT )
-						{
-							quit = true;
-						}
-						//User presses a key
-						else if( e.type == SDL_KEYDOWN )
-						{
-							switch( e.key.keysym.sym )
-							{
-								case SDLK_UP:
-									phi -= (phiChangePerSecond * ticksPerFrame) / 1000.0f;
-									if(phi < 0){
-										phi = 0.0f;
-									}
-									break;
-								
-								case SDLK_DOWN:
-									phi += (phiChangePerSecond * ticksPerFrame) / 1000.0f;
-									if(phi > M_PI){
-										phi = M_PI;
-									}
-									break;
-									
-								default:
-									// Do nothing
-									break;
-							}
-							switch( e.key.keysym.sym )
-							{
-								case SDLK_LEFT:
-									theta += (thetaChangePerSecond * ticksPerFrame) / 1000.0f;
-									if(theta >= (2.0f * M_PI)){
-										theta = theta - (2.0f * M_PI);
-									}
-									break;
-									
-								case SDLK_RIGHT:
-									theta -= (thetaChangePerSecond * ticksPerFrame) / 1000.0f;
-									if(theta < 0.0f){
-										theta = (2 * M_PI) + theta;
-									}
-									break;
-									
-									default:
-									// Do nothing
-									break;
-							}
-						}
-						//Handle button events
-						for( unsigned i = 0; i < sizeof(timeWarpFactors)/sizeof(const size_t); i++ )
-						{
-							if(gButtons[i].handleEvent(&e)){
-								timeWarpLevel = i;
-							}
-						}
-					}
-					
-					// Calculate the graphics matrix
-					a.a[0][0] = cos(theta);
-					a.a[0][1] = -1.0f * sin(theta) * cos(phi);
-					a.a[0][2] = -1.0f * sin(theta) * sin(phi);
-					a.a[1][0] = sin(theta);
-					a.a[1][1] = cos(theta) * cos(phi);
-					a.a[1][2] = cos(theta) * sin(phi);
-					a.a[2][0] = 0.0f;
-					a.a[2][1] = sin(phi);
-					a.a[2][2] = -1.0f * cos(phi);
-					
-					// Invert the graphics matrix
-					a = inverse3x3(a.a);
-					
-					// Clear Screen
-					SDL_RenderClear( gRenderer );
-					
-					//Render texture to screen
-					SDL_RenderCopy( gRenderer, timeAccelTex, NULL, NULL );
-					
-					// Set the color of all the arrows to white
-					SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-					
-					// Draw time acceleration arrows
-					for(unsigned i = 0; i < sizeof(timeWarpFactors)/sizeof(const size_t); i++){
-						drawTriangle(gRenderer, triangleMargin + (triangleWidth + triangleMargin) * i, triangleMargin, triangleHeight, triangleWidth, timeWarpLevel >= i);
-					}
-					
-					SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-					// Draw all the particles as points
-					for(unsigned i = 0; i < solarSystem.numParticles(); i++){
-						particlePoints[0] = solarSystem.getParticle(i).getPos().x;
-						particlePoints[1] = solarSystem.getParticle(i).getPos().y;
-						particlePoints[2] = solarSystem.getParticle(i).getPos().z;
-						
-						// Calculate the projected points of the particles onto the plane
-						projectedPoints = matrix3x3VectorDotProduct(a.a, particlePoints);
-						
-						SDL_RenderDrawPoint(gRenderer, (projectedPoints.x/inputArgs.resolution) + (inputArgs.width/2), (projectedPoints.y/inputArgs.resolution) + (inputArgs.length/2));
-					}
-					SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0x00 );
-					
-					SDL_RenderPresent( gRenderer );
-					
-					stepsPerTime = timeWarpFactors[timeWarpLevel];
-				}
-				
-				workerThread.join();
-				timingThread.join();
-				
-			}
-			else{
-				std::cout << "Error: " << guiInitErrorsToString(guiErrorReturn) << std::endl;
-				return EXIT_FAILURE;
-			}
-		}
-		else{
-			std::cout << "Error: " << NBodySim::NBodySystem<NBodySim::FloatingType>::errorToString(solarSystemParseResult) << std::endl;
-			return EXIT_FAILURE;
-		}
+		inputScenario = readFile(inputArgs.fileName);
 	}
+	
+	// Implements Req FR.Initiate
+	solarSystemParseResult = solarSystem.parse(inputScenario);
+	if(solarSystemParseResult != NBodySim::NBodySystemSpace::SUCCESS){
+		std::cout << "Error: " << NBodySim::NBodySystem<NBodySim::FloatingType>::errorToString(solarSystemParseResult) << std::endl;
+		return EXIT_FAILURE;
+	}
+	
+	// Start the GUI
+	guiErrorReturn = guiInit(&gWindow, &gRenderer, &timeAccelSurf, &timeAccelTex, &gButtons, inputArgs.length, inputArgs.width, sizeof(timeWarpFactors) / sizeof(const size_t),  triangleMargin, triangleWidth, triangleHeight);
+	if(guiErrorReturn != SUCCESS){
+		std::cout << "Error: " << guiInitErrorsToString(guiErrorReturn) << std::endl;
+		return EXIT_FAILURE;
+	}
+	
+	quit = false;
+	// Create a thread for the timer
+	boost::thread timingThread(timingFunction, reinterpret_cast<void *>(&timingStruct));
+	// Create a thread for the worker
+	boost::thread workerThread(workThread, reinterpret_cast<void *>(&workerStruct));
+	
+	//While application is running
+	while( !quit )
+	{
+		stopTime = SDL_GetTicks();
+		ticksPerFrame = stopTime - startTime;
+		startTime = stopTime;
+		if(ticksPerFrame <= 0){
+			ticksPerFrame = 1;
+		}
+		//Handle events on queue
+		while( SDL_PollEvent( &e ) != 0 )
+		{
+			//User requests quit
+			if( e.type == SDL_QUIT )
+			{
+				quit = true;
+			}
+			//User presses a key
+			else if( e.type == SDL_KEYDOWN )
+			{
+				switch( e.key.keysym.sym )
+				{
+					case SDLK_UP:
+						phi -= (phiChangePerSecond * ticksPerFrame) / 1000.0f;
+						if(phi < 0){
+							phi = 0.0f;
+						}
+						break;
+					
+					case SDLK_DOWN:
+						phi += (phiChangePerSecond * ticksPerFrame) / 1000.0f;
+						if(phi > M_PI){
+							phi = M_PI;
+						}
+						break;
+						
+					default:
+						// Do nothing
+						break;
+				}
+				switch( e.key.keysym.sym )
+				{
+					case SDLK_LEFT:
+						theta += (thetaChangePerSecond * ticksPerFrame) / 1000.0f;
+						if(theta >= (2.0f * M_PI)){
+							theta = theta - (2.0f * M_PI);
+						}
+						break;
+						
+					case SDLK_RIGHT:
+						theta -= (thetaChangePerSecond * ticksPerFrame) / 1000.0f;
+						if(theta < 0.0f){
+							theta = (2 * M_PI) + theta;
+						}
+						break;
+						
+						default:
+						// Do nothing
+						break;
+				}
+			}
+			//Handle button events
+			for( unsigned i = 0; i < sizeof(timeWarpFactors)/sizeof(const size_t); i++ )
+			{
+				if(gButtons[i].handleEvent(&e)){
+					timeWarpLevel = i;
+				}
+			}
+		}
+		
+		// Calculate the graphics matrix
+		a.a[0][0] = cos(theta);
+		a.a[0][1] = -1.0f * sin(theta) * cos(phi);
+		a.a[0][2] = -1.0f * sin(theta) * sin(phi);
+		a.a[1][0] = sin(theta);
+		a.a[1][1] = cos(theta) * cos(phi);
+		a.a[1][2] = cos(theta) * sin(phi);
+		a.a[2][0] = 0.0f;
+		a.a[2][1] = sin(phi);
+		a.a[2][2] = -1.0f * cos(phi);
+		
+		// Invert the graphics matrix
+		a = inverse3x3(a.a);
+		
+		// Clear Screen
+		SDL_RenderClear( gRenderer );
+		
+		//Render texture to screen
+		SDL_RenderCopy( gRenderer, timeAccelTex, NULL, NULL );
+		
+		// Set the color of all the arrows to white
+		SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+		
+		// Draw time acceleration arrows
+		for(unsigned i = 0; i < sizeof(timeWarpFactors)/sizeof(const size_t); i++){
+			drawTriangle(gRenderer, triangleMargin + (triangleWidth + triangleMargin) * i, triangleMargin, triangleHeight, triangleWidth, timeWarpLevel >= i);
+		}
+		
+		SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+		// Draw all the particles as points
+		for(unsigned i = 0; i < solarSystem.numParticles(); i++){
+			particlePoints[0] = solarSystem.getParticle(i).getPos().x;
+			particlePoints[1] = solarSystem.getParticle(i).getPos().y;
+			particlePoints[2] = solarSystem.getParticle(i).getPos().z;
+			
+			// Calculate the projected points of the particles onto the plane
+			projectedPoints = matrix3x3VectorDotProduct(a.a, particlePoints);
+			
+			SDL_RenderDrawPoint(gRenderer, (projectedPoints.x/inputArgs.resolution) + (inputArgs.width/2), (projectedPoints.y/inputArgs.resolution) + (inputArgs.length/2));
+		}
+		SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0x00 );
+		
+		SDL_RenderPresent( gRenderer );
+		
+		stepsPerTime = timeWarpFactors[timeWarpLevel];
+	}
+	
+	workerThread.join();
+	timingThread.join();
 	
 	close(gWindow, gRenderer);
 	delete [] gButtons;
