@@ -14,8 +14,12 @@ A good first example is to run the following command:
 That command runs a small example, at 30 fps, which shows a planet clearing the region around its orbit.
 
 # Dependencies
-This program is a C++ program and it depends on the [SDL library](https://www.libsdl.org/), which must be downloaded separately, and the rapidxml library, which has been included in this project.
-Unit tests are dependent on [googletest](https://github.com/google/googletest).
+This program is a C++ program and it depends on:
+- The [SDL library](https://www.libsdl.org/), which must be downloaded separately
+- The [Boost library](http://www.boost.org/), which must be downloaded separately 
+- The rapidxml library, which has been included in this project.
+
+Unit tests are dependent on [Google Test](https://github.com/google/googletest), this library is only required for development.
 
 # Support
 n-body-sim has been tested on the following operating systems:
