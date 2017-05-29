@@ -33,12 +33,14 @@
 	// Mac OS X and Linux
 	#include <SDL2/SDL.h>
 #endif
-#include <pthread.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <semaphore.h>
 #include <cmath>
 #include <errno.h>
+
+#include <boost/thread.hpp>
+#include <boost/functional.hpp>
+#include <boost/interprocess/sync/interprocess_semaphore.hpp>
 
 #include "NBodyTypes.h"
 #include "Particle.h"
@@ -248,7 +250,7 @@ std::string guiInitErrorsToString(guiInitErrors error);
 typedef struct {
 	NBodySim::FloatingType interval;
 	unsigned numSems;
-	sem_t ** timingSems;
+	boost::interprocess::interprocess_semaphore ** timingSems;
 	volatile bool * quitTiming;
 } timingFunctionStruct;
 
@@ -262,7 +264,7 @@ void * timingFunction(void * inputParams);
 
 typedef struct {
 	NBodySim::FloatingType stepSize;
-	sem_t * timingSem;
+	boost::interprocess::interprocess_semaphore * timingSem;
 	volatile bool * quitTiming;
 	NBodySim::NBodySystem<NBodySim::FloatingType> * solarSystem;
 	volatile size_t * stepsPerTime;
@@ -502,7 +504,7 @@ void * timingFunction(void * inputParams){
 	
 	NBodySim::FloatingType interval = inputParamStruct->interval;
 	unsigned numSems = inputParamStruct->numSems;
-	sem_t ** timingSems = inputParamStruct->timingSems;
+	boost::interprocess::interprocess_semaphore ** timingSems = inputParamStruct->timingSems;
 	volatile bool * quitTiming = inputParamStruct->quitTiming;
 	
 	if(timingSems == NULL){
@@ -521,7 +523,7 @@ void * timingFunction(void * inputParams){
 	while(!(*quitTiming)){
 		SDL_Delay(interval);
 		for(unsigned i = 0; i < numSems; i++){
-			sem_post(timingSems[i]);
+			timingSems[i]->post();
 		}
 	}
 	pthread_exit(NULL);
@@ -538,7 +540,7 @@ void * workThread(void * inputParams){
 	workThreadStruct * inputParamStruct = reinterpret_cast<workThreadStruct *>(inputParams);
 	
 	NBodySim::FloatingType stepSize = inputParamStruct->stepSize;
-	sem_t * timingSem = inputParamStruct->timingSem;
+	boost::interprocess::interprocess_semaphore * timingSem = inputParamStruct->timingSem;
 	volatile bool * quitTiming = inputParamStruct->quitTiming;
 	NBodySim::NBodySystem<NBodySim::FloatingType> * solarSystem = inputParamStruct->solarSystem;
 	volatile size_t * stepsPerTime = inputParamStruct->stepsPerTime;
@@ -558,7 +560,7 @@ void * workThread(void * inputParams){
 	
 	// For each iteration, wait on a semaphore
 	while(!(*quitTiming)){
-		while(sem_wait(timingSem) != 0);
+		timingSem->wait();
 		// Implements Req FR.Calculate
 		for(size_t i = 0; i < *stepsPerTime; i++){
 			solarSystem->step(stepSize);
@@ -695,8 +697,8 @@ int main(int argc, char* argv[]){
 	volatile bool quit;
 	volatile size_t stepsPerTime = timeWarpFactors[timeWarpLevel];
 	SDL_Event e;
-	sem_t ** timingSemaphores;
-	timingSemaphores = new (std::nothrow) sem_t*[numTimingSems];
+	boost::interprocess::interprocess_semaphore ** timingSemaphores;
+	timingSemaphores = new boost::interprocess::interprocess_semaphore*[numTimingSems];
 	if(timingSemaphores == NULL){
 		std::cout << "Error: Could not allocate semaphore array." << std::endl;
 		return EXIT_FAILURE;
@@ -728,15 +730,8 @@ int main(int argc, char* argv[]){
 	for(unsigned i = 0; i < numTimingSems; i++){
 		std::ostringstream semName;
 		semName << "timingSem" << i;
-		timingSemaphores[i] = reinterpret_cast<sem_t*>(sem_open(semName.str().c_str(), O_CREAT, S_IWRITE | S_IREAD, 0));
-#ifdef _WIN32
-		if(timingSemaphores[i] == NULL){
-#else
-		if (timingSemaphores[i] == SEM_FAILED) {
-#endif
-			std::cout << "Error initializing semaphore " << i << " error code: " << errno << std::endl;
-			return EXIT_FAILURE;
-		}
+		timingSemaphores[i] = new boost::interprocess::interprocess_semaphore(0);
+
 	}
 	
 	timingStruct.interval = 1000 * inputArgs.stepSize;
@@ -922,14 +917,6 @@ int main(int argc, char* argv[]){
 		}
 		else{
 			std::cout << "Error: " << NBodySim::NBodySystem<NBodySim::FloatingType>::errorToString(solarSystemParseResult) << std::endl;
-			return EXIT_FAILURE;
-		}
-	}
-	
-	// Uninitialize the semaphores
-	for(unsigned i = 0; i < numTimingSems; i++){
-		if(sem_close(timingSemaphores[i]) < 0){
-			std::cout << "Error closing semaphore " << i << " error code: " << errno << std::endl;
 			return EXIT_FAILURE;
 		}
 	}

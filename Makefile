@@ -16,7 +16,7 @@ endif
 # For Linux
 ifeq ($(UNAME_S),Linux) 
 	INC:=-Iheaders/ -Irapidxml/
-	LIB:=-lSDL2 -lpthread
+	LIB:=-lSDL2 -lpthread -lboost_system -lboost_thread -lboost_chrono
 	TEST_LIB=-lpthread -lgtest
 endif
 OBJ_DIR:=obj/
