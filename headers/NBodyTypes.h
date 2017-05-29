@@ -37,7 +37,6 @@ namespace NBodySim{
 	
 	// Set up our types
 	typedef double FloatingType;
-	typedef unsigned long UnsignedType;
 }
 
 #endif // N_BODY_TYPES_H

@@ -27,7 +27,7 @@
 
 
 namespace NBodySim{
-	class Particle;
+	template <class T> class Particle;
 }
 /**
  * @brief An entity with a name, mass, instantaneous position and velocity in three dimensional space.
@@ -35,6 +35,7 @@ namespace NBodySim{
  * @author: W.A. Garrett Weaver
  * @see ThreeVector
  */
+template <class T>
 class NBodySim::Particle {
 private:
 	
@@ -42,17 +43,17 @@ protected:
 	/**
 	 *	position holds the floating point three dimensional position of the particle in meters
 	 */
-	NBodySim::ThreeVector <NBodySim::FloatingType> position;
+	NBodySim::ThreeVector <T> position;
 	
 	/** 
 	 * velocity holds the floating point three dimensional velocity in meters per second
 	 */
-	NBodySim::ThreeVector <NBodySim::FloatingType> velocity;
+	NBodySim::ThreeVector <T> velocity;
 	
 	/**
 	 * mass holds the floating point mass of a particle in kilograms
 	 */
-	NBodySim::FloatingType mass;
+	T mass;
 	
 	/**
 	 * name is the string that holds what the particle is named
@@ -71,7 +72,7 @@ protected:
 	 * @param massIn is the mass of the particle in kilograms
 	 * @param nameIn is the name of the particle
  	 */
-	virtual void particle(NBodySim::FloatingType xPos, NBodySim::FloatingType yPos, NBodySim::FloatingType zPos, NBodySim::FloatingType xVel, NBodySim::FloatingType yVel, NBodySim::FloatingType zVel, NBodySim::FloatingType massIn, std::string nameIn);
+	virtual void particle(T xPos, T yPos, T, T xVel, T yVel, T zVel, T massIn, std::string nameIn);
 
 public:
 	/**
@@ -91,7 +92,7 @@ public:
 	 * @param massIn is the mass of the particle in kilograms
 	 * @param nameIn is the name of the particle
 	 */
-	Particle(NBodySim::FloatingType xPos, NBodySim::FloatingType yPos, NBodySim::FloatingType zPos, NBodySim::FloatingType xVel, NBodySim::FloatingType yVel, NBodySim::FloatingType zVel, NBodySim::FloatingType massIn, std::string nameIn);
+	Particle(T xPos, T yPos, T zPos, T xVel, T yVel, T zVel,T massIn, std::string nameIn);
 	
 	/**
 	 * constructor which takes in Three vectors where possible
@@ -101,7 +102,7 @@ public:
 	 * @param massIn is the mass of the particle in kilograms
 	 * @param nameIn is the name of the particle
 	 */
-	Particle(NBodySim::ThreeVector <NBodySim::FloatingType> pos, NBodySim::ThreeVector <NBodySim::FloatingType> vel, NBodySim::FloatingType massIn, std::string nameIn);
+	Particle(NBodySim::ThreeVector <T> pos, NBodySim::ThreeVector <T> vel, T massIn, std::string nameIn);
 	
 	/**
 	 * Destructor
@@ -113,21 +114,21 @@ public:
 	 *
 	 * @return the position of the particle as a ThreeVector
 	 */
-	NBodySim::ThreeVector <NBodySim::FloatingType> getPos(void);
+	NBodySim::ThreeVector <T> getPos(void);
 	
 	/**
 	* Returns of the velocity of the particle as a ThreeVector
 	*
 	* @return the position of the particle as a ThreeVector
 	*/
-	NBodySim::ThreeVector <NBodySim::FloatingType> getVel(void);
+	NBodySim::ThreeVector <T> getVel(void);
 	
 	/**
 	* Returns of the mass of the particle as a ThreeVector
 	*
 	* @return the position of the particle as a ThreeVector
 	*/
-	NBodySim::FloatingType getMass(void);
+	T getMass(void);
 	
 	/**
 	 * Returns of the name of the particle as a string
@@ -141,63 +142,63 @@ public:
 	 *
 	 * @param newPosition is the new position of the particle
 	 */
-	void setPos(NBodySim::ThreeVector <NBodySim::FloatingType> newPosition);
+	void setPos(NBodySim::ThreeVector <T> newPosition);
 	
 	/**
 	 * Sets the velocity of the particle with ThreeVector
 	 *
 	 * @param newVelocity is the new velocity of the particle
 	 */
-	void setVel(NBodySim::ThreeVector <NBodySim::FloatingType> newVelocity);
+	void setVel(NBodySim::ThreeVector <T> newVelocity);
 	
 	/**
 	 * Sets the mass of the particle with ThreeVector
 	 *
 	 * @param newMass is the new mass of the particle
 	 */
-	void setMass(NBodySim::FloatingType newMass);
+	void setMass(T newMass);
 	
 	/**
 	 * Sets the x position of the particle with a floating point number
 	 *
 	 * @param newPosition is the new x position of the particle
 	 */
-	void setPosX(NBodySim::FloatingType newPosition);
+	void setPosX(T newPosition);
 	
 	/**
 	 * Sets the y position of the particle with a floating point number
 	 *
 	 * @param newPosition is the new y position of the particle
 	 */
-	void setPosY(NBodySim::FloatingType newPosition);
+	void setPosY(T newPosition);
 	
 	/**
 	 * Sets the z position of the particle with a floating point number
 	 *
 	 * @param newPosition is the new z position of the particle
 	 */
-	void setPosZ(NBodySim::FloatingType newPosition);
+	void setPosZ(T newPosition);
 	
 	/**
 	 * Sets the x velocity of the particle with a floating point number
 	 *
 	 * @param newVelocity is the new x position of the particle
 	 */
-	void setVelX(NBodySim::FloatingType newVelocity);
+	void setVelX(T newVelocity);
 	
 	/**
 	 * Sets the y velocity of the particle with a floating point number
 	 *
 	 * @param newVelocity is the new y position of the particle
 	 */
-	void setVelY(NBodySim::FloatingType newVelocity);
+	void setVelY(T newVelocity);
 	
 	/**
 	 * Sets the z velocity of the particle with a floating point number
 	 *
 	 * @param newVelocity is the new z position of the particle
 	 */
-	void setVelZ(NBodySim::FloatingType newVelocity);
+	void setVelZ(T newVelocity);
 	
 	/**
 	 * Sets the name of the particle
@@ -206,5 +207,7 @@ public:
 	 */
 	void setName(std::string nameIn);
 };
+
+template class NBodySim::Particle<NBodySim::FloatingType>;
 
 #endif //PARTICLE_H

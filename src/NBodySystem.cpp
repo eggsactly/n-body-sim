@@ -32,45 +32,52 @@
 #include "Particle.h"
 #include "NBodySystem.h"
 
-NBodySim::NBodySystem::NBodySystem(void){
+template <class T>
+NBodySim::NBodySystem<T>::NBodySystem(void){
 	// Initialize G to be our universe's gravitation constant.
 	G = 6.67408e-11;
 }
 
-NBodySim::NBodySystem::~NBodySystem(void){
+template <class T>
+NBodySim::NBodySystem<T>::~NBodySystem(void){
 	
 }
 
-void NBodySim::NBodySystem::addParticle(NBodySim::Particle p){
+template <class T>
+void NBodySim::NBodySystem<T>::addParticle(NBodySim::Particle<T> p){
 	system.push_back(p);
 }
 
-NBodySim::Particle NBodySim::NBodySystem::getParticle(NBodySim::UnsignedType index){
+template <class T>
+NBodySim::Particle<T> NBodySim::NBodySystem<T>::getParticle(size_t index){
 	return system.at(index);
 }
 
-NBodySim::UnsignedType NBodySim::NBodySystem::numParticles(void){
+template <class T>
+size_t NBodySim::NBodySystem<T>::numParticles(void){
 	return system.size();
 }
 
-void NBodySim::NBodySystem::removeParticle(NBodySim::UnsignedType index){
+template <class T>
+void NBodySim::NBodySystem<T>::removeParticle(size_t index){
 	system.erase(system.begin() + index);
 }
 
-void NBodySim::NBodySystem::step(NBodySim::FloatingType deltaT){
-	std::vector<NBodySim::Particle> systemCopy = system;
-	NBodySim::ThreeVector <NBodySim::FloatingType> distanceComponent;
-	NBodySim::FloatingType distance;
-	NBodySim::FloatingType acceleration;
-	NBodySim::ThreeVector <NBodySim::FloatingType> newPosition;
-	NBodySim::ThreeVector <NBodySim::FloatingType> newVelocity;
+template <class T>
+void NBodySim::NBodySystem<T>::step(T deltaT){
+	std::vector<NBodySim::Particle<T> > systemCopy = system;
+	NBodySim::ThreeVector <T> distanceComponent;
+	T distance;
+	T acceleration;
+	NBodySim::ThreeVector <T> newPosition;
+	NBodySim::ThreeVector <T> newVelocity;
 	
-	for(NBodySim::UnsignedType i = 0; i < systemCopy.size(); i++){
+	for(size_t i = 0; i < systemCopy.size(); i++){
 		// Calculate new position of particle first from current velocity
 		newPosition = system.at(i).getPos();
 		newVelocity = system.at(i).getVel();
 		// Sum forces on body from all bodys to obtain new velocity of paricle
-		for(NBodySim::UnsignedType j = 0; j < systemCopy.size(); j++){
+		for(size_t j = 0; j < systemCopy.size(); j++){
 			distanceComponent.x = systemCopy.at(j).getPos().x - systemCopy.at(i).getPos().x;
 			distanceComponent.y = systemCopy.at(j).getPos().y - systemCopy.at(i).getPos().y;
 			distanceComponent.z = systemCopy.at(j).getPos().z - systemCopy.at(i).getPos().z;
@@ -91,7 +98,8 @@ void NBodySim::NBodySystem::step(NBodySim::FloatingType deltaT){
 	}
 }
 
-std::string NBodySim::NBodySystem::errorToString(NBodySim::NBodySystemSpace::error errorCode){
+template <class T>
+std::string NBodySim::NBodySystem<T>::errorToString(NBodySim::NBodySystemSpace::error errorCode){
 	switch(errorCode){
 		case NBodySim::NBodySystemSpace::SUCCESS: return "success"; break;
 		case NBodySim::NBodySystemSpace::FAILED_TO_ALLOCATE_MEMORY: return "failed to allocate memory"; break;
@@ -111,7 +119,8 @@ std::string NBodySim::NBodySystem::errorToString(NBodySim::NBodySystemSpace::err
 	}
 }
 
-NBodySim::NBodySystemSpace::error NBodySim::NBodySystem::parse(std::string xmlText){
+template <class T>
+NBodySim::NBodySystemSpace::error NBodySim::NBodySystem<T>::parse(std::string xmlText){
 	char * buffer = NULL;
 	rapidxml::xml_node<> *node;
 	rapidxml::xml_node<> *secondNode;
@@ -151,7 +160,7 @@ NBodySim::NBodySystemSpace::error NBodySim::NBodySystem::parse(std::string xmlTe
 	}
 	
 	while(secondNode != NULL){
-		NBodySim::Particle p;
+		NBodySim::Particle<T> p;
 		for(unsigned i = 0; i < NBodySim::NBodySystemSpace::particleAttributeListLength; i++){
 			attr = secondNode->first_attribute(NBodySim::NBodySystemSpace::particleAttributeList[i]);
 			if(attr == NULL){
@@ -190,10 +199,12 @@ NBodySim::NBodySystemSpace::error NBodySim::NBodySystem::parse(std::string xmlTe
 	return NBodySim::NBodySystemSpace::SUCCESS;
 }
 
-void NBodySim::NBodySystem::setGravitation(NBodySim::FloatingType gravitationConstant){
+template <class T>
+void NBodySim::NBodySystem<T>::setGravitation(T gravitationConstant){
 	G = gravitationConstant;
 }
 
-NBodySim::FloatingType NBodySim::NBodySystem::getGravitation(void){
+template <class T>
+T NBodySim::NBodySystem<T>::getGravitation(void){
 	return G;
 }

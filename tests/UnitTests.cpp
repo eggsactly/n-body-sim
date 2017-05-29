@@ -31,9 +31,9 @@
 
 TEST(Basic, Initialize) {	
 	NBodySim::ThreeVector <NBodySim::FloatingType> output;
-	NBodySim::Particle p;
-	NBodySim::NBodySystem sys;
-	NBodySim::NBodySystem sys2;
+	NBodySim::Particle <NBodySim::FloatingType> p;
+	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
+	NBodySim::NBodySystem <NBodySim::FloatingType> sys2;
 	
 	double particleMass = 1000000;
 	p.setPosX(1);

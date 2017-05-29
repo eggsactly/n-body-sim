@@ -264,8 +264,8 @@ typedef struct {
 	NBodySim::FloatingType stepSize;
 	sem_t * timingSem;
 	volatile bool * quitTiming;
-	NBodySim::NBodySystem * solarSystem;
-	volatile NBodySim::UnsignedType * stepsPerTime;
+	NBodySim::NBodySystem<NBodySim::FloatingType> * solarSystem;
+	volatile size_t * stepsPerTime;
 } workThreadStruct;
 
 /**
@@ -540,8 +540,8 @@ void * workThread(void * inputParams){
 	NBodySim::FloatingType stepSize = inputParamStruct->stepSize;
 	sem_t * timingSem = inputParamStruct->timingSem;
 	volatile bool * quitTiming = inputParamStruct->quitTiming;
-	NBodySim::NBodySystem * solarSystem = inputParamStruct->solarSystem;
-	volatile NBodySim::UnsignedType * stepsPerTime = inputParamStruct->stepsPerTime;
+	NBodySim::NBodySystem<NBodySim::FloatingType> * solarSystem = inputParamStruct->solarSystem;
+	volatile size_t * stepsPerTime = inputParamStruct->stepsPerTime;
 	
 	if(timingSem == NULL){
 		pthread_exit(NULL);
@@ -560,7 +560,7 @@ void * workThread(void * inputParams){
 	while(!(*quitTiming)){
 		while(sem_wait(timingSem) != 0);
 		// Implements Req FR.Calculate
-		for(NBodySim::UnsignedType i = 0; i < *stepsPerTime; i++){
+		for(size_t i = 0; i < *stepsPerTime; i++){
 			solarSystem->step(stepSize);
 		}
 	}
@@ -667,7 +667,7 @@ void drawTriangle(SDL_Renderer * gRenderer, int x, int y, int height, int width,
 
 int main(int argc, char* argv[]){
 	// KSP style time warp factors
-	const NBodySim::UnsignedType timeWarpFactors[] = {1, 2, 3, 4, 5, 10, 50, 1000, 10000, 100000};
+	const size_t timeWarpFactors[] = {1, 2, 3, 4, 5, 10, 50, 1000, 10000, 100000};
 	const int triangleWidth = 10;
 	const int triangleHeight = 10;
 	const int triangleMargin = 5;
@@ -676,13 +676,13 @@ int main(int argc, char* argv[]){
 	unsigned timeWarpLevel = 0;
 	//Buttons objects
 	LButton * gButtons;
-	gButtons = new LButton[ sizeof(timeWarpFactors) / sizeof(const NBodySim::UnsignedType) ];
+	gButtons = new LButton[ sizeof(timeWarpFactors) / sizeof(const size_t) ];
 	if(gButtons == NULL){
 		std::cout << "Failed to allocate gButtons." << std::endl;
 		return EXIT_FAILURE;
 	}
 	else {
-		for(int i = 0; i < sizeof(timeWarpFactors) / sizeof(const NBodySim::UnsignedType); i++){
+		for(int i = 0; i < sizeof(timeWarpFactors) / sizeof(const size_t); i++){
 			gButtons[i].setPosition(triangleMargin + (triangleWidth + triangleMargin) * i, triangleMargin);
 			gButtons[i].setHeightWidth(triangleWidth, triangleHeight);
 		}
@@ -690,10 +690,10 @@ int main(int argc, char* argv[]){
 	const unsigned numTimingSems = 2;
 	argsList inputArgs = parseArgs(argc, argv);
 	std::string inputScenario;
-	NBodySim::NBodySystem solarSystem;
+	NBodySim::NBodySystem<NBodySim::FloatingType> solarSystem;
 	NBodySim::NBodySystemSpace::error solarSystemParseResult;
 	volatile bool quit;
-	volatile NBodySim::UnsignedType stepsPerTime = timeWarpFactors[timeWarpLevel];
+	volatile size_t stepsPerTime = timeWarpFactors[timeWarpLevel];
 	SDL_Event e;
 	sem_t ** timingSemaphores;
 	timingSemaphores = new (std::nothrow) sem_t*[numTimingSems];
@@ -777,7 +777,7 @@ int main(int argc, char* argv[]){
 		// Implements Req FR.Initiate
 		solarSystemParseResult = solarSystem.parse(inputScenario);
 		if(solarSystemParseResult == NBodySim::NBodySystemSpace::SUCCESS){
-			guiErrorReturn = guiInit(&gWindow, &gRenderer, &timeAccelSurf, &timeAccelTex, &gButtons, inputArgs.length, inputArgs.width, sizeof(timeWarpFactors) / sizeof(const NBodySim::UnsignedType),  triangleMargin, triangleWidth, triangleHeight);
+			guiErrorReturn = guiInit(&gWindow, &gRenderer, &timeAccelSurf, &timeAccelTex, &gButtons, inputArgs.length, inputArgs.width, sizeof(timeWarpFactors) / sizeof(const size_t),  triangleMargin, triangleWidth, triangleHeight);
 			if(guiErrorReturn == SUCCESS){
 				quit = false;
 				// Create a thread for the timer
@@ -848,7 +848,7 @@ int main(int argc, char* argv[]){
 									}
 								}
 								//Handle button events
-								for( unsigned i = 0; i < sizeof(timeWarpFactors)/sizeof(const NBodySim::UnsignedType); i++ )
+								for( unsigned i = 0; i < sizeof(timeWarpFactors)/sizeof(const size_t); i++ )
 								{
 									if(gButtons[i].handleEvent(&e)){
 										timeWarpLevel = i;
@@ -880,7 +880,7 @@ int main(int argc, char* argv[]){
 							SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 							
 							// Draw time acceleration arrows
-							for(unsigned i = 0; i < sizeof(timeWarpFactors)/sizeof(const NBodySim::UnsignedType); i++){
+							for(unsigned i = 0; i < sizeof(timeWarpFactors)/sizeof(const size_t); i++){
 								drawTriangle(gRenderer, triangleMargin + (triangleWidth + triangleMargin) * i, triangleMargin, triangleHeight, triangleWidth, timeWarpLevel >= i);
 							}
 							
@@ -921,7 +921,7 @@ int main(int argc, char* argv[]){
 			}
 		}
 		else{
-			std::cout << "Error: " << NBodySim::NBodySystem::errorToString(solarSystemParseResult) << std::endl;
+			std::cout << "Error: " << NBodySim::NBodySystem<NBodySim::FloatingType>::errorToString(solarSystemParseResult) << std::endl;
 			return EXIT_FAILURE;
 		}
 	}

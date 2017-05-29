@@ -23,19 +23,23 @@
 #include "NBodyTypes.h"
 #include "Particle.h"
 
-NBodySim::Particle::Particle(void){
+template <class T>
+NBodySim::Particle<T>::Particle(void){
 	particle(0, 0, 0, 0, 0, 0, 0, "");
 }
 
-NBodySim::Particle::Particle(NBodySim::FloatingType xPos, NBodySim::FloatingType yPos, NBodySim::FloatingType zPos, NBodySim::FloatingType xVel, NBodySim::FloatingType yVel, NBodySim::FloatingType zVel, NBodySim::FloatingType massIn, std::string nameIn){
+template <class T>
+NBodySim::Particle<T>::Particle(T xPos, T yPos, T zPos, T xVel, T yVel, T zVel, T massIn, std::string nameIn){
 	particle(xPos, yPos, zPos, xVel, yVel, zVel, massIn, nameIn);
 }
 
-NBodySim::Particle::Particle(NBodySim::ThreeVector <NBodySim::FloatingType> pos, NBodySim::ThreeVector <NBodySim::FloatingType> vel, NBodySim::FloatingType massIn, std::string nameIn){
+template <class T>
+NBodySim::Particle<T>::Particle(NBodySim::ThreeVector <T> pos, NBodySim::ThreeVector <T> vel, T massIn, std::string nameIn){
 	particle(pos.x, pos.y, pos.z, vel.x, vel.y, vel.z, massIn, nameIn);
 }
 
-void NBodySim::Particle::particle(NBodySim::FloatingType xPos, NBodySim::FloatingType yPos, NBodySim::FloatingType zPos, NBodySim::FloatingType xVel, NBodySim::FloatingType yVel, NBodySim::FloatingType zVel, NBodySim::FloatingType massIn, std::string nameIn){
+template <class T>
+void NBodySim::Particle<T>::particle(T xPos, T yPos, T zPos, T xVel, T yVel, T zVel, T massIn, std::string nameIn){
 	position.x = xPos;
 	position.y = yPos;
 	position.z = zPos;
@@ -46,62 +50,77 @@ void NBodySim::Particle::particle(NBodySim::FloatingType xPos, NBodySim::Floatin
 	name = nameIn;
 }
 
-NBodySim::Particle::~Particle(void){
+template <class T>
+NBodySim::Particle<T>::~Particle(void){
 	// Do nothing
 }
 
-NBodySim::ThreeVector <NBodySim::FloatingType> NBodySim::Particle::getPos(void){
+template <class T>
+NBodySim::ThreeVector <T> NBodySim::Particle<T>::getPos(void){
 	return position;
 }
 
-NBodySim::ThreeVector <NBodySim::FloatingType> NBodySim::Particle::getVel(void){
+template <class T>
+NBodySim::ThreeVector<T> NBodySim::Particle<T>::getVel(void){
 	return velocity;
 }
 
-NBodySim::FloatingType NBodySim::Particle::getMass(void){
+template <class T>
+T NBodySim::Particle<T>::getMass(void){
 	return mass;
 }
 
-std::string NBodySim::Particle::getName(void){
+template <class T>
+std::string NBodySim::Particle<T>::getName(void){
 	return name;
 }
 
-void NBodySim::Particle::setPos(NBodySim::ThreeVector <NBodySim::FloatingType> newPosition){
+template <class T>
+void NBodySim::Particle<T>::setPos(NBodySim::ThreeVector <T> newPosition){
 	position = newPosition;
 }
 
-void NBodySim::Particle::setVel(NBodySim::ThreeVector <NBodySim::FloatingType> newVelocity){
+template <class T>
+void NBodySim::Particle<T>::setVel(NBodySim::ThreeVector <T> newVelocity){
 	velocity = newVelocity;
 }
 
-void NBodySim::Particle::setMass(NBodySim::FloatingType newMass){
+template <class T>
+void NBodySim::Particle<T>::setMass(T newMass){
 	mass = newMass;
 }
 
-void NBodySim::Particle::setPosX(NBodySim::FloatingType newPosition){
+template <class T>
+void NBodySim::Particle<T>::setPosX(T newPosition){
 	position.x = newPosition;
 }
 
-void NBodySim::Particle::setPosY(NBodySim::FloatingType newPosition){
+template <class T>
+void NBodySim::Particle<T>::setPosY(T newPosition){
 	position.y = newPosition;
 }
 
-void NBodySim::Particle::setPosZ(NBodySim::FloatingType newPosition){
+template <class T>
+void NBodySim::Particle<T>::setPosZ(T newPosition){
 	position.z = newPosition;
 }
 
-void NBodySim::Particle::setVelX(NBodySim::FloatingType newVelocity){
+template <class T>
+void NBodySim::Particle<T>::setVelX(T newVelocity){
 	velocity.x = newVelocity;
 }
 
-void NBodySim::Particle::setVelY(NBodySim::FloatingType newVelocity){
+template <class T>
+void NBodySim::Particle<T>::setVelY(T newVelocity){
 	velocity.y = newVelocity;
 }
 
-void NBodySim::Particle::setVelZ(NBodySim::FloatingType newVelocity){
+template <class T>
+void NBodySim::Particle<T>::setVelZ(T newVelocity){
 	velocity.z = newVelocity;
 }
 
-void NBodySim::Particle::setName(std::string nameIn){
+template <class T>
+void NBodySim::Particle<T>::setName(std::string nameIn){
 	name = nameIn;
 }

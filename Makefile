@@ -39,7 +39,7 @@ debug: DEBUG+=-g
 debug: all
 
 $(EXE): $(OBJ_DIR) $(OBJECTS)
-	$(CXX) $(DEBUG)$(LIB) $(OBJECTS) -o $@
+	$(CXX) $(DEBUG)$(OBJECTS) $(LIB) -o $@
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
 	$(CXX) $(DEBUG)$(INC) -c $^ -o $@

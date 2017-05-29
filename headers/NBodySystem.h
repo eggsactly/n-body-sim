@@ -28,7 +28,7 @@
 #include "Particle.h"
 
 namespace NBodySim {
-	class NBodySystem;
+	template <class T> class NBodySystem;
 	namespace NBodySystemSpace {
 		const unsigned particleAttributeListLength = 8;
 		const char particleAttributeList [][NBodySim::NBodySystemSpace::particleAttributeListLength] = {"posX", "posY", "posZ", "velX", "velY", "velZ", "mass", "name"};
@@ -141,6 +141,7 @@ namespace NBodySim {
  * @author W.A. Garrett Weaver
  * @see Particle
  */
+template <class T>
 class NBodySim::NBodySystem {
 private:
 	
@@ -148,7 +149,7 @@ protected:
 	/**
 	 * system is set of all particles, where the order doesn't matter, but a vector was used anyways.
 	 */
-	std::vector<NBodySim::Particle> system;
+	std::vector<NBodySim::Particle<T> > system;
 	/**
 	 * G is the gravitation constant for the objects system
 	 */
@@ -169,7 +170,7 @@ public:
 	 *
 	 * @param p is a particle to be added to the system vector
 	 */
-	void addParticle(NBodySim::Particle p);
+	void addParticle(NBodySim::Particle<T> p);
 	
 	/**
 	 * getParticle returns a particle based on its index
@@ -177,28 +178,28 @@ public:
 	 * @param index the index of the particle to return
 	 * @return the particle specified by the index
 	 */
-	NBodySim::Particle getParticle(NBodySim::UnsignedType index);
+	NBodySim::Particle<T> getParticle(size_t index);
 	
 	/**
 	 * numParticles returns the number of particles in the simulation
 	 *
 	 * @return an unsigned number representing the number of particles in the simulation
 	 */
-	NBodySim::UnsignedType numParticles(void);
+	size_t numParticles(void);
 	
 	/**
 	 * removeParticle removes a particle from the simulation based on its index
 	 *
 	 * @param index is the index of the particle to be removed
 	 */
-	void removeParticle(NBodySim::UnsignedType index);
+	void removeParticle(size_t index);
 	
 	/**
 	 * step calculates new positions and velocities of the particles in the system
 	 *
 	 * @param deltaT is a floating point number of the amount of time that passes till the next step
 	 */
-	void step(NBodySim::FloatingType deltaT);
+	void step(T deltaT);
 	
 	/**
 	 * parse takes in a string containing xml text of a system scenario and creates particle instances in this class
@@ -213,14 +214,14 @@ public:
 	 *
 	 * @param gravitationConstant is the gravitation constant the system shall be set to
 	 */
-	void setGravitation(NBodySim::FloatingType gravitationConstant);
+	void setGravitation(T gravitationConstant);
 	
 	/**
 	 * getGravitation returns the systems gravitation constant
 	 *
 	 * @return the systems gravitation constant
 	 */
-	NBodySim::FloatingType getGravitation(void);
+	T getGravitation(void);
 	
 	/**
 	 * errorToString takes an error code and returns it in human readable format
@@ -230,5 +231,7 @@ public:
 	 */
 	static std::string errorToString(NBodySim::NBodySystemSpace::error errorCode);
 };
+
+template class NBodySim::NBodySystem<NBodySim::FloatingType>;
 
 #endif // N_BODY_SYSTEM_H
