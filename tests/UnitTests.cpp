@@ -23,22 +23,13 @@
 #include <cstdlib>
 #include <cmath>
 
+#include "gtest/gtest.h"
+
 #include "NBodyTypes.h"
 #include "Particle.h"
 #include "NBodySystem.h"
 
-template <typename T>
-unsigned char assert(T val1, T val2, T margin){
-	if(val1 > (val2 + margin) || val1 < (val2 - margin)){
-		return 1;
-	}
-	else{
-		return 0;
-	}
-}
-
-int main(){
-	
+TEST(Basic, Initialize) {	
 	NBodySim::ThreeVector <NBodySim::FloatingType> output;
 	NBodySim::Particle p;
 	NBodySim::NBodySystem sys;
@@ -59,40 +50,22 @@ int main(){
 	
 	output = p.getPos();
 	
-	if(assert<NBodySim::FloatingType>(output.x, 1, 0)){
-		std::cout << "Assertion 1 failed, output.x is " << output.x << " not 1." << std::endl;
-		return EXIT_FAILURE;
-	}
+	
+	EXPECT_DOUBLE_EQ(output.x, 1.00f);
 	
 	sys.addParticle(p);
 	
-	if(assert<NBodySim::FloatingType>(sys.numParticles(), 1, 0)){
-		std::cout << "Assertion 2 failed, sys.numParticles() is " << sys.numParticles() << " not 1." << std::endl;
-		return EXIT_FAILURE;
-	}
-	
-	if(assert<NBodySim::FloatingType>(sys.getParticle(0).getPos().x, 1, 0)){
-		std::cout << "Assertion 3 failed, sys.getParticle(0).getPos().x is " << sys.getParticle(0).getPos().x << " not 1." << std::endl;
-		return EXIT_FAILURE;
-	}
+	EXPECT_EQ(sys.numParticles(), 1);
+	EXPECT_DOUBLE_EQ(sys.getParticle(0).getPos().x, 1.00f);
 	
 	p.setPosX(-1);
 	p.setName("2");
 	
 	sys.addParticle(p);
 	
-	if(assert<NBodySim::FloatingType>(sys.numParticles(), 2, 0)){
-		std::cout << "Assertion 4 failed, sys.numParticles() is " << sys.numParticles() << " not 2." << std::endl;
-		return EXIT_FAILURE;
-	}
-	if(assert<NBodySim::FloatingType>(sys.getParticle(0).getPos().x, 1, 0)){
-		std::cout << "Assertion 5 failed, sys.getParticle(0).getPos().x is " << sys.getParticle(0).getPos().x << " not 1." << std::endl;
-		return EXIT_FAILURE;
-	}
-	if(assert<NBodySim::FloatingType>(sys.getParticle(1).getPos().x, -1, 0)){
-		std::cout << "Assertion 6 failed, sys.getParticle(1).getPos().x is " << sys.getParticle(1).getPos().x << " not -1." << std::endl;
-		return EXIT_FAILURE;
-	}
+	EXPECT_EQ(sys.numParticles(), 2);
+	EXPECT_DOUBLE_EQ(sys.getParticle(0).getPos().x, 1.00f);
+	EXPECT_DOUBLE_EQ(sys.getParticle(1).getPos().x, -1.00f);
 	
 	/* Test the result of letting two bodies move towards each other for one second */
 	// Verifies Req FR.Calculate
@@ -101,54 +74,38 @@ int main(){
 	// Verifies Req FR.Calculate
 	// Verifies Req NF.UsersProvideTime
 	double newXPos = (1 - (sys.getGravitation() * particleMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)));
-	if(assert<NBodySim::FloatingType>(sys.getParticle(0).getPos().x, newXPos, margin)){
-		std::cout << "Assertion 7 failed, sys.getParticle(0).getPos().x is " << sys.getParticle(0).getPos().x << " not " << newXPos << "." << std::endl;
-		return EXIT_FAILURE;
-	}
+	EXPECT_NEAR(sys.getParticle(0).getPos().x, newXPos, margin);
+	
 	// Verifies Req FR.Calculate
 	// Verifies Req NF.UsersProvideTime
 	newXPos = (sys.getGravitation() * particleMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)) - 1;
-	if(assert<NBodySim::FloatingType>(sys.getParticle(1).getPos().x, newXPos, margin)){
-		std::cout << "Assertion 7 failed, sys.getParticle(1).getPos().x is " << sys.getParticle(1).getPos().x << " not " << newXPos << "." << std::endl;
-		return EXIT_FAILURE;
-	}
+	EXPECT_NEAR(sys.getParticle(1).getPos().x, newXPos, margin);
 	
 	/* Test parsing of an xml file */
 	// Verifies Req NF.UsersProvideFile
 	// Verifies Req FR.Initiate
-	if(assert<unsigned char>(sys2.parse(xmlString), 0, 0)){
-		std::cout << "Assertion 9 failed, sys2.parse(xmlString) is " << 1 << " not " << 0 << "." << std::endl;
-		return EXIT_FAILURE;
-	}
+	EXPECT_EQ(sys2.parse(xmlString), 0);
 	
 	// Verifies Req NF.SystemsProvideG
 	// Verifies Req FR.Initiate
-	if(assert<NBodySim::FloatingType>(sys2.getGravitation(), 1.00f, 0.0)){
-		std::cout << "Assertion 10 failed, sys2.getGravitation() " << sys2.getGravitation() << " not " << 1.00 << "." << std::endl;
-		return EXIT_FAILURE;
-	}
+	EXPECT_DOUBLE_EQ(sys2.getGravitation(), 1.00f);
 	
 	// Verifies Req FR.Initiate
-	if(assert<NBodySim::UnsignedType>(sys2.numParticles(), 3, 0)){
-		std::cout << "Assertion 11 failed, sys2.numParticles() " << sys2.numParticles() << " not " << 3 << "." << std::endl;
-		return EXIT_FAILURE;
-	}
-	// Verifies Req FR.Initiate
-	if(sys2.getParticle(0).getName() != "Sun"){
-		std::cout << "Assertion 12 failed, sys2.getParticle(0).getName() " << sys2.getParticle(0).getName() << " not " << "Sun" << "." << std::endl;
-		return EXIT_FAILURE;
-	}
-	// Verifies Req FR.Initiate
-	if(sys2.getParticle(1).getName() != "Earth"){
-		std::cout << "Assertion 13 failed, sys2.getParticle(1).getName() " << sys2.getParticle(1).getName() << " not " << "Earth" << "." << std::endl;
-		return EXIT_FAILURE;
-	}
-	// Verifies Req FR.Initiate
-	if(sys2.getParticle(2).getName() != "Moon"){
-		std::cout << "Assertion 14 failed, sys2.getParticle(2).getName() " << sys2.getParticle(2).getName() << " not " << "Moon" << "." << std::endl;
-		return EXIT_FAILURE;
-	}
+	EXPECT_EQ(sys2.numParticles(), 3);
 	
-	std::cout << "Tests passed!" << std::endl;
-	return EXIT_SUCCESS;
+	// Verifies Req FR.Initiate
+	EXPECT_EQ(sys2.getParticle(0).getName(), "Sun");
+
+	// Verifies Req FR.Initiate
+	EXPECT_EQ(sys2.getParticle(1).getName(), "Earth");
+
+	// Verifies Req FR.Initiate
+	EXPECT_EQ(sys2.getParticle(2).getName(), "Moon");
+}
+
+int main(int argc, char* argv[]){
+	
+	std::cout << "Running main()" << std::endl;
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
 }

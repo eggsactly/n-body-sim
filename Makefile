@@ -11,11 +11,13 @@ UNAME_S:=$(shell uname -s)
 ifeq ($(UNAME_S),Darwin) 
 	INC:=-I headers/ -I rapidxml/ -F/Library/Frameworks -framework SDL2
 	LIB:=-F/Library/Frameworks -framework SDL2
+	TEST_LIB=-lpthread -lgtest
 endif
 # For Linux
 ifeq ($(UNAME_S),Linux) 
-	INC:=-I headers/ -I rapidxml/ 
-	LIB:=-lSDL2 -pthread
+	INC:=-Iheaders/ -Irapidxml/
+	LIB:=-lSDL2 -lpthread
+	TEST_LIB=-lpthread -lgtest
 endif
 OBJ_DIR:=obj/
 SRC_DIR:=src/
@@ -37,24 +39,24 @@ debug: DEBUG+=-g
 debug: all
 
 $(EXE): $(OBJ_DIR) $(OBJECTS)
-	$(CXX) $(DEBUG) $(LIB) $(OBJECTS) -o $@
+	$(CXX) $(DEBUG)$(LIB) $(OBJECTS) -o $@
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
-	$(CXX) $(DEBUG) $(INC) -c $^ -o $@
+	$(CXX) $(DEBUG)$(INC) -c $^ -o $@
 
 $(OBJ_DIR):
 	mkdir $(OBJ_DIR)
 
 # test runs unit tests, which are used to verify the requirements 
 .PHONY: test
-test: $(TESTDIR)/test
+test: $(OBJ_DIR) $(TESTDIR)/test
 	./$(TESTDIR)/test
 
-$(TESTDIR)/test : $(TESTDIR)/UnitTests.o $(OBJ_DIR) $(TEST_OBJECTS) 
-	$(CXX) $(DEBUG) $(INC) $(LIB) $< $(TEST_OBJECTS) -o $@
+$(TESTDIR)/test : $(TESTDIR)/UnitTests.o $(TEST_OBJECTS) 
+	$(CXX) $(DEBUG)$^ $(TEST_LIB) -o $@
 
 $(TESTDIR)/UnitTests.o : $(TESTDIR)/UnitTests.cpp
-	$(CXX) $(DEBUG) $(INC) -c $^ -o $@
+	$(CXX) $(DEBUG)$(INC) -c $^ -o $@
 
 .PHONY: clean
 clean:
