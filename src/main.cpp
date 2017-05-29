@@ -46,6 +46,7 @@
 #include "Particle.h"
 #include "NBodySystem.h"
 
+const static std::string programName = "n-body-sim";
 
 /**
  * @brief main is the root function for the program
@@ -347,7 +348,7 @@ std::string readFile(std::string fileName){
 		return scenarioText;
 	}
 	else {
-		std::cout << "Could not open file " << fileName << std::endl;
+		std::cerr << programName << ": Error: Could not open file :" << fileName << std::endl;
 		return "";
 	}
 }
@@ -677,7 +678,7 @@ int main(int argc, char* argv[]){
 	LButton * gButtons;
 	gButtons = new LButton[ sizeof(timeWarpFactors) / sizeof(const size_t) ];
 	if(gButtons == NULL){
-		std::cout << "Failed to allocate gButtons." << std::endl;
+		std::cerr << programName << ": Failed to allocate gButtons." << std::endl;
 		return EXIT_FAILURE;
 	}
 	else {
@@ -697,7 +698,7 @@ int main(int argc, char* argv[]){
 	boost::interprocess::interprocess_semaphore ** timingSemaphores;
 	timingSemaphores = new boost::interprocess::interprocess_semaphore*[numTimingSems];
 	if(timingSemaphores == NULL){
-		std::cout << "Error: Could not allocate semaphore array." << std::endl;
+		std::cerr << programName << ": Error: Could not allocate semaphore array." << std::endl;
 		return EXIT_FAILURE;
 	}
 	// Range: 0 <= Theta < 2 * PI
@@ -764,14 +765,14 @@ int main(int argc, char* argv[]){
 	// Implements Req FR.Initiate
 	solarSystemParseResult = solarSystem.parse(inputScenario);
 	if(solarSystemParseResult != NBodySim::NBodySystemSpace::SUCCESS){
-		std::cout << "Error: " << NBodySim::NBodySystem<NBodySim::FloatingType>::errorToString(solarSystemParseResult) << std::endl;
+		std::cerr << programName << ": Error: " << NBodySim::NBodySystem<NBodySim::FloatingType>::errorToString(solarSystemParseResult) << std::endl;
 		return EXIT_FAILURE;
 	}
 	
 	// Start the GUI
 	guiErrorReturn = guiInit(&gWindow, &gRenderer, &timeAccelSurf, &timeAccelTex, &gButtons, inputArgs.length, inputArgs.width, sizeof(timeWarpFactors) / sizeof(const size_t),  triangleMargin, triangleWidth, triangleHeight);
 	if(guiErrorReturn != SUCCESS){
-		std::cout << "Error: " << guiInitErrorsToString(guiErrorReturn) << std::endl;
+		std::cerr << programName << ": Error: " << guiInitErrorsToString(guiErrorReturn) << std::endl;
 		return EXIT_FAILURE;
 	}
 	
