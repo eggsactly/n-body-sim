@@ -30,7 +30,7 @@ TESTDIR:=tests
 PREFIX?=/usr/local/bin
 
 .PHONY: all
-all: $(EXE) test
+all: $(OBJ_DIR) $(EXE)
 
 # The debug option cleans and builds the application with the -g compile flag
 .PHONY: debug
@@ -38,8 +38,8 @@ debug: clean
 debug: DEBUG+=-g 
 debug: all
 
-$(EXE): $(OBJ_DIR) $(OBJECTS)
-	$(CXX) $(DEBUG)$(OBJECTS) $(LIB) -o $@
+$(EXE): $(OBJECTS)
+	$(CXX) $(DEBUG) $^ $(LIB) -o $@
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
 	$(CXX) $(DEBUG)$(INC) -c $^ -o $@
