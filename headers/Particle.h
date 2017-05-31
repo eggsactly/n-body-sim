@@ -208,6 +208,4 @@ public:
 	void setName(std::string nameIn);
 };
 
-template class NBodySim::Particle<NBodySim::FloatingType>;
-
 #endif //PARTICLE_H

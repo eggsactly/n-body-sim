@@ -232,6 +232,4 @@ public:
 	static std::string errorToString(NBodySim::NBodySystemSpace::error errorCode);
 };
 
-template class NBodySim::NBodySystem<NBodySim::FloatingType>;
-
 #endif // N_BODY_SYSTEM_H
