@@ -9,8 +9,8 @@ UNAME_S:=$(shell uname -s)
 
 # For Mac OS X
 ifeq ($(UNAME_S),Darwin) 
-	INC:=-I headers/ -I rapidxml/ -F/Library/Frameworks -framework SDL2
-	LIB:=-F/Library/Frameworks -framework SDL2
+	INC:=-Iheaders/ -Irapidxml/ -I/opt/local/include/ -F/Library/Frameworks -framework SDL2
+	LIB:=-F/Library/Frameworks -framework SDL2 -L/opt/local/lib -lpthread -lboost_system-mt -lboost_thread-mt
 	TEST_LIB=-lpthread -lgtest
 endif
 # For Linux
@@ -42,7 +42,7 @@ $(EXE): $(OBJECTS)
 	$(CXX) $(DEBUG) $^ $(LIB) -o $@
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
-	$(CXX) $(DEBUG)$(INC) -c $^ -o $@
+	$(CXX) $(DEBUG) $(INC) -c $^ -o $@
 
 $(OBJ_DIR):
 	mkdir $(OBJ_DIR)
