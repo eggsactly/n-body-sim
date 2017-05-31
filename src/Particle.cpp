@@ -124,3 +124,5 @@ template <class T>
 void NBodySim::Particle<T>::setName(std::string nameIn){
 	name = nameIn;
 }
+
+template class NBodySim::Particle<NBodySim::FloatingType>;

@@ -208,3 +208,6 @@ template <class T>
 T NBodySim::NBodySystem<T>::getGravitation(void){
 	return G;
 }
+
+template class NBodySim::NBodySystem<NBodySim::FloatingType>;
+
