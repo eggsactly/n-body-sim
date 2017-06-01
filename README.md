@@ -25,6 +25,7 @@ Unit tests are dependent on [Google Test](https://github.com/google/googletest),
 n-body-sim has been tested on the following operating systems:
 - Mac OS X 10.11.6
 - Debian 8.5
+- Windows 10
 
 Other Linux operating systems are expected to work but have not been tested. 
 
