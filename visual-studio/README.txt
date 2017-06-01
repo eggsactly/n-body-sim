@@ -9,8 +9,5 @@ To get this project to work under Windows do the following:
 5. Copy C:\vs-dev-lib\SDL2-2.0.5\lib\x86\SDL2test.lib to C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\lib
 6. Run git submodule init
 7. Run git submodule update
-8. Download http://cs.du.edu/~mitchell/pthreads_compiled.zip
-9. Create the folder C:\vs-dev-lib\pthread
-10. Put the files pthread.h, sched.h, sempahore.h into C:\vs-dev-lib\pthread
-11. Place pthreadVC2.dll into C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin
-12. Place pthreadVC2.lib into C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\lib
+8. Download Boost: https://dl.bintray.com/boostorg/release/1.64.0/source/
+9. Follow the instructions on this website to install boost: http://www.boost.org/doc/libs/1_55_0/more/getting_started/windows.html#build-from-the-visual-studio-ide

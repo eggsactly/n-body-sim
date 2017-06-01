@@ -131,6 +131,7 @@ NBodySim::NBodySystemSpace::error NBodySim::NBodySystem<T>::parse(std::string xm
 	if(buffer == NULL){
 		return NBodySim::NBodySystemSpace::FAILED_TO_ALLOCATE_MEMORY;
 	}
+
 	std::strcpy(buffer, xmlText.c_str());
 	
 	// Parse the file
