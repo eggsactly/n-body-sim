@@ -1,5 +1,5 @@
 *.o
-n-body-sim
+/n-body-sim
 .DS_Store
 docs/
 tests/test
