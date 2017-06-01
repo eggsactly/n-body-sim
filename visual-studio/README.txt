@@ -9,5 +9,10 @@ To get this project to work under Windows do the following:
 5. Copy C:\vs-dev-lib\SDL2-2.0.5\lib\x86\SDL2test.lib to C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\lib
 6. Run git submodule init
 7. Run git submodule update
-8. Download Boost: https://dl.bintray.com/boostorg/release/1.64.0/source/
-9. Follow the instructions on this website to install boost: http://www.boost.org/doc/libs/1_55_0/more/getting_started/windows.html#build-from-the-visual-studio-ide
+8. Download the zip file of Boost at https://dl.bintray.com/boostorg/release/1.64.0/source/
+9. Unpack the zip file and place the files into C:\Program Files (x86)\boost\boost_1_64_0
+10. In the command line run: chdir C:\Program Files (x86)\boost\boost_1_64_0
+11. bootstrap
+12. .\b2
+13. Wait for the build process to complete (it will take a while). 
+14. When it's done you'll be able to compile and run the program with visual studio.
