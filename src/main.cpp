@@ -29,6 +29,8 @@
 	#include <SDL.h>
 	// Keep redeclaration of timespec
 	#define HAVE_STRUCT_TIMESPEC
+	// Undefine main because of sdl
+	#undef main
 #else
 	// Mac OS X and Linux
 	#include <SDL2/SDL.h>
@@ -627,8 +629,6 @@ int main(int argc, char* argv[]){
 	
 	timingFunctionStruct timingStruct;
 	workThreadStruct workerStruct;
-	
-	void * status;
 	
 	// Initialize the semaphores
 	for(unsigned i = 0; i < numTimingSems; i++){
