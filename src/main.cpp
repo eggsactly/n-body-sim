@@ -53,6 +53,7 @@
 #include "NBodyTypes.h"
 #include "Particle.h"
 #include "NBodySystem.h"
+#include "threads.h"
 
 /**
  * @brief main is the root function for the program
@@ -255,30 +256,6 @@ bool LButton::handleEvent( SDL_Event* e)
 std::string guiInitErrorsToString(guiInitErrors error);
 
 /**
- * @brief timingFunction pulls a semaphore high every interval for as long as quitTiming is false
- *
- * @param interval simulation step size
- * @param numSems number of semaphores to post
- * @param timingSems an array of sempahores that shall be posted when the interval has transpired
- * @param quiTiming a boolean used to indicate if the timing should continue
- * @return A null pointer
- */
-void * timingFunction(NBodySim::FloatingType interval, unsigned numSems, boost::interprocess::interprocess_semaphore ** timingSems, volatile bool * quitTiming);
-
-/**
- * @brief workThread calculates new positions and velocities for the particle vector till program close
- * The Proletariat will rise and overthrow the Bourgeoisie.
- *
- * @param stepSize the amount of time for each simulation step
- * @param timingSem a pointer to a semaphore used to tell the function when to procede with the next step
- * @param quitTiming a bool used to indicate if the thread should continue
- * @param solarSystem a pointer to the system containing all the particles
- * @param stepsPerTime a pointer to an int indicating how many time steps should occur per timingSem post
- * @return A null pointer
- */
-void * workThread(NBodySim::FloatingType stepSize, boost::interprocess::interprocess_semaphore * timingSem, volatile bool * quitTiming, NBodySim::NBodySystem<NBodySim::FloatingType> * solarSystem, volatile size_t * stepsPerTime);
-
-/**
  * @brief drawTrianle draws a triangle at position x, y with height and width, users can fill in the triangle too
  * @param gRenderer place to draw the trianlge
  * @param x location in the x plane
@@ -449,58 +426,6 @@ void close(SDL_Window * gWindow, SDL_Renderer * gRenderer)
 	
 	//Quit SDL subsystems
 	SDL_Quit();
-}
-
-void * timingFunction(NBodySim::FloatingType interval, unsigned numSems, boost::interprocess::interprocess_semaphore ** timingSems, volatile bool * quitTiming){
-	if(timingSems == NULL){
-		return NULL;
-	}
-	for(unsigned i = 0; i < numSems; i++){
-		if(timingSems[i] == NULL){
-			return NULL;
-		}
-	}
-	if(quitTiming == NULL){
-		return NULL;
-	}
-	
-	// When each interval passes, raise up all the semaphores passed to this function.
-	while(!(*quitTiming)){
-		SDL_Delay(interval);
-		for(unsigned i = 0; i < numSems; i++){
-			timingSems[i]->post();
-		}
-	}
-
-	return NULL;
-}
-
-void * workThread(NBodySim::FloatingType stepSize, boost::interprocess::interprocess_semaphore * timingSem, volatile bool * quitTiming, NBodySim::NBodySystem<NBodySim::FloatingType> * solarSystem, volatile size_t * stepsPerTime){
-	
-	if(timingSem == NULL){
-		return NULL;
-	}
-	if(quitTiming == NULL){
-		return NULL;
-	}
-	if(solarSystem == NULL){
-		return NULL;
-	}
-	if(stepsPerTime == NULL){
-		return NULL;
-	}
-	
-	// For each iteration, wait on a semaphore
-	while(!(*quitTiming)){
-		timingSem->wait();
-		// Implements Req FR.Calculate
-		for(size_t i = 0; i < *stepsPerTime; i++){
-			solarSystem->step(stepSize);
-		}
-	}
-
-	return NULL;
-
 }
 
 // Source: http://www.crystalclearsoftware.com/cgi-bin/boost_wiki/wiki.pl?LU_Matrix_Inversion
