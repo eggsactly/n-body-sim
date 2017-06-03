@@ -632,8 +632,6 @@ int main(int argc, char* argv[]){
 	
 	// Initialize the semaphores
 	for(unsigned i = 0; i < numTimingSems; i++){
-		std::ostringstream semName;
-		semName << "timingSem" << i;
 		timingSemaphores[i] = new boost::interprocess::interprocess_semaphore(0);
 	}
 	
