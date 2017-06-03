@@ -256,20 +256,16 @@ bool LButton::handleEvent( SDL_Event* e)
  */
 std::string guiInitErrorsToString(guiInitErrors error);
 
-typedef struct {
-	NBodySim::FloatingType interval;
-	unsigned numSems;
-	boost::interprocess::interprocess_semaphore ** timingSems;
-	volatile bool * quitTiming;
-} timingFunctionStruct;
-
 /**
  * @brief timingFunction pulls a semaphore high every interval for as long as quitTiming is false
  *
- * @param inputParams A pointer to the timingFunctionStruct
+ * @param interval simulation step size
+ * @param numSems number of semaphores to post
+ * @param timingSems an array of sempahores that shall be posted when the interval has transpired
+ * @param quiTiming a boolean used to indicate if the timing should continue
  * @return A null pointer
  */
-void * timingFunction(void * inputParams);
+void * timingFunction(NBodySim::FloatingType interval, unsigned numSems, boost::interprocess::interprocess_semaphore ** timingSems, volatile bool * quitTiming);
 
 /**
  * @brief workThread calculates new positions and velocities for the particle vector till program close
@@ -457,19 +453,7 @@ void close(SDL_Window * gWindow, SDL_Renderer * gRenderer)
 	SDL_Quit();
 }
 
-void * timingFunction(void * inputParams){
-
-	if(inputParams == NULL){
-		return NULL;
-	}
-	
-	timingFunctionStruct * inputParamStruct = reinterpret_cast<timingFunctionStruct *>(inputParams);
-	
-	NBodySim::FloatingType interval = inputParamStruct->interval;
-	unsigned numSems = inputParamStruct->numSems;
-	boost::interprocess::interprocess_semaphore ** timingSems = inputParamStruct->timingSems;
-	volatile bool * quitTiming = inputParamStruct->quitTiming;
-	
+void * timingFunction(NBodySim::FloatingType interval, unsigned numSems, boost::interprocess::interprocess_semaphore ** timingSems, volatile bool * quitTiming){
 	if(timingSems == NULL){
 		return NULL;
 	}
@@ -612,17 +596,10 @@ int main(int argc, char* argv[]){
 	Uint32 stopTime = SDL_GetTicks();
 	Uint32 ticksPerFrame;
 	
-	timingFunctionStruct timingStruct;
-	
 	// Initialize the semaphores
 	for(unsigned i = 0; i < numTimingSems; i++){
 		timingSemaphores[i] = new boost::interprocess::interprocess_semaphore(0);
 	}
-	
-	timingStruct.interval = 1000 * inputArgs.stepSize;
-	timingStruct.numSems = numTimingSems;
-	timingStruct.timingSems = timingSemaphores;
-	timingStruct.quitTiming = &quit;
 	
 	//The window we'll be rendering to
 	SDL_Window* gWindow = NULL;
@@ -663,9 +640,8 @@ int main(int argc, char* argv[]){
 		return EXIT_FAILURE;
 	}
 	
-	quit = false;
 	// Create a thread for the timer
-	boost::thread timingThread(timingFunction, reinterpret_cast<void *>(&timingStruct));
+	boost::thread timingThread(timingFunction, 1000 * inputArgs.stepSize, numTimingSems, timingSemaphores, &quit);
 	// Create a thread for the worker
 	boost::thread workerThread(workThread, inputArgs.stepSize, timingSemaphores[1], &quit, &solarSystem, &stepsPerTime);
 	
