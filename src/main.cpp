@@ -271,22 +271,18 @@ typedef struct {
  */
 void * timingFunction(void * inputParams);
 
-typedef struct {
-	NBodySim::FloatingType stepSize;
-	boost::interprocess::interprocess_semaphore * timingSem;
-	volatile bool * quitTiming;
-	NBodySim::NBodySystem<NBodySim::FloatingType> * solarSystem;
-	volatile size_t * stepsPerTime;
-} workThreadStruct;
-
 /**
  * @brief workThread calculates new positions and velocities for the particle vector till program close
  * The Proletariat will rise and overthrow the Bourgeoisie.
  *
- * @param inputParams A pointer to the workerThreadStruct
+ * @param stepSize the amount of time for each simulation step
+ * @param timingSem a pointer to a semaphore used to tell the function when to procede with the next step
+ * @param quitTiming a bool used to indicate if the thread should continue
+ * @param solarSystem a pointer to the system containing all the particles
+ * @param stepsPerTime a pointer to an int indicating how many time steps should occur per timingSem post
  * @return A null pointer
  */
-void * workThread(void * inputParams);
+void * workThread(NBodySim::FloatingType stepSize, boost::interprocess::interprocess_semaphore * timingSem, volatile bool * quitTiming, NBodySim::NBodySystem<NBodySim::FloatingType> * solarSystem, volatile size_t * stepsPerTime);
 
 /**
  * @brief drawTrianle draws a triangle at position x, y with height and width, users can fill in the triangle too
@@ -497,18 +493,7 @@ void * timingFunction(void * inputParams){
 	return NULL;
 }
 
-void * workThread(void * inputParams){
-	if(inputParams == NULL){
-		return NULL;
-	}
-	
-	workThreadStruct * inputParamStruct = reinterpret_cast<workThreadStruct *>(inputParams);
-	
-	NBodySim::FloatingType stepSize = inputParamStruct->stepSize;
-	boost::interprocess::interprocess_semaphore * timingSem = inputParamStruct->timingSem;
-	volatile bool * quitTiming = inputParamStruct->quitTiming;
-	NBodySim::NBodySystem<NBodySim::FloatingType> * solarSystem = inputParamStruct->solarSystem;
-	volatile size_t * stepsPerTime = inputParamStruct->stepsPerTime;
+void * workThread(NBodySim::FloatingType stepSize, boost::interprocess::interprocess_semaphore * timingSem, volatile bool * quitTiming, NBodySim::NBodySystem<NBodySim::FloatingType> * solarSystem, volatile size_t * stepsPerTime){
 	
 	if(timingSem == NULL){
 		return NULL;
@@ -628,7 +613,6 @@ int main(int argc, char* argv[]){
 	Uint32 ticksPerFrame;
 	
 	timingFunctionStruct timingStruct;
-	workThreadStruct workerStruct;
 	
 	// Initialize the semaphores
 	for(unsigned i = 0; i < numTimingSems; i++){
@@ -639,12 +623,6 @@ int main(int argc, char* argv[]){
 	timingStruct.numSems = numTimingSems;
 	timingStruct.timingSems = timingSemaphores;
 	timingStruct.quitTiming = &quit;
-
-	workerStruct.stepSize = inputArgs.stepSize;
-	workerStruct.timingSem = timingSemaphores[1];
-	workerStruct.quitTiming = &quit;
-	workerStruct.solarSystem = &solarSystem;
-	workerStruct.stepsPerTime = &stepsPerTime;
 	
 	//The window we'll be rendering to
 	SDL_Window* gWindow = NULL;
@@ -689,7 +667,7 @@ int main(int argc, char* argv[]){
 	// Create a thread for the timer
 	boost::thread timingThread(timingFunction, reinterpret_cast<void *>(&timingStruct));
 	// Create a thread for the worker
-	boost::thread workerThread(workThread, reinterpret_cast<void *>(&workerStruct));
+	boost::thread workerThread(workThread, inputArgs.stepSize, timingSemaphores[1], &quit, &solarSystem, &stepsPerTime);
 	
 	//While application is running
 	while( !quit )
