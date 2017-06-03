@@ -6,17 +6,17 @@
 \section*{n-body-system Requirements}
 	\subsection*{Functional Requirements}
 		\begin{enumerate}[label=FR-\arabic*]
-			\item \label{FR.Initiate} When the user initiates the program, the program {\em shall} parse an input file containing a collection of particles.
-			\item \label{FR.Calculate} When a system of particles has been parsed the program {\em shall} calculate the position and velocity of every particle for every time step in accordance with Newton's law of universal gravitation.
-			\item \label{FR.TimeAccelerate} When the user specifies a ratio of simulation time to elapsed time the program {\em shall} calculate the number of simulation steps indicated by the ratio every simulation time step.
-			\item \label{FR.ViewWindow} When user initiates the program, the program {\em shall} plot the position of each particle on a view window where a multiple of the view window's normal vector summed with the particle vector is orthogonal to the view window.
+			\item \label{FR_Initiate} When the user initiates the program, the program {\em shall} parse an input file containing a collection of particles.
+			\item \label{FR_Calculate} When a system of particles has been parsed the program {\em shall} calculate the position and velocity of every particle for every time step in accordance with Newton's law of universal gravitation.
+			\item \label{FR_TimeAccelerate} When the user specifies a ratio of simulation time to elapsed time the program {\em shall} calculate the number of simulation steps indicated by the ratio every simulation time step.
+			\item \label{FR_ViewWindow} When user initiates the program, the program {\em shall} plot the position of each particle on a view window where a multiple of the view window's normal vector summed with the particle vector is orthogonal to the view window.
 		\end{enumerate}
 	\subsection*{Non-functional Requirements}
 		\begin{enumerate}[label=NR-\arabic*]
-			\item \label{NF.UsersProvideFile} The program {\em shall} allow users to provide their own system files. 
-			\item \label{NF.SystemsProvideG} The program {\em shall} allow system files to provide their own gravitation constant. 
-			\item \label{NF.UsersProvideTime} The program  {\em shall} allow users to provide simulation time step sizes. 
-			\item \label{NF.DynamicTimeAccelerate} The program {\em shall} dynamically accept user changes to simulation to elapsed time ratio.
+			\item \label{NF_UsersProvideFile} The program {\em shall} allow users to provide their own system files. 
+			\item \label{NF_SystemsProvideG} The program {\em shall} allow system files to provide their own gravitation constant. 
+			\item \label{NF_UsersProvideTime} The program  {\em shall} allow users to provide simulation time step sizes. 
+			\item \label{NF_DynamicTimeAccelerate} The program {\em shall} dynamically accept user changes to simulation to elapsed time ratio.
 			\item \label{NF.FR.DynamicViewWindow} The program {\em shall} dynamically accept user changes to the angles of the view window's normal vector. 
 		\end{enumerate}
 \end{document}

@@ -29,7 +29,7 @@
 #include "NBodySystem.h"
 
 
-TEST(FR, Initiate) {
+TEST(FR_Initiate, EarthMoonSun) {
 	std::string xmlString = "<?xml version=\"1.0\"?>\n<system G=\"1.00\">\n\t<particle posX=\"0\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"0\" velZ=\"0\" mass=\"1.988500e30\" name=\"Sun\"/>\n\t<particle posX=\"0\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"0\" velZ=\"0\" mass=\"5.972e24\" name=\"Earth\"/>\n\t<particle posX=\"4.054e8\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"-964.0f\" velZ=\"0\" mass=\"7.34767309e22\" name=\"Moon\"/>\t</system>";
 	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
 	
@@ -40,7 +40,7 @@ TEST(FR, Initiate) {
 	EXPECT_EQ(sys.getParticle(2).getName(), "Moon");
 }
 
-TEST(FR, Calculate){
+TEST(FR_Calculate, TwoMassCollide){
 	NBodySim::Particle <NBodySim::FloatingType> p;
 	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
 	NBodySim::FloatingType newXPos;
@@ -75,7 +75,7 @@ TEST(FR, Calculate){
 	EXPECT_NEAR(sys.getParticle(1).getPos().x, newXPos, margin);
 }
 
-TEST(NF, SystemsProvideG){
+TEST(NF_SystemsProvideG, GetGofOne){
 	std::string xmlString = "<?xml version=\"1.0\"?>\n<system G=\"1.00\">\n\t<particle posX=\"0\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"0\" velZ=\"0\" mass=\"1.988500e30\" name=\"Sun\"/>\n\t<particle posX=\"0\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"0\" velZ=\"0\" mass=\"5.972e24\" name=\"Earth\"/>\n\t<particle posX=\"4.054e8\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"-964.0f\" velZ=\"0\" mass=\"7.34767309e22\" name=\"Moon\"/>\t</system>";
 	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
 	
@@ -83,7 +83,7 @@ TEST(NF, SystemsProvideG){
 	EXPECT_EQ(sys.getGravitation(), 1.0f);
 }
 
-TEST(NF, UsersProvideTime){
+TEST(NF_UsersProvideTime, TestPointFiveStepSize){
 	NBodySim::Particle <NBodySim::FloatingType> p;
 	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
 	NBodySim::FloatingType newXPos;
