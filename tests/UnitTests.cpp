@@ -27,6 +27,7 @@
 #include "NBodyTypes.h"
 #include "Particle.h"
 #include "NBodySystem.h"
+#include "threads.h"
 
 
 TEST(FR_Initiate, EarthMoonSun) {
@@ -117,6 +118,35 @@ TEST(NF_UsersProvideTime, TestPointFiveStepSize){
 	
 	newXPos = (stepSize * sys.getGravitation() * particleMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)) - 1;
 	EXPECT_NEAR(sys.getParticle(1).getPos().x, newXPos, margin);
+}
+
+TEST(FR_TimeAccelerate, TenStepsTest){
+	/* For the time acceleration test we shall use one paticle moving at 1 m/s and run it 
+	 * for 10 steps and test to see if it moved 10 meters.
+	 */
+	NBodySim::Particle <NBodySim::FloatingType> p;
+	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
+	NBodySim::FloatingType newXPos;
+	NBodySim::FloatingType particleMass = 1000000;
+	NBodySim::FloatingType margin = 0.00001;
+	NBodySim::FloatingType stepSize = 1;
+	
+	p.setPosX(0);
+	p.setPosY(0);
+	p.setPosZ(0);
+	p.setVelX(0);
+	p.setVelY(1);
+	p.setVelZ(0);
+	p.setMass(particleMass);
+	p.setName("1");
+	
+	sys.addParticle(p);
+	
+	// Create a thread for the timer
+	//boost::thread timingThread(timingFunction, 1000 * inputArgs.stepSize, numTimingSems, timingSemaphores, &quit);
+	// Create a thread for the worker
+	//boost::thread workerThread(workThread, inputArgs.stepSize, timingSemaphores[1], &quit, &solarSystem, &stepsPerTime);
+	
 }
 
 int main(int argc, char* argv[]){
