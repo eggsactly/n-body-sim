@@ -22,6 +22,10 @@
 #include <cstdlib>
 #include <cmath>
 
+#include <boost/thread.hpp>
+#include <boost/functional.hpp>
+#include <boost/interprocess/sync/interprocess_semaphore.hpp>
+
 #include "gtest/gtest.h"
 
 #include "NBodyTypes.h"
@@ -131,7 +135,7 @@ TEST(FR_TimeAccelerate, TenStepsTest){
 	NBodySim::FloatingType margin = 0.00001;
 	NBodySim::FloatingType stepSize = 1;
 	size_t numTimingSems = 1;
-	boost::interprocess::interprocess_semaphore ** timingSemaphores = new boost::interprocess::interprocess_semaphore*[numTimingSems];
+	boost::interprocess::interprocess_semaphore * timingSemaphore = new boost::interprocess::interprocess_semaphore(0);
 	volatile bool quit = false;
 	volatile size_t stepsPerTime = 10;
 	NBodySim::FloatingType yVel = 1;
@@ -149,10 +153,10 @@ TEST(FR_TimeAccelerate, TenStepsTest){
 	sys.addParticle(p);
 	
 	// Create a thread for the worker
-	boost::thread workerThread(workThread, stepSize, timingSemaphores[0], &quit, &sys, &stepsPerTime);
+	boost::thread workerThread(workThread, stepSize, timingSemaphore, &quit, &sys, &stepsPerTime);
 	
 	for(size_t i = 0; i < numIterations; i++){
-		//timingSemaphores[0]->post();
+		timingSemaphore->post();
 	}
 	
 	quit = true;
@@ -160,7 +164,6 @@ TEST(FR_TimeAccelerate, TenStepsTest){
 	workerThread.join();
 	
 	EXPECT_DOUBLE_EQ(sys.getParticle(0).getPos().y, stepSize * stepsPerTime * numIterations * yVel);
-	delete timingSemaphores;
 }
 
 int main(int argc, char* argv[]){
