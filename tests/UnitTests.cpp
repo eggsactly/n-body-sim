@@ -157,9 +157,9 @@ TEST(FR_TimeAccelerate, TenStepsTest){
 	
 	for(size_t i = 0; i < numIterations; i++){
 		timingSemaphore->post();
+		// Give the thread plenty of time to complete
+		sleep(1);
 	}
-	// Give the thread plenty of time to complete
-	sleep(1);
 	quit = true;
 	// Post the semaphore to force the thread to exit
 	timingSemaphore->post();
@@ -167,6 +167,61 @@ TEST(FR_TimeAccelerate, TenStepsTest){
 	workerThread.join();
 	
 	EXPECT_DOUBLE_EQ(sys.getParticle(0).getPos().y, stepSize * stepsPerTime * numIterations * yVel);
+}
+
+TEST(NF_DynamicTimeAccelerate, FifteenStepsTest){
+	/* For the time acceleration test we shall use one paticle moving at 1 m/s and run it 
+	 * for 15 steps and test to see if it moved 15 meters.
+	 */
+	NBodySim::Particle <NBodySim::FloatingType> p;
+	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
+	NBodySim::FloatingType newXPos;
+	NBodySim::FloatingType particleMass = 1000000;
+	NBodySim::FloatingType margin = 0.00001;
+	NBodySim::FloatingType stepSize = 1;
+	size_t numTimingSems = 1;
+	boost::interprocess::interprocess_semaphore * timingSemaphore = new boost::interprocess::interprocess_semaphore(0);
+	volatile bool quit = false;
+	volatile size_t stepsPerTime[] = {5, 10};
+	volatile size_t stepsToThread;
+	NBodySim::FloatingType yVel = 1;
+	size_t numIterations[sizeof(stepsPerTime)/sizeof(size_t)] = {1, 1};
+	size_t totalSteps = 0;
+	
+	p.setPosX(0);
+	p.setPosY(0);
+	p.setPosZ(0);
+	p.setVelX(0);
+	p.setVelY(yVel);
+	p.setVelZ(0);
+	p.setMass(particleMass);
+	p.setName("1");
+	
+	sys.addParticle(p);
+	
+	// Create a thread for the worker
+	boost::thread workerThread(workThread, stepSize, timingSemaphore, &quit, &sys, &stepsToThread);
+	
+	// This loop simulates the user changing the time acceleration rate between timing sem posts
+	for(size_t i = 0; i < sizeof(stepsPerTime)/sizeof(size_t); i++){
+		stepsToThread = stepsPerTime[i];
+		for(size_t j = 0; j < numIterations[i]; j++){
+			timingSemaphore->post();
+		}
+		// Give the thread plenty of time to complete
+		sleep(1);
+	}
+	quit = true;
+	// Post the semaphore to force the thread to exit
+	timingSemaphore->post();
+	
+	workerThread.join();
+	
+	for(size_t i; i < sizeof(stepsPerTime)/sizeof(size_t); i++){
+		totalSteps += stepsPerTime[i] * numIterations[i];
+	}
+	
+	EXPECT_DOUBLE_EQ(sys.getParticle(0).getPos().y, stepSize * totalSteps * yVel);
 }
 
 int main(int argc, char* argv[]){
