@@ -158,8 +158,11 @@ TEST(FR_TimeAccelerate, TenStepsTest){
 	for(size_t i = 0; i < numIterations; i++){
 		timingSemaphore->post();
 	}
-	
+	// Give the thread plenty of time to complete
+	sleep(1);
 	quit = true;
+	// Post the semaphore to force the thread to exit
+	timingSemaphore->post();
 	
 	workerThread.join();
 	
