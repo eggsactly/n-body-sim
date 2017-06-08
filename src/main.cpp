@@ -691,5 +691,9 @@ int main(int argc, char* argv[]){
 	
 	close(gWindow, gRenderer);
 	delete [] gButtons;
+	for(unsigned i = 0; i < numTimingSems; i++){
+		delete timingSemaphores[i];
+	}
+	delete timingSemaphores;
 	return EXIT_SUCCESS;
 }
