@@ -565,7 +565,7 @@ int main(int argc, char* argv[]){
 	}
 	
 	// Create a thread for the timer
-	boost::thread timingThread(timingFunction, 1000 * inputArgs.stepSize, numTimingSems, timingSemaphores, &quit);
+	boost::thread timingThread(timingFunction, inputArgs.stepSize, numTimingSems, timingSemaphores, &quit);
 	// Create a thread for the worker
 	boost::thread workerThread(workThread, inputArgs.stepSize, timingSemaphores[1], &quit, &solarSystem, &stepsPerTime);
 	

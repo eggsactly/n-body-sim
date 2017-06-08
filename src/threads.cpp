@@ -18,20 +18,12 @@
  *
  */
 
-#ifdef _WIN32
-#include <SDL.h>
-	// Keep redeclaration of timespec
-	#define HAVE_STRUCT_TIMESPEC
-	// Undefine main because of sdl
-	#undef main
-#else
-	// Mac OS X and Linux
-	#include <SDL2/SDL.h>
-#endif
-
 #include "threads.h"
 
 void * timingFunction(NBodySim::FloatingType interval, unsigned numSems, boost::interprocess::interprocess_semaphore ** timingSems, volatile bool * quitTiming){
+	long waitTime;
+	NBodySim::FloatingType millisecondsInSeconds = 1e3;
+	
 	if(timingSems == NULL){
 		return NULL;
 	}
@@ -44,9 +36,11 @@ void * timingFunction(NBodySim::FloatingType interval, unsigned numSems, boost::
 		return NULL;
 	}
 	
+	waitTime = static_cast<long>(millisecondsInSeconds * interval);
+	
 	// When each interval passes, raise up all the semaphores passed to this function.
 	while(!(*quitTiming)){
-		SDL_Delay(interval);
+		boost::this_thread::sleep(boost::posix_time::milliseconds(waitTime));
 		for(unsigned i = 0; i < numSems; i++){
 			timingSems[i]->post();
 		}

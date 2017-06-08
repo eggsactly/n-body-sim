@@ -38,7 +38,7 @@
 /**
  * @brief timingFunction pulls a semaphore high every interval for as long as quitTiming is false
  *
- * @param interval simulation step size
+ * @param interval simulation step size in seconds
  * @param numSems number of semaphores to post
  * @param timingSems an array of sempahores that shall be posted when the interval has transpired
  * @param quiTiming a boolean used to indicate if the timing should continue
@@ -48,9 +48,8 @@ void * timingFunction(NBodySim::FloatingType interval, unsigned numSems, boost::
 
 /**
  * @brief workThread calculates new positions and velocities for the particle vector till program close
- * The Proletariat will rise and overthrow the Bourgeoisie.
  *
- * @param stepSize the amount of time for each simulation step
+ * @param stepSize the amount of time for each simulation step in seconds
  * @param timingSem a pointer to a semaphore used to tell the function when to procede with the next step
  * @param quitTiming a bool used to indicate if the thread should continue
  * @param solarSystem a pointer to the system containing all the particles
