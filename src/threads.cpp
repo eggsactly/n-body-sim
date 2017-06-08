@@ -74,7 +74,7 @@ void * workThread(NBodySim::FloatingType stepSize, boost::interprocess::interpro
 	while(!(*quitTiming)){
 		timingSem->wait();
 		// Implements Req FR.Calculate
-		for(size_t i = 0; i < *stepsPerTime; i++){
+		for(size_t i = 0; i < *stepsPerTime && !(*quitTiming); i++){
 			solarSystem->step(stepSize);
 		}
 	}
