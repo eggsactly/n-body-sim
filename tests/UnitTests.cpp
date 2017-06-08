@@ -130,23 +130,37 @@ TEST(FR_TimeAccelerate, TenStepsTest){
 	NBodySim::FloatingType particleMass = 1000000;
 	NBodySim::FloatingType margin = 0.00001;
 	NBodySim::FloatingType stepSize = 1;
+	size_t numTimingSems = 1;
+	boost::interprocess::interprocess_semaphore ** timingSemaphores = new boost::interprocess::interprocess_semaphore*[numTimingSems];
+	volatile bool quit = false;
+	volatile size_t stepsPerTime = 10;
+	NBodySim::FloatingType yVel = 1;
+	size_t numIterations = 1;
 	
 	p.setPosX(0);
 	p.setPosY(0);
 	p.setPosZ(0);
 	p.setVelX(0);
-	p.setVelY(1);
+	p.setVelY(yVel);
 	p.setVelZ(0);
 	p.setMass(particleMass);
 	p.setName("1");
 	
 	sys.addParticle(p);
 	
-	// Create a thread for the timer
-	//boost::thread timingThread(timingFunction, 1000 * inputArgs.stepSize, numTimingSems, timingSemaphores, &quit);
 	// Create a thread for the worker
-	//boost::thread workerThread(workThread, inputArgs.stepSize, timingSemaphores[1], &quit, &solarSystem, &stepsPerTime);
+	boost::thread workerThread(workThread, stepSize, timingSemaphores[0], &quit, &sys, &stepsPerTime);
 	
+	for(size_t i = 0; i < numIterations; i++){
+		//timingSemaphores[0]->post();
+	}
+	
+	quit = true;
+	
+	workerThread.join();
+	
+	EXPECT_DOUBLE_EQ(sys.getParticle(0).getPos().y, stepSize * stepsPerTime * numIterations * yVel);
+	delete timingSemaphores;
 }
 
 int main(int argc, char* argv[]){
