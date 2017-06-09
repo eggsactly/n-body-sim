@@ -57,6 +57,7 @@ The rapidxml library included on this software and is licensed under both the Bo
 - reqs/ contains requirements for the program in LaTeX format
 - src/ contains the implementation of the programs classes
 - tests/ contains unit tests for the project
+- visual-studio/ contains a .sln and .vcxproj files for building this project on Windows
 
 # Coding Standards
 Consistancy helps build maintainable code, even if you don't agree with all the decisions. If you contribute to this project, please follow these guidelines:
