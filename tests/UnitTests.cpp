@@ -83,50 +83,6 @@ TEST(FR_Calculate, TwoMassCollide){
 	EXPECT_NEAR(sys.getParticle(1).getPos().x, newXPos, margin);
 }
 
-TEST(NF_SystemsProvideG, GetGofOne){
-	std::string xmlString = "<?xml version=\"1.0\"?>\n<system G=\"1.00\">\n\t<particle posX=\"0\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"0\" velZ=\"0\" mass=\"1.988500e30\" name=\"Sun\"/>\n\t<particle posX=\"0\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"0\" velZ=\"0\" mass=\"5.972e24\" name=\"Earth\"/>\n\t<particle posX=\"4.054e8\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"-964.0f\" velZ=\"0\" mass=\"7.34767309e22\" name=\"Moon\"/>\t</system>";
-	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
-	
-	EXPECT_EQ(sys.parse(xmlString), 0);
-	EXPECT_EQ(sys.getGravitation(), 1.0f);
-}
-
-TEST(NF_UsersProvideTime, TestPointFiveStepSize){
-	NBodySim::Particle <NBodySim::FloatingType> p;
-	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
-	NBodySim::FloatingType newXPos;
-	NBodySim::FloatingType particleMass = 1000000;
-	NBodySim::FloatingType margin = 0.00001;
-	NBodySim::FloatingType stepSize = 0.5;
-	
-	p.setPosX(1);
-	p.setPosY(0);
-	p.setPosZ(0);
-	p.setVelX(0);
-	p.setVelY(0);
-	p.setVelZ(0);
-	p.setMass(particleMass);
-	p.setName("1");
-	
-	sys.addParticle(p);
-	
-	p.setPosX(-1);
-	p.setName("2");
-	
-	sys.addParticle(p);
-	
-	EXPECT_EQ(sys.numParticles(), 2);
-	EXPECT_DOUBLE_EQ(sys.getParticle(0).getPos().x, 1.00f);
-	EXPECT_DOUBLE_EQ(sys.getParticle(1).getPos().x, -1.00f);
-	
-	sys.step(stepSize);
-	newXPos = (1 - (stepSize * sys.getGravitation() * particleMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)));
-	EXPECT_NEAR(sys.getParticle(0).getPos().x, newXPos, margin);
-	
-	newXPos = (stepSize * sys.getGravitation() * particleMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)) - 1;
-	EXPECT_NEAR(sys.getParticle(1).getPos().x, newXPos, margin);
-}
-
 TEST(FR_TimeAccelerate, TenStepsTest){
 	/* For the time acceleration test we shall use one paticle moving at 1 m/s and run it 
 	 * for 10 steps and test to see if it moved 10 meters.
@@ -170,6 +126,74 @@ TEST(FR_TimeAccelerate, TenStepsTest){
 	workerThread.join();
 	
 	EXPECT_DOUBLE_EQ(sys.getParticle(0).getPos().y, stepSize * stepsPerTime * numIterations * yVel);
+}
+
+TEST(FR_ViewWindow, ParticleAtOneTwoThreeTest){
+	NBodySim::Particle <NBodySim::FloatingType> p;
+	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
+	NBodySim::FloatingType particleMass = 1000000;
+	NBodySim::ParticlePlotter<NBodySim::FloatingType> graphicsMatrix;
+	boost::numeric::ublas::vector<NBodySim::FloatingType> projectedPoints(2);
+	
+	p.setPosX(1);
+	p.setPosY(2);
+	p.setPosZ(3);
+	p.setVelX(0);
+	p.setVelY(0);
+	p.setVelZ(0);
+	p.setMass(particleMass);
+	p.setName("1");
+	
+	sys.addParticle(p);
+	
+	// Test to make sure the particle is at coordinates (1, 2)
+	projectedPoints = graphicsMatrix.calculateProjection(sys.getParticle(0));
+	EXPECT_DOUBLE_EQ(projectedPoints(0), 1);
+	EXPECT_DOUBLE_EQ(projectedPoints(1), 2);
+}
+
+TEST(NF_SystemsProvideG, GetGofOne){
+	std::string xmlString = "<?xml version=\"1.0\"?>\n<system G=\"1.00\">\n\t<particle posX=\"0\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"0\" velZ=\"0\" mass=\"1.988500e30\" name=\"Sun\"/>\n\t<particle posX=\"0\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"0\" velZ=\"0\" mass=\"5.972e24\" name=\"Earth\"/>\n\t<particle posX=\"4.054e8\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"-964.0f\" velZ=\"0\" mass=\"7.34767309e22\" name=\"Moon\"/>\t</system>";
+	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
+	
+	EXPECT_EQ(sys.parse(xmlString), 0);
+	EXPECT_EQ(sys.getGravitation(), 1.0f);
+}
+
+TEST(NF_UsersProvideTime, TestPointFiveStepSize){
+	NBodySim::Particle <NBodySim::FloatingType> p;
+	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
+	NBodySim::FloatingType newXPos;
+	NBodySim::FloatingType particleMass = 1000000;
+	NBodySim::FloatingType margin = 0.00001;
+	NBodySim::FloatingType stepSize = 0.5;
+	
+	p.setPosX(1);
+	p.setPosY(0);
+	p.setPosZ(0);
+	p.setVelX(0);
+	p.setVelY(0);
+	p.setVelZ(0);
+	p.setMass(particleMass);
+	p.setName("1");
+	
+	sys.addParticle(p);
+	
+	p.setPosX(-1);
+	p.setName("2");
+	
+	sys.addParticle(p);
+	
+	EXPECT_EQ(sys.numParticles(), 2);
+	EXPECT_DOUBLE_EQ(sys.getParticle(0).getPos().x, 1.00f);
+	EXPECT_DOUBLE_EQ(sys.getParticle(1).getPos().x, -1.00f);
+	
+	sys.step(stepSize);
+	newXPos = (1 - (stepSize * sys.getGravitation() * particleMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)));
+	EXPECT_NEAR(sys.getParticle(0).getPos().x, newXPos, margin);
+	
+	newXPos = (stepSize * sys.getGravitation() * particleMass / pow(sys.getParticle(0).getPos().x - sys.getParticle(1).getPos().x, 2)) - 1;
+	EXPECT_NEAR(sys.getParticle(1).getPos().x, newXPos, margin);
 }
 
 TEST(NF_DynamicTimeAccelerate, FifteenStepsTest){
@@ -225,30 +249,6 @@ TEST(NF_DynamicTimeAccelerate, FifteenStepsTest){
 	}
 	
 	EXPECT_DOUBLE_EQ(sys.getParticle(0).getPos().y, stepSize * totalSteps * yVel);
-}
-
-TEST(FR_ViewWindow, ParticleAtOneTwoThreeTest){
-	NBodySim::Particle <NBodySim::FloatingType> p;
-	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
-	NBodySim::FloatingType particleMass = 1000000;
-	NBodySim::ParticlePlotter<NBodySim::FloatingType> graphicsMatrix;
-	boost::numeric::ublas::vector<NBodySim::FloatingType> projectedPoints(2);
-	
-	p.setPosX(1);
-	p.setPosY(2);
-	p.setPosZ(3);
-	p.setVelX(0);
-	p.setVelY(0);
-	p.setVelZ(0);
-	p.setMass(particleMass);
-	p.setName("1");
-	
-	sys.addParticle(p);
-	
-	// Test to make sure the particle is at coordinates (1, 2)
-	projectedPoints = graphicsMatrix.calculateProjection(sys.getParticle(0));
-	EXPECT_DOUBLE_EQ(projectedPoints(0), 1);
-	EXPECT_DOUBLE_EQ(projectedPoints(1), 2);
 }
 
 TEST(NF_DynamicViewWindow, ParticleAtOneTwoThreeTestDynamic){
