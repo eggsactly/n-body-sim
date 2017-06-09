@@ -25,6 +25,8 @@
 #include <boost/thread.hpp>
 #include <boost/functional.hpp>
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/vector_proxy.hpp>
 
 #include "gtest/gtest.h"
 
@@ -32,6 +34,7 @@
 #include "Particle.h"
 #include "NBodySystem.h"
 #include "threads.h"
+#include "ParticlePlotter.h"
 
 
 TEST(FR_Initiate, EarthMoonSun) {
@@ -222,6 +225,30 @@ TEST(NF_DynamicTimeAccelerate, FifteenStepsTest){
 	}
 	
 	EXPECT_DOUBLE_EQ(sys.getParticle(0).getPos().y, stepSize * totalSteps * yVel);
+}
+
+TEST(FR_ViewWindow, ParticleAtOneTwoThreeTest){
+	NBodySim::Particle <NBodySim::FloatingType> p;
+	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
+	NBodySim::FloatingType particleMass = 1000000;
+	NBodySim::ParticlePlotter<NBodySim::FloatingType> graphicsMatrix;
+	boost::numeric::ublas::vector<NBodySim::FloatingType> projectedPoints(2);
+	
+	p.setPosX(1);
+	p.setPosY(2);
+	p.setPosZ(3);
+	p.setVelX(0);
+	p.setVelY(0);
+	p.setVelZ(0);
+	p.setMass(particleMass);
+	p.setName("1");
+	
+	sys.addParticle(p);
+	
+	// Test to make sure the particle is at coordinates (1, 2)
+	projectedPoints = graphicsMatrix.calculateProjection(sys.getParticle(0));
+	EXPECT_DOUBLE_EQ(projectedPoints(0), 1);
+	EXPECT_DOUBLE_EQ(projectedPoints(1), 2);
 }
 
 int main(int argc, char* argv[]){
