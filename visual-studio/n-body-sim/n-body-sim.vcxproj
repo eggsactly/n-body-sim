@@ -69,12 +69,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\vs-dev-lib\SDL2-2.0.5\include;C:\Program Files (x86)\boost\boost_1_64_0;..\..\rapidxml;..\..\headers;..\Getopt-for-Visual-Studio;$(IncludePath)</IncludePath>
+    <IncludePath>C:\vs-dev-lib\SDL2-2.0.5\include;C:\Program Files (x86)\boost\boost_1_64_0;..\..\rapidxml;..\..\include;..\Getopt-for-Visual-Studio;$(IncludePath)</IncludePath>
     <LibraryPath>C:\vs-dev-lib\SDL2-2.0.5\lib\x86;C:\Program Files (x86)\boost\boost_1_64_0\stage\lib;$(LibraryPath)</LibraryPath>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>..\Getopt-for-Visual-Studio;..\..\headers;..\..\rapidxml;C:\Program Files (x86)\boost\boost_1_64_0;C:\vs-dev-lib\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\Getopt-for-Visual-Studio;..\..\include;..\..\rapidxml;C:\Program Files (x86)\boost\boost_1_64_0;C:\vs-dev-lib\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files (x86)\boost\boost_1_64_0\stage\lib;C:\vs-dev-lib\SDL2-2.0.5\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -126,9 +126,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\headers\NBodySystem.h" />
-    <ClInclude Include="..\..\headers\NBodyTypes.h" />
-    <ClInclude Include="..\..\headers\Particle.h" />
+    <ClInclude Include="..\..\include\NBodySystem.h" />
+    <ClInclude Include="..\..\include\NBodyTypes.h" />
+    <ClInclude Include="..\..\include\Particle.h" />
+    <ClInclude Include="..\..\include\threads.h" />
+    <ClInclude Include="..\..\include\ParticlePlotter.h" />
     <ClInclude Include="..\..\rapidxml\rapidxml.hpp" />
     <ClInclude Include="..\..\rapidxml\rapidxml_iterators.hpp" />
     <ClInclude Include="..\..\rapidxml\rapidxml_print.hpp" />
@@ -138,6 +140,8 @@
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\NBodySystem.cpp" />
     <ClCompile Include="..\..\src\Particle.cpp" />
+    <ClInclude Include="..\..\include\threads.cpp" />
+    <ClInclude Include="..\..\include\ParticlePlotter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

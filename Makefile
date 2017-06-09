@@ -9,12 +9,12 @@ UNAME_S:=$(shell uname -s)
 
 # For Mac OS X
 ifeq ($(UNAME_S),Darwin) 
-	INC:=-Iheaders/ -Irapidxml/ -I/opt/local/include/ -F/Library/Frameworks -framework SDL2
+	INC:=-Iinclude/ -Irapidxml/ -I/opt/local/include/ -F/Library/Frameworks -framework SDL2
 	LIB:=-F/Library/Frameworks -framework SDL2 -L/opt/local/lib -lpthread -lboost_system-mt -lboost_thread-mt
 endif
 # For Linux
 ifeq ($(UNAME_S),Linux) 
-	INC:=-Iheaders/ -Irapidxml/
+	INC:=-Iinclude/ -Irapidxml/
 	LIB:=-lSDL2 -lpthread -lboost_system -lboost_thread
 endif
 TEST_LIB=-lpthread -lgtest $(LIB)
