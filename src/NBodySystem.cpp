@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 W.A. Garrett Weaver
+ * Copyright (c) 2016 - 2017 W.A. Garrett Weaver
  *
  * This file is part of n-body-sim.
  *
