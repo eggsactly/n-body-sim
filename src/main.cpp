@@ -45,15 +45,12 @@
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/triangular.hpp>
-#include <boost/numeric/ublas/lu.hpp>
-#include <boost/numeric/ublas/io.hpp>
 
 #include "NBodyTypes.h"
 #include "Particle.h"
 #include "NBodySystem.h"
 #include "threads.h"
+#include "ParticlePlotter.h"
 
 /**
  * @brief main is the root function for the program
@@ -428,25 +425,6 @@ void close(SDL_Window * gWindow, SDL_Renderer * gRenderer)
 	SDL_Quit();
 }
 
-// Source: http://www.crystalclearsoftware.com/cgi-bin/boost_wiki/wiki.pl?LU_Matrix_Inversion
-template<class T> 
-bool InvertMatrix (const boost::numeric::ublas::matrix<T>& input, boost::numeric::ublas::matrix<T>& inverse) { 
-    typedef  boost::numeric::ublas::permutation_matrix<std::size_t> pmatrix; 
-    // create a working copy of the input 
-    boost::numeric::ublas::matrix<T> A(input); 
-    // create a permutation matrix for the LU-factorization 
-    pmatrix pm(A.size1()); 
-    // perform LU-factorization 
-    int res = lu_factorize(A,pm); 
-    if( res != 0 )
-        return false; 
-    // create identity matrix of "inverse" 
-    inverse.assign(boost::numeric::ublas::identity_matrix<T>(A.size1())); 
-    // backsubstitute to get the inverse 
-    boost::numeric::ublas::lu_substitute(A, pm, inverse); 
-    return true; 
-}
-
 void drawTriangle(SDL_Renderer * gRenderer, int x, int y, int height, int width, unsigned char fillIn){
 	int calculatedWidth = static_cast<int>(static_cast<double>(width) * sqrt(3.00f)/2.00f);
 	int slope = height / width;
@@ -511,10 +489,8 @@ int main(int argc, char* argv[]){
 	NBodySim::FloatingType theta = 0;
 	// Range: 0 <= Phi <= PI
 	NBodySim::FloatingType phi = 0;
-	boost::numeric::ublas::matrix<NBodySim::FloatingType> a (3, 3);
-	boost::numeric::ublas::matrix<NBodySim::FloatingType> A (3, 3);
-	boost::numeric::ublas::vector<NBodySim::FloatingType> projectedPoints(3);
-	boost::numeric::ublas::vector<NBodySim::FloatingType> particlePoints(3);
+	NBodySim::ParticlePlotter<NBodySim::FloatingType> graphicsMatrix;
+	boost::numeric::ublas::vector<NBodySim::FloatingType> projectedPoints(2);
 	
 	Uint32 startTime = SDL_GetTicks();
 	Uint32 stopTime = SDL_GetTicks();
@@ -639,19 +615,7 @@ int main(int argc, char* argv[]){
 			}
 		}
 		
-		// Calculate the graphics matrix
-		a(0, 0) = cos(theta);
-		a(0, 1) = -1.0f * sin(theta) * cos(phi);
-		a(0, 2) = -1.0f * sin(theta) * sin(phi);
-		a(1, 0) = sin(theta);
-		a(1, 1) = cos(theta) * cos(phi);
-		a(1, 2) = cos(theta) * sin(phi);
-		a(2, 0) = 0.0f;
-		a(2, 1) = sin(phi);
-		a(2, 2) = -1.0f * cos(phi);
-		
-		// Invert the graphics matrix
-		InvertMatrix (a, A);
+		graphicsMatrix.setAngle(theta, phi);
 		
 		// Clear Screen
 		SDL_RenderClear( gRenderer );
@@ -670,12 +634,8 @@ int main(int argc, char* argv[]){
 		SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 		// Draw all the particles as points
 		for(unsigned i = 0; i < solarSystem.numParticles(); i++){
-			particlePoints(0) = solarSystem.getParticle(i).getPos().x;
-			particlePoints(1) = solarSystem.getParticle(i).getPos().y;
-			particlePoints(2) = solarSystem.getParticle(i).getPos().z;
 			
-			// Calculate the projected points of the particles onto the plane
-			boost::numeric::ublas::axpy_prod(A, particlePoints, projectedPoints, true);
+			projectedPoints = graphicsMatrix.calculateProjection(solarSystem.getParticle(i));
 			
 			SDL_RenderDrawPoint(gRenderer, (projectedPoints(0)/inputArgs.resolution) + (inputArgs.width/2), (projectedPoints(1)/inputArgs.resolution) + (inputArgs.length/2));
 		}
