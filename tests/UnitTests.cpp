@@ -251,6 +251,50 @@ TEST(FR_ViewWindow, ParticleAtOneTwoThreeTest){
 	EXPECT_DOUBLE_EQ(projectedPoints(1), 2);
 }
 
+TEST(NF_DynamicViewWindow, ParticleAtOneTwoThreeTestDynamic){
+	NBodySim::Particle <NBodySim::FloatingType> p;
+	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
+	NBodySim::FloatingType particleMass = 1000000;
+	NBodySim::ParticlePlotter<NBodySim::FloatingType> graphicsMatrix;
+	boost::numeric::ublas::vector<NBodySim::FloatingType> projectedPoints(2);
+	NBodySim::FloatingType theta = 0;
+	NBodySim::FloatingType phi = 0;
+	
+	p.setPosX(1);
+	p.setPosY(2);
+	p.setPosZ(3);
+	p.setVelX(0);
+	p.setVelY(0);
+	p.setVelZ(0);
+	p.setMass(particleMass);
+	p.setName("1");
+	
+	sys.addParticle(p);
+	
+	graphicsMatrix.setAngle(theta, phi);
+	
+	// Test to make sure the particle is at coordinates (1, 2)
+	projectedPoints = graphicsMatrix.calculateProjection(sys.getParticle(0));
+	EXPECT_DOUBLE_EQ(projectedPoints(0), 1);
+	EXPECT_DOUBLE_EQ(projectedPoints(1), 2);
+	
+	// Rotate N to be on the negative y axis
+	theta = 0;
+	phi = M_PI/2;
+	graphicsMatrix.setAngle(theta, phi);
+	projectedPoints = graphicsMatrix.calculateProjection(sys.getParticle(0));
+	EXPECT_DOUBLE_EQ(projectedPoints(0), 1);
+	EXPECT_DOUBLE_EQ(projectedPoints(1), 3);
+	
+	// Rotate N to be on the x axis
+	theta = M_PI/2;
+	phi = M_PI/2;
+	graphicsMatrix.setAngle(theta, phi);
+	projectedPoints = graphicsMatrix.calculateProjection(sys.getParticle(0));
+	EXPECT_DOUBLE_EQ(projectedPoints(0), 2);
+	EXPECT_DOUBLE_EQ(projectedPoints(1), 3);
+}
+
 int main(int argc, char* argv[]){
 	
 	std::cout << "Running main()" << std::endl;
