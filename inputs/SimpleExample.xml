@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <system G="5.483e-10">
 	<particle posX="0" posY="0" posZ="0" velX="0" velY="0" velZ="0" mass="1e10" name="Sun"/>
-	<particle posX="0" posY="5" posZ="0" velX="1.047197551" velY="0" velZ="0" mass="1" name="Planet"/>
+	<particle posX="0" posY="5" posZ="0" velX="1.047197551" velY="0" velZ="0" mass="1e5" name="Planet"/>
 	<particle posX="0" posY="-10" posZ="0" velX="-0.5" velY="0" velZ="0" mass="0.001" name="Comet1"/>
 	<particle posX="7" posY="0" posZ="0" velX="0" velY="-0.55" velZ="0" mass="0.001" name="Comet2"/>
 	<particle posX="-6" posY="0" posZ="0" velX="0" velY="0.6" velZ="0" mass="0.0025" name="Comet3"/>
