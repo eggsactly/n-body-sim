@@ -152,6 +152,22 @@ TEST(FR_ViewWindow, ParticleAtOneTwoThreeTest){
 	EXPECT_DOUBLE_EQ(projectedPoints(1), 2);
 }
 
+TEST(NF_UsersProvideFile, ParseXML) {
+	std::string xmlString = "<?xml version=\"1.0\"?>\n<system G=\"1.00\">\n\t<particle posX=\"0\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"0\" velZ=\"0\" mass=\"1.988500e30\" name=\"Sun\"/>\n\t<particle posX=\"0\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"0\" velZ=\"0\" mass=\"5.972e24\" name=\"Earth\"/>\n\t<particle posX=\"4.054e8\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"-964.0f\" velZ=\"0\" mass=\"7.34767309e22\" name=\"Moon\"/>\t</system>";
+	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
+	
+	EXPECT_EQ(sys.parse(xmlString), 0);
+	EXPECT_EQ(sys.numParticles(), 3);
+	EXPECT_EQ(sys.getParticle(0).getName(), "Sun");
+	EXPECT_EQ(sys.getParticle(1).getName(), "Earth");
+	EXPECT_EQ(sys.getParticle(2).getName(), "Moon");
+	
+	// Get the position of the earth
+	EXPECT_DOUBLE_EQ(sys.getParticle(1).getPos().x, 0);
+	EXPECT_DOUBLE_EQ(sys.getParticle(1).getPos().y, 1.5210e11);
+	EXPECT_DOUBLE_EQ(sys.getParticle(1).getPos().z, 0);
+}
+
 TEST(NF_SystemsProvideG, GetGofOne){
 	std::string xmlString = "<?xml version=\"1.0\"?>\n<system G=\"1.00\">\n\t<particle posX=\"0\" posY=\"0\" posZ=\"0\" velX=\"0\" velY=\"0\" velZ=\"0\" mass=\"1.988500e30\" name=\"Sun\"/>\n\t<particle posX=\"0\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"0\" velZ=\"0\" mass=\"5.972e24\" name=\"Earth\"/>\n\t<particle posX=\"4.054e8\" posY=\"1.5210e11\" posZ=\"0\" velX=\"-2.929e4\" velY=\"-964.0f\" velZ=\"0\" mass=\"7.34767309e22\" name=\"Moon\"/>\t</system>";
 	NBodySim::NBodySystem <NBodySim::FloatingType> sys;
