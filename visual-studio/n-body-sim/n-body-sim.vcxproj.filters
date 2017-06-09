@@ -53,11 +53,10 @@
     <ClCompile Include="..\..\src\Particle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    </ClCompile>
-    <ClCompile Include="..\..\src\threads.cpp">
+    <ClCompile Include="..\..\src\ParticlePlotter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\ParticlePlotter.cpp">
+    <ClCompile Include="..\..\src\threads.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

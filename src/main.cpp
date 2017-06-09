@@ -476,7 +476,7 @@ int main(int argc, char* argv[]){
 	std::string inputScenario;
 	NBodySim::NBodySystem<NBodySim::FloatingType> solarSystem;
 	NBodySim::NBodySystemSpace::error solarSystemParseResult;
-	volatile bool quit;
+	volatile bool quit = false;
 	volatile size_t stepsPerTime = timeWarpFactors[timeWarpLevel];
 	SDL_Event e;
 	boost::interprocess::interprocess_semaphore ** timingSemaphores;
