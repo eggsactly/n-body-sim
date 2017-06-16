@@ -260,7 +260,7 @@ TEST(NF_DynamicTimeAccelerate, FifteenStepsTest){
 	
 	workerThread.join();
 	
-	for(size_t i; i < sizeof(stepsPerTime)/sizeof(size_t); i++){
+	for(size_t i = 0; i < sizeof(stepsPerTime)/sizeof(size_t); i++){
 		totalSteps += stepsPerTime[i] * numIterations[i];
 	}
 	
