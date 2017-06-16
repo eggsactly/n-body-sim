@@ -31,7 +31,7 @@ SRC_DIR:=src
 SOURCES:=$(wildcard $(SRC_DIR)/*.cpp)
 OBJECTS:=$(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)$(SLASH_CHAR)%.o, $(SOURCES))
 DEBUG:=
-TEST_OBJECTS:=$(patsubst $(OBJ_DIR)main.o, , $(OBJECTS))
+TEST_OBJECTS:=$(patsubst $(OBJ_DIR)$(SLASH_CHAR)main.o, , $(OBJECTS))
 TESTDIR:=tests
 PREFIX?=/usr/local/bin
 
