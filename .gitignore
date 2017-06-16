@@ -12,3 +12,4 @@ tests/test
 *.bbl
 *~
 *.kate-swp
+*.exe

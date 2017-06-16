@@ -19,6 +19,7 @@
  */
 
 #include <cmath>
+#include <boost/serialization/array_wrapper.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
