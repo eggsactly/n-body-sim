@@ -24,7 +24,10 @@
 #include <boost/thread.hpp>
 #include <boost/functional.hpp>
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
+#ifdef _WIN32
+// array_wrapper is needed exclusively in Windows but this file is not available in Mac OS X and Linux
 #include <boost/serialization/array_wrapper.hpp>
+#endif
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
