@@ -39,6 +39,7 @@
 #include <sys/stat.h>
 #include <cmath>
 #include <errno.h>
+#include <algorithm>
 
 #include <boost/thread.hpp>
 #include <boost/functional.hpp>
@@ -453,7 +454,11 @@ void drawTriangle(SDL_Renderer * gRenderer, int x, int y, int height, int width,
 }
 
 int main(int argc, char* argv[]){
-	const static std::string programName = "n-body-sim";
+	// Get program name for standard error print out
+	std::string programName = argv[0];
+	programName.erase(std::remove(programName.begin(), programName.end(), '.'), programName.end());
+	programName.erase(std::remove(programName.begin(), programName.end(), '/'), programName.end());
+
 	// KSP style time warp factors
 	const size_t timeWarpFactors[] = {1, 2, 3, 4, 5, 10, 50, 1000, 10000, 100000};
 	const int triangleWidth = 10;
